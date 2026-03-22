@@ -10,36 +10,43 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
     <style>
-        :root { --bg: #000; --card: #0d0d0f; --border: #1c1c1e; --blue: #5856d6; --red: #ff3b30; --text-sec: #8e8e93; }
-        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: #fff; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        :root {
+            --bg: #000; --card: #0d0d0f; --border: #1c1c1e; --blue: #5856d6; --red: #ff3b30; --text: #fff; --text-sec: #8e8e93;
+        }
+        [data-theme="light"] {
+            --bg: #f2f2f7; --card: #fff; --border: #d1d1d6; --blue: #007aff; --red: #ff3b30; --text: #000; --text-sec: #8e8e93;
+        }
+
+        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; transition: 0.3s; }
         
-        header { width: 100%; max-width: 500px; padding: 40px 20px 20px 20px; text-align: center; }
-        .greeting { font-size: 14px; color: var(--blue); font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .app-title { font-size: 26px; font-weight: 800; margin: 0; }
+        header { width: 100%; max-width: 500px; padding: 30px 20px 10px 20px; text-align: center; position: relative; }
+        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 50%; cursor: pointer; }
+        .greeting { font-size: 14px; color: var(--blue); font-weight: 600; }
+        .app-title { font-size: 26px; font-weight: 800; margin: 10px 0; }
 
-        /* Floating Add Button */
-        .show-input-btn {
-            background: var(--blue); color: #fff; border: none; padding: 12px 25px; 
-            border-radius: 30px; font-weight: 700; cursor: pointer; margin: 20px 0;
-            display: flex; align-items: center; gap: 8px; font-size: 15px; transition: 0.3s;
-        }
-        .show-input-btn:hover { transform: scale(1.05); background: #4a48c5; }
+        /* Search & Controls */
+        .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; outline: none; box-sizing: border-box; }
+        
+        .show-input-btn { background: var(--blue); color: #fff; border: none; padding: 12px; border-radius: 30px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        /* Hidden Input Section */
-        #inputSection {
-            width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border);
-            border-radius: 20px; padding: 20px; margin-bottom: 20px;
-            display: none; /* මුලින්ම පේන්නේ නැහැ */
-            animation: slideDown 0.4s ease forwards;
-        }
+        /* Input Section */
+        #inputSection { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: none; animation: slideDown 0.4s ease; }
+        textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; }
+        .submit-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        textarea, input { width: 100%; background: #1c1c1e; border: 1px solid var(--border); border-radius: 12px; color: white; padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; }
-        .add-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-
+        /* Notes Feed */
         .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 50px; }
         .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; animation: fadeIn 0.5s ease; }
         .media-content { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
-        .del-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--text-sec); cursor: pointer; font-size: 16px; opacity: 0.5; }
+        
+        .note-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.6; }
+        .action-btn:hover { opacity: 1; }
+
+        /* Reactions */
+        .reactions { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 10px; }
+        .react-btn { background: var(--bg); border: 1px solid var(--border); padding: 5px 10px; border-radius: 20px; color: var(--text); font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -48,48 +55,28 @@
 <body>
 
 <header>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
     <div id="greeting" class="greeting">HELLO!</div>
     <h1 class="app-title">Smart Notes Sri Lanka</h1>
 </header>
 
-<button class="show-input-btn" id="mainAddBtn" onclick="toggleInput()">
-    <span>➕</span> Add New Note
-</button>
+<div class="controls">
+    <input type="text" id="searchInput" class="search-input" onkeyup="searchNotes()" placeholder="සටහන් සොයන්න (Search)...">
+    <button class="show-input-btn" id="mainAddBtn" onclick="toggleInput()">
+        <span>➕</span> Add New Note
+    </button>
+</div>
 
 <div id="inputSection">
+    <input type="hidden" id="editKey">
     <textarea id="noteInput" placeholder="ඔයාගේ සටහන මෙතන ටයිප් කරන්න..."></textarea>
-    <input type="text" id="mediaUrl" placeholder="Image හෝ Video URL එක (අත්‍යවශ්‍ය නොවේ)">
-    <button class="add-btn" onclick="addNote()">Submit Note</button>
+    <input type="text" id="mediaUrl" class="url-input" placeholder="Image හෝ Video URL එක">
+    <button class="submit-btn" id="submitBtn" onclick="saveNote()">Submit Note</button>
 </div>
 
 <div class="notes-feed" id="notesFeed"></div>
 
 <script>
-    function setGreeting() {
-        const hour = new Date().getHours();
-        const greetingDiv = document.getElementById('greeting');
-        if (hour < 12) greetingDiv.innerText = "Good Morning ☀️";
-        else if (hour < 17) greetingDiv.innerText = "Good Afternoon 🌤️";
-        else if (hour < 21) greetingDiv.innerText = "Good Evening 🌙";
-        else greetingDiv.innerText = "Good Night 😴";
-    }
-    setGreeting();
-
-    // Input Box එක පෙන්නන්න සහ හංගන්න
-    function toggleInput() {
-        const section = document.getElementById('inputSection');
-        const btn = document.getElementById('mainAddBtn');
-        if (section.style.display === "none" || section.style.display === "") {
-            section.style.display = "block";
-            btn.innerHTML = "<span>✖</span> Close";
-            btn.style.background = "#ff3b30"; // Cancel කරන්න රතු පාට වෙන්න
-        } else {
-            section.style.display = "none";
-            btn.innerHTML = "<span>➕</span> Add New Note";
-            btn.style.background = "#5856d6";
-        }
-    }
-
     const firebaseConfig = {
         apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
         authDomain: "smart-notes-sl.firebaseapp.com",
@@ -99,50 +86,123 @@
         messagingSenderId: "887470710465",
         appId: "1:887470710465:web:dced581802fce10ef93e40"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function addNote() {
-        const text = document.getElementById('noteInput').value;
-        const url = document.getElementById('mediaUrl').value;
-        if(text.trim() !== "") {
-            db.ref('smart_notes').push({ text, url, time: new Date().toLocaleString() });
-            document.getElementById('noteInput').value = "";
-            document.getElementById('mediaUrl').value = "";
-            toggleInput(); // සේව් වුණාම ආයෙත් පෙට්ටිය හංගන්න
+    // Theme Toggle
+    function toggleTheme() {
+        const body = document.body;
+        const current = body.getAttribute('data-theme');
+        body.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+    }
+
+    function setGreeting() {
+        const hour = new Date().getHours();
+        const g = document.getElementById('greeting');
+        if (hour < 12) g.innerText = "Good Morning ☀️";
+        else if (hour < 17) g.innerText = "Good Afternoon 🌤️";
+        else if (hour < 21) g.innerText = "Good Evening 🌙";
+        else g.innerText = "Good Night 😴";
+    }
+    setGreeting();
+
+    function toggleInput() {
+        const s = document.getElementById('inputSection');
+        const b = document.getElementById('mainAddBtn');
+        if (s.style.display === "none" || s.style.display === "") {
+            s.style.display = "block";
+            b.innerHTML = "<span>✖</span> Close";
+            b.style.background = "var(--red)";
+        } else {
+            s.style.display = "none";
+            b.innerHTML = "<span>➕</span> Add New Note";
+            b.style.background = "var(--blue)";
+            resetForm();
         }
     }
 
-    function deleteNote(id) {
-        const pass = prompt("Password එක ඇතුළත් කරන්න:");
-        if(pass === "2005") {
-            db.ref('smart_notes/' + id).remove();
-        } else {
-            alert("Password එක වැරදියි!");
+    function saveNote() {
+        const t = document.getElementById('noteInput').value;
+        const u = document.getElementById('mediaUrl').value;
+        const key = document.getElementById('editKey').value;
+
+        if(t.trim() !== "") {
+            if(key) {
+                db.ref('smart_notes/' + key).update({ text: t, url: u });
+            } else {
+                db.ref('smart_notes').push({ 
+                    text: t, url: u, time: new Date().toLocaleString(),
+                    likes: 0, hearts: 0
+                });
+            }
+            toggleInput();
         }
+    }
+
+    function resetForm() {
+        document.getElementById('noteInput').value = "";
+        document.getElementById('mediaUrl').value = "";
+        document.getElementById('editKey').value = "";
+        document.getElementById('submitBtn').innerText = "Submit Note";
+    }
+
+    function editNote(key, text, url) {
+        toggleInput();
+        document.getElementById('noteInput').value = text;
+        document.getElementById('mediaUrl').value = url;
+        document.getElementById('editKey').value = key;
+        document.getElementById('submitBtn').innerText = "Update Note";
+    }
+
+    function deleteNote(id) {
+        if(prompt("Password (2005):") === "2005") db.ref('smart_notes/' + id).remove();
+    }
+
+    function copyNote(text) {
+        navigator.clipboard.writeText(text);
+        alert("සටහන Copy කරගත්තා!");
+    }
+
+    function react(key, type) {
+        const ref = db.ref(`smart_notes/${key}/${type}`);
+        ref.transaction(current => (current || 0) + 1);
+    }
+
+    function searchNotes() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.note-card');
+        cards.forEach(card => {
+            card.style.display = card.innerText.toLowerCase().includes(query) ? "block" : "none";
+        });
     }
 
     db.ref('smart_notes').on('value', (snap) => {
         const feed = document.getElementById('notesFeed');
         feed.innerHTML = "";
         snap.forEach((child) => {
-            const note = child.val();
-            let mediaHtml = "";
-            if(note.url) {
-                if(note.url.includes('youtube.com') || note.url.includes('youtu.be')) {
-                    const vidId = note.url.split('v=')[1] || note.url.split('/').pop();
-                    mediaHtml = `<iframe class="media-content" height="230" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>`;
-                } else {
-                    mediaHtml = `<img src="${note.url}" class="media-content" onerror="this.style.display='none'">`;
-                }
+            const n = child.val();
+            const key = child.key;
+            let mHtml = "";
+            if(n.url) {
+                if(n.url.includes('youtube')) mHtml = `<iframe class="media-content" height="230" src="https://www.youtube.com/embed/${n.url.split('v=')[1] || n.url.split('/').pop()}" frameborder="0"></iframe>`;
+                else mHtml = `<img src="${n.url}" class="media-content">`;
             }
+            
             feed.innerHTML = `
                 <div class="note-card">
-                    <button class="del-btn" onclick="deleteNote('${child.key}')">🗑️</button>
-                    <div style="font-size: 15px; padding-right: 20px;">${note.text}</div>
-                    ${mediaHtml}
-                    <div style="font-size:10px; color:var(--text-sec); margin-top:12px;">${note.time}</div>
+                    <div class="note-actions">
+                        <button class="action-btn" onclick="copyNote('${n.text.replace(/'/g, "\\'")}')">📋</button>
+                        <button class="action-btn" onclick="editNote('${key}', '${n.text.replace(/'/g, "\\'")}', '${n.url}')">✏️</button>
+                        <button class="action-btn" onclick="deleteNote('${key}')">🗑️</button>
+                    </div>
+                    <div style="font-size: 15px; margin-top:10px;">${n.text}</div>
+                    ${mHtml}
+                    <div style="font-size:10px; color:var(--text-sec); margin-top:10px;">${n.time}</div>
+                    
+                    <div class="reactions">
+                        <button class="react-btn" onclick="react('${key}', 'likes')">👍 <span>${n.likes || 0}</span></button>
+                        <button class="react-btn" onclick="react('${key}', 'hearts')">❤️ <span>${n.hearts || 0}</span></button>
+                    </div>
                 </div>` + feed.innerHTML;
         });
     });
