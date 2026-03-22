@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Notes Sri Lanka - Final Fixed</title>
+    <title>Smart Notes Sri Lanka - Pro UI</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Sinhala:wght@400;600;800&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Sinhala:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
@@ -16,102 +16,102 @@
         [data-theme="forest"] { --bg: #0a1a0a; --card: #142914; --border: #1e3d1e; --accent: #4cd964; --text: #e6ffe6; --text-sec: #99ff99; }
         [data-theme="rose"] { --bg: #1a0f0f; --card: #2d1a1a; --border: #3d2424; --accent: #ff2d55; --text: #ffe6eb; --text-sec: #ff99ad; }
 
-        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; transition: 0.5s; min-height: 100vh; overflow-x: hidden; }
-        
-        body > * { opacity: 0; animation: fallIn 1s ease-out forwards; }
-        
-        header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; position: relative; animation-delay: 0.1s; }
-        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--accent); border: none; color: white; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 700; z-index: 10; }
-        .app-title { font-size: 26px; font-weight: 800; margin: 10px 0; }
+        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.5s; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
+        body > * { opacity: 0; animation: fallIn 0.8s ease-out forwards; }
 
-        .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; animation-delay: 0.3s; }
+        header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; position: relative; }
+        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--accent); border: none; color: white; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 700; }
+        .app-title { font-size: 24px; font-weight: 800; margin: 10px 0; }
+
+        .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
         .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; outline: none; box-sizing: border-box; }
         .show-input-btn { background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; }
 
         #inputSection { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: none; box-sizing: border-box; }
-        textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; font-family: inherit; }
+        textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; }
         .submit-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 100px; animation-delay: 0.5s; }
-        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; animation: noteFallIn 0.6s ease-out forwards; }
+        .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 120px; }
+        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; animation: noteFall 0.5s ease-out forwards; }
         .media-content { width: 100%; border-radius: 10px; margin: 12px 0; border: 1px solid var(--border); }
-        .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px;}
+        .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
         .text-btn { background: var(--border); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 700; }
-        .text-btn.delete { color: var(--red); }
 
-        .reactions { display: flex; gap: 8px; margin-top: 12px; }
-        .react-btn { background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; color: var(--text); font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        /* --- Stylish Floating Buttons (No Emojis) --- */
+        .fab-container { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
+        .fab { width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--accent); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: 0.3s; }
+        .fab:hover { transform: scale(1.1); }
+        .fab svg { width: 24px; height: 24px; fill: currentColor; }
 
-        /* Floating Buttons UI */
-        .chat-btn { position: fixed; bottom: 85px; right: 20px; width: 50px; height: 50px; background: var(--accent); border: none; border-radius: 50%; color: white; font-size: 22px; cursor: pointer; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: fabPopIn 0.5s ease-out 1.2s forwards; opacity: 0; }
-        .info-fab { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--accent); color: white; border: none; border-radius: 50%; font-size: 24px; font-weight: bold; cursor: pointer; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: fabPopIn 0.5s ease-out 1s forwards; opacity: 0; }
-
-        /* Chat & Info Modals */
-        #chatBox, #infoModal { display: none; position: fixed; bottom: 90px; right: 20px; width: 320px; height: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; animation: modalPopIn 0.3s ease-out; }
-        #infoModal { height: auto; bottom: 80px; max-width: 400px; padding: 20px; box-sizing: border-box; }
+        /* Modals */
+        #chatBox, #infoModal { display: none; position: fixed; bottom: 95px; right: 25px; width: 320px; height: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 25px; flex-direction: column; z-index: 2000; box-shadow: 0 15px 40px rgba(0,0,0,0.6); overflow: hidden; animation: popUp 0.3s ease-out; }
+        .modal-head { background: var(--accent); color: white; padding: 15px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
         
-        .chat-header, .info-header { background: var(--accent); color: white; padding: 15px; font-weight: 700; display: flex; justify-content: space-between; }
-        .chat-logs { flex: 1; padding: 15px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
-        .chat-msg { padding: 10px; border-radius: 15px; max-width: 85%; }
-        .chat-msg.me { background: var(--accent); color: white; align-self: flex-end; }
-        .chat-msg.other { background: var(--card); align-self: flex-start; border: 1px solid var(--border); }
-        
-        #nameOverlay { position: absolute; inset: 0; background: var(--card); z-index: 2005; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        .chat-logs { flex: 1; padding: 15px; overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 14px; border-radius: 15px; font-size: 13px; max-width: 80%; }
+        .msg.me { background: var(--accent); align-self: flex-end; }
+        .msg.other { background: var(--card); align-self: flex-start; border: 1px solid var(--border); }
 
-        @keyframes fallIn { 0% { opacity: 0; transform: translateY(-100px); } 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes noteFallIn { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes fabPopIn { 0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } }
-        @keyframes modalPopIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        #nameOverlay { position: absolute; inset: 0; background: var(--card); z-index: 2005; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+        
+        @keyframes fallIn { 0% { opacity: 0; transform: translateY(-50px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes noteFall { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes popUp { 0% { opacity: 0; transform: translateY(20px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
     </style>
 </head>
 <body data-theme="dark">
 
 <header>
-    <button class="theme-toggle" onclick="cycleThemes()">THEME</button>
-    <div id="greeting" style="font-size:12px; color:var(--accent); font-weight:600;">HELLO!</div>
+    <button type="button" class="theme-toggle" onclick="cycleThemes()">THEME</button>
     <h1 class="app-title">Smart Notes Sri Lanka</h1>
 </header>
 
 <div class="controls">
     <input type="text" id="searchInput" class="search-input" onkeyup="searchNotes()" placeholder="සටහන් සොයන්න...">
-    <button class="show-input-btn" id="mainAddBtn" onclick="toggleInput()">ADD NEW NOTE</button>
+    <button type="button" class="show-input-btn" id="mainAddBtn" onclick="toggleInput()">ADD NEW NOTE</button>
 </div>
 
 <div id="inputSection">
     <input type="hidden" id="editKey">
     <textarea id="noteInput" placeholder="සටහන මෙතන ලියන්න..."></textarea>
     <input type="text" id="mediaUrl" class="url-input" placeholder="Image/Video URL (Optional)">
-    <button class="submit-btn" id="submitBtn" onclick="saveNote()">SAVE NOTE</button>
+    <button type="button" class="submit-btn" id="submitBtn" onclick="saveNote()">SAVE NOTE</button>
 </div>
 
 <div class="notes-feed" id="notesFeed"></div>
 
-<button class="chat-btn" onclick="toggleChat()">💬</button>
+<div class="fab-container">
+    <button type="button" class="fab" onclick="toggleChat(event)">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </button>
+    <button type="button" class="fab" onclick="toggleInfo(event)">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+    </button>
+</div>
+
 <div id="chatBox">
-    <div class="chat-header"><span>Live Community</span> <span onclick="toggleChat()" style="cursor:pointer">✖</span></div>
+    <div class="modal-head"><span>Live Chat</span> <span onclick="toggleChat(event)" style="cursor:pointer">✕</span></div>
     <div id="nameOverlay">
-        <p style="font-weight:700;">ඔයාගේ නම ලියන්න</p>
-        <input type="text" id="userNameInput" placeholder="Name..." style="width:80%; padding:10px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:white;">
-        <button onclick="saveUserName()" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">START</button>
+        <p style="font-weight:700;">නම ඇතුළත් කරන්න</p>
+        <input type="text" id="userNameInput" placeholder="Name..." style="width:100%; padding:10px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:white;">
+        <button type="button" onclick="saveUserName()" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">START</button>
     </div>
     <div class="chat-logs" id="chatLogs"></div>
     <div style="padding:10px; display:flex; gap:5px; background:var(--card);">
-        <input type="text" id="chatInput" placeholder="Type..." style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:white;">
-        <button onclick="sendChat()" style="background:var(--accent); border:none; color:white; border-radius:8px; padding:0 15px;">➜</button>
+        <input type="text" id="chatInput" placeholder="Message..." style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:white;">
+        <button type="button" onclick="sendChat()" style="background:var(--accent); border:none; color:white; border-radius:10px; padding:0 15px;">➜</button>
     </div>
 </div>
 
-<button class="info-fab" onclick="toggleInfo()">i</button>
 <div id="infoModal">
-    <div class="info-header"><span>DEVELOPER</span> <span onclick="toggleInfo()" style="cursor:pointer">✖</span></div>
-    <div style="padding:15px; font-size:14px; line-height:1.6;">
-        <p><b>Creator:</b> යුරේෂ් කාවින්ද්‍ය සුමනසිංහ</p>
-        <p>මෙම පද්ධතියේ සියලුම වැඩකටයුතු මා විසින්ම අතින් (Manual) නිම කරන ලදී.</p>
+    <div class="modal-head"><span>Developer Info</span> <span onclick="toggleInfo(event)" style="cursor:pointer">✕</span></div>
+    <div style="padding:20px; font-size:14px; line-height:1.6;">
+        <p><b>Developer:</b> යුරේෂ් කාවින්ද්‍ය සුමනසිංහ</p>
+        <p>මෙම පද්ධතිය යුරේෂ් විසින් 2026 වසරේදී නිර්මාණය කරන ලද්දකි.</p>
     </div>
 </div>
 
 <script>
-    // Firebase Config (ඔයා එවපු Screenshot එකේ විස්තර අනුව)
     const firebaseConfig = {
         apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
         authDomain: "smart-notes-sl.firebaseapp.com",
@@ -124,7 +124,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Theme Logic
+    // Theme Switcher
     const themes = ["dark", "light", "blue", "forest", "rose"];
     let currentThemeIdx = 0;
     function cycleThemes() {
@@ -132,60 +132,54 @@
         document.body.setAttribute('data-theme', themes[currentThemeIdx]);
     }
 
-    // Chat Logic
-    let myName = localStorage.getItem('chat_name');
-    function toggleChat() { 
+    // Modal Toggles (Back wenna nathi wenna hadapuwa)
+    function toggleChat(e) {
+        if(e) e.preventDefault();
         const cb = document.getElementById('chatBox');
         cb.style.display = (cb.style.display === 'flex') ? 'none' : 'flex';
-        document.getElementById('nameOverlay').style.display = myName ? 'none' : 'flex';
+        document.getElementById('nameOverlay').style.display = localStorage.getItem('chat_name') ? 'none' : 'flex';
     }
-    function toggleInfo() {
+    function toggleInfo(e) {
+        if(e) e.preventDefault();
         const im = document.getElementById('infoModal');
-        im.style.display = (im.style.display === 'block') ? 'none' : 'block';
+        im.style.display = (im.style.display === 'flex') ? 'none' : 'flex';
     }
+
+    // Chat Logic
+    let myName = localStorage.getItem('chat_name');
     function saveUserName() {
-        const n = document.getElementById('userNameInput').value.trim();
-        if(n) { myName = n; localStorage.setItem('chat_name', n); document.getElementById('nameOverlay').style.display = 'none'; }
+        const val = document.getElementById('userNameInput').value.trim();
+        if(val) { myName = val; localStorage.setItem('chat_name', val); document.getElementById('nameOverlay').style.display = 'none'; }
     }
     function sendChat() {
         const i = document.getElementById('chatInput');
-        if(i.value.trim() && myName) { db.ref('community_chat').push({ name: myName, message: i.value, time: Date.now() }); i.value = ""; }
+        if(i.value.trim() && myName) { db.ref('community_chat').push({ name: myName, msg: i.value, time: Date.now() }); i.value = ""; }
     }
-    db.ref('community_chat').on('value', (snap) => {
-        const logs = document.getElementById('chatLogs'); logs.innerHTML = "";
-        snap.forEach(c => {
-            const d = c.val(); logs.innerHTML += `<div class="chat-msg ${d.name === myName ? 'me' : 'other'}"><small>${d.name}</small><br>${d.message}</div>`;
+    db.ref('community_chat').on('value', (s) => {
+        const l = document.getElementById('chatLogs'); l.innerHTML = "";
+        s.forEach(c => {
+            const d = c.val(); l.innerHTML += `<div class="msg ${d.name === myName ? 'me' : 'other'}"><b>${d.name}</b><br>${d.msg}</div>`;
         });
-        logs.scrollTop = logs.scrollHeight;
+        l.scrollTop = l.scrollHeight;
     });
 
-    // Notes & Edit Logic
+    // Notes Logic
     function toggleInput() {
         const s = document.getElementById('inputSection'), b = document.getElementById('mainAddBtn');
         s.style.display = (s.style.display === "none" || s.style.display === "") ? "block" : "none";
         b.innerText = (s.style.display === "block") ? "CLOSE" : "ADD NEW NOTE";
-        if(s.style.display === "none") resetForm();
-    }
-    function resetForm() {
-        document.getElementById('noteInput').value = ""; document.getElementById('mediaUrl').value = "";
-        document.getElementById('editKey').value = ""; document.getElementById('submitBtn').innerText = "SAVE NOTE";
     }
     function saveNote() {
         const t = document.getElementById('noteInput').value, u = document.getElementById('mediaUrl').value, k = document.getElementById('editKey').value;
         if(t.trim()) {
             if(k) db.ref('smart_notes/' + k).update({ text: t, url: u });
             else db.ref('smart_notes').push({ text: t, url: u, time: new Date().toLocaleString(), likes: 0, hearts: 0 });
-            toggleInput();
+            toggleInput(); document.getElementById('noteInput').value = ""; document.getElementById('mediaUrl').value = ""; document.getElementById('editKey').value = "";
         }
     }
     function editNote(key, text, url) {
-        document.getElementById('inputSection').style.display = "block";
-        document.getElementById('mainAddBtn').innerText = "CLOSE";
-        document.getElementById('noteInput').value = text;
-        document.getElementById('mediaUrl').value = url;
-        document.getElementById('editKey').value = key;
-        document.getElementById('submitBtn').innerText = "UPDATE NOW";
-        window.scrollTo(0,0);
+        toggleInput(); document.getElementById('noteInput').value = text; document.getElementById('mediaUrl').value = url;
+        document.getElementById('editKey').value = key; document.getElementById('submitBtn').innerText = "UPDATE NOW"; window.scrollTo(0,0);
     }
     function deleteNote(id) { if(confirm("මැකීමට අවශ්‍යද?")) db.ref('smart_notes/' + id).remove(); }
     function react(k, ty) { db.ref(`smart_notes/${k}/${ty}`).transaction(c => (c || 0) + 1); }
@@ -195,22 +189,21 @@
     }
 
     db.ref('smart_notes').on('value', (snap) => {
-        const feed = document.getElementById('notesFeed'); feed.innerHTML = "";
+        const f = document.getElementById('notesFeed'); f.innerHTML = "";
         snap.forEach((c) => {
             const n = c.val(), k = c.key;
             let m = n.url ? (n.url.includes('youtube') ? `<iframe class="media-content" height="230" src="https://www.youtube.com/embed/${n.url.split('v=')[1] || n.url.split('/').pop()}" frameborder="0"></iframe>` : `<img src="${n.url}" class="media-content">`) : "";
-            const card = document.createElement('div');
-            card.className = 'note-card';
-            card.innerHTML = `<div>${n.text}</div>${m}
-                <div class="reactions"><button class="react-btn" onclick="react('${k}', 'likes')">👍 ${n.likes || 0}</button><button class="react-btn" onclick="react('${k}', 'hearts')">❤️ ${n.hearts || 0}</button></div>
+            const div = document.createElement('div'); div.className = 'note-card';
+            div.innerHTML = `<div>${n.text}</div>${m}
+                <div style="display:flex; gap:10px; margin-top:10px;"><button type="button" class="text-btn" onclick="react('${k}','likes')">👍 ${n.likes||0}</button><button type="button" class="text-btn" onclick="react('${k}','hearts')">❤️ ${n.hearts||0}</button></div>
                 <div class="note-footer">
                     <div style="display:flex; gap:5px;">
-                        <button class="text-btn" onclick="navigator.clipboard.writeText('${n.text}')">COPY</button>
-                        <button class="text-btn" onclick="editNote('${k}', \`${n.text}\`, '${n.url}')">EDIT</button>
+                        <button type="button" class="text-btn" onclick="navigator.clipboard.writeText(\`${n.text}\`)">COPY</button>
+                        <button type="button" class="text-btn" onclick="editNote('${k}', \`${n.text}\`, '${n.url}')">EDIT</button>
                     </div>
-                    <button class="text-btn delete" onclick="deleteNote('${k}')">DELETE</button>
+                    <button type="button" class="text-btn" style="color:var(--red)" onclick="deleteNote('${k}')">DELETE</button>
                 </div>`;
-            feed.prepend(card);
+            f.prepend(div);
         });
     });
 </script>
