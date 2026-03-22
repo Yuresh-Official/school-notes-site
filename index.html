@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Notes Sri Lanka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Sinhala:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <style>
+        :root { --bg: #000; --card: #0d0d0f; --border: #1c1c1e; --blue: #5856d6; }
+        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        header { text-align: center; padding: 30px; }
+        .app-title { font-size: 28px; font-weight: 800; background: linear-gradient(to right, #fff, #8e8e93); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 20px; }
+        .subject-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; }
+        .subject-card h3 { margin: 0 0 15px 0; color: var(--blue); display: flex; align-items: center; gap: 10px; }
+        .note-list { display: flex; flex-direction: column; gap: 10px; }
+        .note-item { background: #1c1c1e; padding: 12px; border-radius: 12px; border-left: 4px solid var(--blue); font-size: 14px; line-height: 1.5; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="app-title">Smart Notes Sri Lanka</h1>
+    </header>
+    <div class="container">
+        <div class="subject-card"><h3>🔬 Science</h3><div id="science-list" class="note-list"></div></div>
+        <div class="subject-card"><h3>📐 Maths</h3><div id="maths-list" class="note-list"></div></div>
+        <div class="subject-card"><h3>💻 ICT</h3><div id="ict-list" class="note-list"></div></div>
+    </div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
+            authDomain: "smart-notes-sl.firebaseapp.com",
+            databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com",
+            projectId: "smart-notes-sl",
+            storageBucket: "smart-notes-sl.firebasestorage.app",
+            messagingSenderId: "887470710465",
+            appId: "1:887470710465:web:dced581802fce10ef93e40"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        function listenNotes(subject) {
+            db.ref('notes/' + subject).on('value', (snap) => {
+                const div = document.getElementById(subject + '-list');
+                div.innerHTML = "";
+                snap.forEach((child) => {
+                    const item = document.createElement('div');
+                    item.className = 'note-item';
+                    item.innerText = child.val().text;
+                    div.prepend(item); // අලුත් ඒවා උඩට එන්න
+                });
+            });
+        }
+        listenNotes('science'); listenNotes('maths'); listenNotes('ict');
+    </script>
+</body>
+</html>
