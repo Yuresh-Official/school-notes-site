@@ -3,67 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Notes Sri Lanka - Pro</title>
+    <title>Smart Notes Sri Lanka - Community</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Sinhala:wght@400;600;800&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
     <style>
-        /* --- Themes Configurations --- */
         :root { --bg: #000; --card: #121214; --border: #1c1c1e; --accent: #5856d6; --red: #ff3b30; --text: #fff; --text-sec: #8e8e93; }
         [data-theme="light"] { --bg: #f2f2f7; --card: #fff; --border: #d1d1d6; --accent: #007aff; --text: #000; --text-sec: #666; }
         [data-theme="blue"] { --bg: #001a33; --card: #00264d; --border: #003366; --accent: #00d4ff; --text: #e6f7ff; --text-sec: #80ccff; }
         [data-theme="forest"] { --bg: #0a1a0a; --card: #142914; --border: #1e3d1e; --accent: #4cd964; --text: #e6ffe6; --text-sec: #99ff99; }
         [data-theme="rose"] { --bg: #1a0f0f; --card: #2d1a1a; --border: #3d2424; --accent: #ff2d55; --text: #ffe6eb; --text-sec: #ff99ad; }
 
-        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); min-height: 100vh; overflow-x: hidden; perspective: 1000px; }
+        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; transition: 0.5s; min-height: 100vh; overflow-x: hidden; }
         
         body > * { opacity: 0; animation: fallIn 1s ease-out forwards; }
         
         header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; position: relative; animation-delay: 0.1s; }
-        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--accent); border: none; color: white; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 700; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .greeting { font-size: 13px; color: var(--accent); font-weight: 600; }
+        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--accent); border: none; color: white; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 700; z-index: 10; }
         .app-title { font-size: 26px; font-weight: 800; margin: 10px 0; }
 
         .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; animation-delay: 0.3s; }
-        .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; outline: none; box-sizing: border-box; transition: 0.3s; }
-        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent); }
-        .show-input-btn { background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; outline: none; box-sizing: border-box; }
+        .show-input-btn { background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; }
 
-        #inputSection { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: none; box-sizing: border-box; animation: slideDown 0.4s ease-out forwards; }
+        #inputSection { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: none; box-sizing: border-box; }
         textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; font-family: inherit; }
         .submit-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
         .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 100px; animation-delay: 0.5s; }
         .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; animation: noteFallIn 0.6s ease-out forwards; }
         .media-content { width: 100%; border-radius: 10px; margin: 12px 0; border: 1px solid var(--border); }
-        
         .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px;}
         .text-btn { background: var(--border); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 700; }
-        .text-btn.delete { color: var(--red); }
 
         .reactions { display: flex; gap: 8px; margin-top: 12px; }
-        .react-btn { background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; color: var(--text); font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+        .react-btn { background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; color: var(--text); font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
-        /* --- Chat Bot UI --- */
+        /* --- Live Community Chat UI --- */
         .chat-btn { position: fixed; bottom: 85px; right: 20px; width: 50px; height: 50px; background: var(--accent); border: none; border-radius: 50%; color: white; font-size: 22px; cursor: pointer; z-index: 999; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: fabPopIn 0.5s ease-out 1.2s forwards; opacity: 0; }
-        #chatBox { display: none; position: fixed; bottom: 90px; right: 20px; width: 300px; height: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; flex-direction: column; z-index: 1001; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; animation: modalPopIn 0.3s ease-out; }
+        #chatBox { display: none; position: fixed; bottom: 90px; right: 20px; width: 320px; height: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; flex-direction: column; z-index: 1001; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; animation: modalPopIn 0.3s ease-out; }
         .chat-header { background: var(--accent); color: white; padding: 15px; font-weight: 700; display: flex; justify-content: space-between; }
-        .chat-logs { flex: 1; padding: 15px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
-        .chat-msg { padding: 8px 12px; border-radius: 12px; max-width: 80%; }
-        .chat-msg.bot { background: var(--border); align-self: flex-start; }
-        .chat-msg.user { background: var(--accent); color: white; align-self: flex-end; }
-        .chat-input-area { padding: 10px; display: flex; gap: 5px; border-top: 1px solid var(--border); }
-        .chat-input-area input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: white; padding: 8px; outline: none; }
+        .chat-logs { flex: 1; padding: 15px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
+        .chat-msg { padding: 10px; border-radius: 15px; max-width: 85%; position: relative; }
+        .chat-msg.other { background: var(--card); align-self: flex-start; border: 1px solid var(--border); }
+        .chat-msg.me { background: var(--accent); color: white; align-self: flex-end; }
+        .msg-user { font-size: 10px; font-weight: 800; display: block; margin-bottom: 4px; opacity: 0.8; }
+        .chat-input-area { padding: 12px; display: flex; gap: 8px; border-top: 1px solid var(--border); background: var(--card); }
+        .chat-input-area input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: white; padding: 10px; outline: none; }
+        
+        #nameOverlay { display: none; position: absolute; inset: 0; background: var(--card); z-index: 1005; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
 
         .info-fab { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--accent); color: white; border: none; border-radius: 50%; font-size: 24px; font-weight: bold; cursor: pointer; z-index: 999; animation: fabPopIn 0.5s ease-out 1s forwards; opacity: 0; }
 
-        #infoModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--card); max-width: 500px; margin: 40px auto; padding: 25px; border-radius: 25px; animation: modalPopIn 0.4s ease-out forwards; }
-
         @keyframes fallIn { 0% { opacity: 0; transform: translateY(-100px); } 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes noteFallIn { 0% { opacity: 0; transform: translateY(-50px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes noteFallIn { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes fabPopIn { 0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } }
         @keyframes modalPopIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
     </style>
@@ -90,35 +85,26 @@
 
 <div class="notes-feed" id="notesFeed"></div>
 
-<button class="chat-btn" onclick="toggleChat()">🤖</button>
+<button class="chat-btn" onclick="toggleChat()">💬</button>
 <div id="chatBox">
-    <div class="chat-header"><span>Smart AI Bot</span> <span onclick="toggleChat()" style="cursor:pointer">✖</span></div>
-    <div class="chat-logs" id="chatLogs">
-        <div class="chat-msg bot">හායි යුරේෂ්! මම කොහොමද උදව් කරන්නෙ?</div>
+    <div class="chat-header"><span>Community Chat</span> <span onclick="toggleChat()" style="cursor:pointer">✖</span></div>
+    
+    <div id="nameOverlay">
+        <p style="font-weight:700;">චැට් එකට කලින් ඔයාගේ නම ලියන්න</p>
+        <input type="text" id="userNameInput" placeholder="ඔයාගේ නම..." style="width:80%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:white; outline:none; margin-bottom:15px;">
+        <button onclick="saveUserName()" style="background:var(--accent); color:white; border:none; padding:10px 25px; border-radius:10px; font-weight:700; cursor:pointer;">START CHAT</button>
     </div>
-    <div class="chat-input-area">
-        <input type="text" id="chatInput" placeholder="මොනවා හරි අහන්න...">
-        <button onclick="sendChat()" style="background:var(--accent); border:none; color:white; border-radius:8px; padding:0 10px;">➜</button>
+
+    <div class="chat-logs" id="chatLogs"></div>
+    <div class="chat-input-area" id="chatInputArea">
+        <input type="text" id="chatInput" placeholder="පණිවිඩයක් ලියන්න...">
+        <button onclick="sendChat()" style="background:var(--accent); border:none; color:white; border-radius:10px; padding:0 15px; cursor:pointer;">➜</button>
     </div>
 </div>
 
-<button class="info-fab" onclick="openModal()">i</button>
-
-<div id="infoModal">
-    <div class="modal-content">
-        <div style="text-align:center; font-weight:800; color:var(--accent); font-size:20px; margin-bottom:20px;">DEVELOPER DETAILS</div>
-        <div style="font-size:14px; line-height:1.6;">
-            <p><b>Sinhala:</b> යුරේෂ් කාවින්ද්‍ය සුමනසිංහ විසින් නිර්මාණය කරන ලදි. සියලුම කේතයන් අතින් සකස් කරන ලදි.</p>
-            <p><b>English:</b> Crafted by Yuresh Kavindu Sumanasinha. All code was manually written.</p>
-            <p><b>Tamil:</b> யுரேஷ் காவிந்து சுமனசிங்கால் உருவாக்கப்பட்டது. அனைத்து குறியீடுகளும் கையால் எழுதப்பட்டவை.</p>
-            <p style="direction:rtl;"><b>Arabic:</b> تم إنشاؤه بواسطة يوريش كافيندو سومانسينها. تم كتابة جميع الأكواد يدوياً.</p>
-        </div>
-        <button onclick="closeModal()" style="width:100%; background:var(--red); color:white; border:none; padding:12px; border-radius:12px; cursor:pointer; margin-top:20px;">CLOSE</button>
-    </div>
-</div>
+<button class="info-fab" onclick="window.alert('Developer: Yuresh Kavindu Sumanasinha')">i</button>
 
 <script>
-    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
         authDomain: "smart-notes-sl.firebaseapp.com",
@@ -131,7 +117,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Theme Cycler (5 Designs)
+    // Theme Cycler
     const themes = ["dark", "light", "blue", "forest", "rose"];
     let currentThemeIdx = 0;
     function cycleThemes() {
@@ -139,44 +125,59 @@
         document.body.setAttribute('data-theme', themes[currentThemeIdx]);
     }
 
-    // Chat Bot Logic
+    // Live Chat Logic
+    let myName = localStorage.getItem('chat_name');
+
     function toggleChat() { 
         const cb = document.getElementById('chatBox');
+        const overlay = document.getElementById('nameOverlay');
         cb.style.display = (cb.style.display === 'flex') ? 'none' : 'flex';
+        if(!myName) overlay.style.display = 'flex';
+        else overlay.style.display = 'none';
+    }
+
+    function saveUserName() {
+        const name = document.getElementById('userNameInput').value.trim();
+        if(name !== "") {
+            myName = name;
+            localStorage.setItem('chat_name', name);
+            document.getElementById('nameOverlay').style.display = 'none';
+        }
     }
 
     function sendChat() {
         const input = document.getElementById('chatInput');
-        const logs = document.getElementById('chatLogs');
-        if(input.value.trim() === "") return;
-
-        logs.innerHTML += `<div class="chat-msg user">${input.value}</div>`;
-        const userMsg = input.value.toLowerCase();
+        if(input.value.trim() === "" || !myName) return;
+        
+        db.ref('community_chat').push({
+            name: myName,
+            message: input.value,
+            time: Date.now()
+        });
         input.value = "";
-
-        setTimeout(() => {
-            let reply = "මට ඒක තේරුණේ නැහැ. යුරේෂ්ගෙන් අහන්න!";
-            if(userMsg.includes("kauda") || userMsg.includes("who")) reply = "මේක හැදුවේ යුරේෂ් කාවින්ද්‍ය සුමනසිංහ.";
-            if(userMsg.includes("hello") || userMsg.includes("hi")) reply = "හායි! මම Smart AI Bot.";
-            if(userMsg.includes("monada puluwan")) reply = "මට ඔයාට සටහන් ලියන්න, ඒවා කියවන්න උදව් කරන්න පුළුවන්.";
-            if(userMsg.includes("yuresh")) reply = "යුරේෂ් තමයි මේ ලස්සන සයිට් එකේ නිර්මාණකරු!";
-            
-            logs.innerHTML += `<div class="chat-msg bot">${reply}</div>`;
-            logs.scrollTop = logs.scrollHeight;
-        }, 1000);
     }
 
-    // Modal & Other Functions (Same as previous)
-    function openModal() { document.getElementById('infoModal').style.display = 'block'; }
-    function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
+    // Listen for new messages
+    db.ref('community_chat').limitToLast(50).on('value', (snap) => {
+        const logs = document.getElementById('chatLogs');
+        logs.innerHTML = "";
+        snap.forEach(child => {
+            const data = child.val();
+            const type = (data.name === myName) ? 'me' : 'other';
+            logs.innerHTML += `
+                <div class="chat-msg ${type}">
+                    <span class="msg-user">${data.name}</span>
+                    ${data.message}
+                </div>`;
+        });
+        logs.scrollTop = logs.scrollHeight;
+    });
+
+    // Notes Logic
     function toggleInput() {
         const s = document.getElementById('inputSection'), b = document.getElementById('mainAddBtn');
-        if (s.style.display === "none" || s.style.display === "") {
-            s.style.display = "block"; b.innerText = "CLOSE";
-        } else {
-            s.style.display = "none"; b.innerText = "ADD NEW NOTE";
-            resetForm();
-        }
+        s.style.display = (s.style.display === "none" || s.style.display === "") ? "block" : "none";
+        b.innerText = (s.style.display === "block") ? "CLOSE" : "ADD NEW NOTE";
     }
     function saveNote() {
         const t = document.getElementById('noteInput').value, u = document.getElementById('mediaUrl').value, k = document.getElementById('editKey').value;
@@ -184,12 +185,10 @@
             if(k) db.ref('smart_notes/' + k).update({ text: t, url: u });
             else db.ref('smart_notes').push({ text: t, url: u, time: new Date().toLocaleString(), likes: 0, hearts: 0 });
             toggleInput();
+            document.getElementById('noteInput').value = ""; document.getElementById('mediaUrl').value = "";
         }
     }
-    function resetForm() { document.getElementById('noteInput').value = ""; document.getElementById('mediaUrl').value = ""; document.getElementById('editKey').value = ""; }
-    function editNote(key, text, url) { toggleInput(); document.getElementById('noteInput').value = text; document.getElementById('mediaUrl').value = url; document.getElementById('editKey').value = key; window.scrollTo(0,0); }
     function deleteNote(id) { if(confirm("මැකීමට අවශ්‍යද?")) db.ref('smart_notes/' + id).remove(); }
-    function copyNote(text) { navigator.clipboard.writeText(text).then(() => alert("Copied!")); }
     function react(key, type) { db.ref(`smart_notes/${key}/${type}`).transaction(c => (c || 0) + 1); }
     function searchNotes() {
         const q = document.getElementById('searchInput').value.toLowerCase();
@@ -203,9 +202,9 @@
             let m = n.url ? (n.url.includes('youtube') ? `<iframe class="media-content" height="230" src="https://www.youtube.com/embed/${n.url.split('v=')[1] || n.url.split('/').pop()}" frameborder="0"></iframe>` : `<img src="${n.url}" class="media-content">`) : "";
             const card = document.createElement('div');
             card.className = 'note-card';
-            card.innerHTML = `<div>${n.text}</div>${m}<div style="font-size:10px; color:var(--text-sec); margin-top:8px;">${n.time}</div>
-                <div class="reactions"><button class="react-btn" onclick="react('${k}', 'likes')">👍 <span>${n.likes || 0}</span></button><button class="react-btn" onclick="react('${k}', 'hearts')">❤️ <span>${n.hearts || 0}</span></button></div>
-                <div class="note-footer"><div class="btn-group"><button class="text-btn" onclick="copyNote('${n.text}')">COPY</button><button class="text-btn" onclick="editNote('${k}', '${n.text}', '${n.url}')">EDIT</button></div><button class="text-btn delete" onclick="deleteNote('${k}')">DELETE</button></div>`;
+            card.innerHTML = `<div>${n.text}</div>${m}
+                <div class="reactions"><button class="react-btn" onclick="react('${k}', 'likes')">👍 ${n.likes || 0}</button><button class="react-btn" onclick="react('${k}', 'hearts')">❤️ ${n.hearts || 0}</button></div>
+                <div class="note-footer"><button class="text-btn" onclick="navigator.clipboard.writeText('${n.text}')">COPY</button><button class="text-btn delete" onclick="deleteNote('${k}')">DELETE</button></div>`;
             feed.prepend(card);
         });
     });
