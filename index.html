@@ -33,9 +33,6 @@
         /* රූල් ඇර පෙන්වීම සඳහා මෙම කොටස වැදගත් වේ */
         .note-display { white-space: pre-wrap; word-wrap: break-word; line-height: 1.6; margin-bottom: 10px; }
         
-        /* අකුරු බෝල්ඩ් (Bold) ලෙස පෙන්වීමට අවශ්‍ය CSS */
-        .note-display b { font-weight: bold; color: inherit; }
-
         .media-content { width: 100%; border-radius: 10px; margin-top: 10px; object-fit: cover; }
         
         .text-btn { background: #1e1e1e; color: #aaa; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; }
@@ -44,15 +41,18 @@
         .modal-box { position: fixed; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; z-index: 1000; display: none; padding: 10px; }
         .modal-head { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold; }
 
+        /* Comment System Styling */
         .comment-section { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; }
         .comment-item { font-size: 13px; margin-bottom: 5px; background: #1a1a1a; padding: 5px; border-radius: 5px; }
         .comment-input-group { display: flex; gap: 5px; margin-top: 10px; }
         .comment-input { flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #333; background: #000; color: #fff; }
         .comment-send { background: var(--primary); border: none; color: #fff; padding: 0 10px; border-radius: 5px; cursor: pointer; }
 
+        /* Floating buttons */
         .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 999; }
         .fab { width: 50px; height: 50px; border-radius: 50%; background: var(--primary); border: none; color: #fff; font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
+        /* Chat System */
         #chatBox { bottom: 90px; height: 400px; flex-direction: column; }
         #chatLogs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
         .msg { padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 14px; }
@@ -105,47 +105,6 @@
         <div style="margin-top:15px;">
             <p><b>🇱🇰 සිංහල:</b> මෙම වෙබ් අඩවිය මගේ නවීන ඩිජිටල් සටහන් කළමනාකරණ පද්ධතියකි. මෙහි ප්‍රධාන අරමුණ වන්නේ වැදගත් සටහන්, ඡායාරූප සහ වීඩියෝ සබැඳි ඉතා ආරක්ෂිතව සහ පහසුවෙන් ගබඩා කර තබා ගැනීමට අවස්ථාව ලබා දීමයි.</p>
             <p><b>🇬🇧 English:</b> This website is a modern digital note-management system developed by Yuresh Kavindu Sumanasinha.</p>
-            <p><b>🇮🇳 தமிழ்:</b> இந்த இணையதளம் யுரேஷ் காவிந்த்ய சுமனசிங்க அவர்களால் உருவாக்கப்பட்ட ஒரு நவீன டிஜிட்டல் குறிப்பு மேலாண்மை அமைப்பாகும்.</p>
-            <p dir="rtl"><b>🇸🇦 العربية:</b> هذا الموقع هو نظام حديث لإدارة الملاحظات الرقمية تم تطويره بواسطة يوريش كافيندو سومனாسينها.</p>
+            <p><b>🇮🇳 தமிழ்:</b> இந்த இணையதளம் யுரேஷ் காවිந்த்ய சுமனசிங்க அவர்களால் உருவாக்கப்பட்ட ஒரு நவீன டிජිටල් குறிப்பு மேලාண்மை அமைப்பாகும்.</p>
+            <p dir="rtl"><b>🇸🇦 العربية:</b> هذا الموقع هو نظام حديث لإدارة الملاحظات الرقمية تم تطويره بواسطة يوريش كافيندو سومناسينها.</p>
         </div>
-    </div>
-</div>
-
-<script>
-// අකුරු Bold කිරීමේ logic එක
-function formatWhatsAppStyle(text) {
-    if (!text) return "";
-    let safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    return safeText.replace(/\*(.*?)\*/g, '<b>$1</b>');
-}
-
-// *** මෙතැනට ඔයාගේ Firebase Config එක පේස්ට් කරන්න ***
-// const firebaseConfig = { ... };
-// firebase.initializeApp(firebaseConfig);
-// const db = firebase.database();
-
-function toggleInput() {
-    const x = document.getElementById("inputSection");
-    x.style.display = (x.style.display === "block") ? "none" : "block";
-}
-
-function cycleThemes() {
-    const body = document.body;
-    body.setAttribute("data-theme", body.getAttribute("data-theme") === "dark" ? "light" : "dark");
-}
-
-function closeModals() {
-    document.getElementById("chatBox").style.display = "none";
-    document.getElementById("infoModal").style.display = "none";
-}
-
-function openChat() { closeModals(); document.getElementById("chatBox").style.display = "flex"; }
-function openInfo() { closeModals(); document.getElementById("infoModal").style.display = "block"; }
-
-// සටහන් පෙන්වන විට පහත ආකාරයට formatWhatsAppStyle() භාවිතා කරන්න
-// උදාහරණයක් ලෙස:
-// noteDiv.innerHTML = formatWhatsAppStyle(data.text);
-</script>
-
-</body>
-</html>
