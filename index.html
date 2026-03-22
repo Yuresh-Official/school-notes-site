@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Notes Sri Lanka - Yuresh Official</title>
+    <title>Smart Notes Sri Lanka - Community Edition</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Sinhala:wght@400;600;800&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
     
@@ -22,16 +22,13 @@
         /* Welcome Overlay */
         #welcomeOverlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; padding: 20px; }
         #welcomeOverlay h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
-        #welcomeOverlay p { opacity: 0.7; margin-bottom: 30px; }
-        .enter-btn { background: var(--accent); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 16px; box-shadow: 0 0 20px var(--accent); transition: 0.3s; }
+        .enter-btn { background: var(--accent); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 16px; box-shadow: 0 0 20px var(--accent); }
         
-        /* Header & Music Toggle */
         header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; position: relative; }
-        .music-toggle { position: absolute; top: 20px; left: 20px; background: var(--card); border: 1px solid var(--border); color: var(--text); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; }
         .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--accent); border: none; color: white; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 700; z-index: 100; }
         .app-title { font-size: 26px; font-weight: 800; margin: 10px 0; }
 
-        /* General UI */
+        /* Notes & Forms */
         .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
         .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; outline: none; box-sizing: border-box; }
         .show-input-btn { background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; }
@@ -39,19 +36,27 @@
         textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; font-family: inherit; }
         .submit-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        /* Notes */
+        /* Notes Feed */
         .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 150px; }
-        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; }
+        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; }
         .media-content { width: 100%; border-radius: 12px; margin: 12px 0; border: 1px solid var(--border); }
         .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
         .text-btn { background: var(--border); color: var(--text); border: none; padding: 7px 14px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 700; }
 
-        /* Floating Buttons */
+        /* --- Comment System Styles --- */
+        .comment-section { margin-top: 15px; background: var(--bg); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
+        .comment-list { max-height: 150px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .comment-item { font-size: 12px; padding: 6px 10px; background: var(--card); border-radius: 8px; border-left: 3px solid var(--accent); }
+        .comment-item b { color: var(--accent); }
+        .comment-input-group { display: flex; gap: 5px; }
+        .comment-input { flex: 1; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 8px; padding: 6px 10px; font-size: 12px; outline: none; }
+        .comment-send { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 0 12px; cursor: pointer; font-size: 12px; }
+
+        /* Floating UI */
         .fab-container { position: fixed; bottom: 30px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
         .fab { width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--accent); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
         .fab svg { width: 24px; height: 24px; fill: white; }
 
-        /* Modals */
         .modal-box { display: none; position: fixed; bottom: 100px; right: 25px; width: 320px; height: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 25px; flex-direction: column; z-index: 2000; box-shadow: 0 10px 40px rgba(0,0,0,0.6); overflow: hidden; }
         .modal-head { background: var(--accent); color: white; padding: 15px; font-weight: 700; display: flex; justify-content: space-between; }
         .chat-logs { flex: 1; padding: 15px; overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; gap: 8px; }
@@ -59,9 +64,6 @@
         .msg.me { background: var(--accent); align-self: flex-end; }
         .msg.other { background: var(--border); align-self: flex-start; }
         #nameOverlay { position: absolute; inset: 0; background: var(--card); z-index: 2100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; }
-
-        /* Arabic Text Style */
-        .arabic-text { font-family: 'Noto Sans Arabic', sans-serif; direction: rtl; font-size: 14px; }
     </style>
 </head>
 <body data-theme="dark">
@@ -72,14 +74,7 @@
     <button class="enter-btn" onclick="startSite()">ENTER SITE</button>
 </div>
 
-<audio id="bgMusic" loop>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-</audio>
-
 <header>
-    <button class="music-toggle" onclick="toggleMusic()">
-        <svg id="musicIcon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-    </button>
     <button class="theme-toggle" onclick="cycleThemes()">THEME</button>
     <h1 class="app-title">Smart Notes Sri Lanka</h1>
 </header>
@@ -123,13 +118,13 @@
 
 <div id="infoModal" class="modal-box" style="height:auto; bottom:90px;">
     <div class="modal-head"><span>Developer Info</span> <span onclick="closeModals()" style="cursor:pointer">✕</span></div>
-    <div style="padding:20px; font-size:14px; line-height:1.8;">
+    <div style="padding:20px; font-size:14px; line-height:1.6;">
         <p><b>Developer:</b> යුරේෂ් කාවින්ද්‍ය සුමනසිංහ</p>
         <p><b>Location:</b> නාරම්මල, ශ්‍රී ලංකාව</p>
         <hr style="border:0; border-top:1px solid var(--border); margin:10px 0;">
         <p>මෙම අඩවිය ශ්‍රී ලංකාවේ නාරම්මල ප්‍රදේශයේ සිට යුරේෂ් විසින් නිර්මාණය කරන ලද්දකි.</p>
         <p><i>This website was created by Yuresh from Narammala, Sri Lanka.</i></p>
-        <p class="arabic-text">تم إنشاء هذا الموقع بواسطة يوريش من نارامالا، سريلانකා.</p>
+        <p style="font-family: 'Noto Sans Arabic', sans-serif; direction: rtl;">تم إنشاء هذا الموقع بواسطة يوريش من نارامالا، سريلانكا.</p>
     </div>
 </div>
 
@@ -147,21 +142,9 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Welcome & Music Logic
-    const bgMusic = document.getElementById('bgMusic');
-    function startSite() {
-        document.getElementById('welcomeOverlay').style.display = 'none';
-        bgMusic.play();
-    }
-    function toggleMusic() {
-        if (bgMusic.paused) {
-            bgMusic.play();
-            document.getElementById('musicIcon').style.color = 'var(--accent)';
-        } else {
-            bgMusic.pause();
-            document.getElementById('musicIcon').style.color = 'var(--text)';
-        }
-    }
+    let myName = localStorage.getItem('chat_name') || "අමුත්තෙක්";
+
+    function startSite() { document.getElementById('welcomeOverlay').style.display = 'none'; }
 
     // Theme Logic
     const themes = ["dark", "light", "blue", "forest", "rose"];
@@ -176,13 +159,13 @@
     function openInfo() { document.getElementById('infoModal').style.display = 'block'; }
     function closeModals() { document.getElementById('chatBox').style.display = 'none'; document.getElementById('infoModal').style.display = 'none'; }
     
-    // Chat Functionality
-    let myName = localStorage.getItem('chat_name');
-    function checkName() { document.getElementById('nameOverlay').style.display = myName ? 'none' : 'flex'; }
+    function checkName() { document.getElementById('nameOverlay').style.display = localStorage.getItem('chat_name') ? 'none' : 'flex'; }
     function saveUserName() {
         const n = document.getElementById('userNameInput').value.trim();
         if(n) { myName = n; localStorage.setItem('chat_name', n); checkName(); }
     }
+
+    // Global Chat
     function sendChat() {
         const i = document.getElementById('chatInput');
         if(i.value.trim() && myName) { db.ref('community_chat').push({ name: myName, msg: i.value, time: Date.now() }); i.value = ""; }
@@ -195,20 +178,31 @@
         l.scrollTop = l.scrollHeight;
     });
 
-    // Notes Logic
+    // Notes & Comments Logic
     function toggleInput() {
         const s = document.getElementById('inputSection'), b = document.getElementById('mainAddBtn');
         s.style.display = (s.style.display === "none" || s.style.display === "") ? "block" : "none";
         b.innerText = (s.style.display === "block") ? "CLOSE" : "ADD NEW NOTE";
     }
+
     function saveNote() {
         const t = document.getElementById('noteInput').value, u = document.getElementById('mediaUrl').value, k = document.getElementById('editKey').value;
         if(t.trim()) {
             if(k) db.ref('smart_notes/' + k).update({ text: t, url: u });
             else db.ref('smart_notes').push({ text: t, url: u, time: new Date().toLocaleString(), likes: 0, hearts: 0 });
-            toggleInput();
+            toggleInput(); document.getElementById('noteInput').value = ""; document.getElementById('mediaUrl').value = ""; document.getElementById('editKey').value = "";
         }
     }
+
+    function addComment(noteId) {
+        const input = document.getElementById(`comment-in-${noteId}`);
+        const text = input.value.trim();
+        if(text) {
+            db.ref(`smart_notes/${noteId}/comments`).push({ name: myName, text: text, time: Date.now() });
+            input.value = "";
+        }
+    }
+
     function editNote(key, text, url) {
         document.getElementById('inputSection').style.display = "block";
         document.getElementById('mainAddBtn').innerText = "CLOSE";
@@ -218,6 +212,7 @@
         document.getElementById('submitBtn').innerText = "UPDATE NOW";
         window.scrollTo(0,0);
     }
+
     function deleteNote(id) { if(confirm("මැකීමට අවශ්‍යද?")) db.ref('smart_notes/' + id).remove(); }
     function react(k, ty) { db.ref(`smart_notes/${k}/${ty}`).transaction(c => (c || 0) + 1); }
     function searchNotes() {
@@ -230,9 +225,27 @@
         snap.forEach((c) => {
             const n = c.val(), k = c.key;
             let m = n.url ? (n.url.includes('youtube') ? `<iframe class="media-content" height="230" src="https://www.youtube.com/embed/${n.url.split('v=')[1] || n.url.split('/').pop()}" frameborder="0"></iframe>` : `<img src="${n.url}" class="media-content">`) : "";
+            
+            // Build comments list
+            let commentsHtml = "";
+            if(n.comments) {
+                Object.values(n.comments).forEach(com => {
+                    commentsHtml += `<div class="comment-item"><b>${com.name}:</b> ${com.text}</div>`;
+                });
+            }
+
             const div = document.createElement('div'); div.className = 'note-card';
             div.innerHTML = `<div>${n.text}</div>${m}
                 <div style="display:flex; gap:10px; margin-top:10px;"><button class="text-btn" onclick="react('${k}','likes')">👍 ${n.likes||0}</button><button class="text-btn" onclick="react('${k}','hearts')">❤️ ${n.hearts||0}</button></div>
+                
+                <div class="comment-section">
+                    <div class="comment-list" id="com-list-${k}">${commentsHtml}</div>
+                    <div class="comment-input-group">
+                        <input type="text" id="comment-in-${k}" class="comment-input" placeholder="අදහසක් දක්වන්න...">
+                        <button class="comment-send" onclick="addComment('${k}')">➜</button>
+                    </div>
+                </div>
+
                 <div class="note-footer">
                     <div style="display:flex; gap:5px;">
                         <button class="text-btn" onclick="navigator.clipboard.writeText(\`${n.text}\`)">COPY</button>
