@@ -1,115 +1,23 @@
 <!DOCTYPE html>
-<html lang="si">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Notes Sri Lanka</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-    <style>
-        :root {
-            --bg: #000;
-            --card: #121212;
-            --primary: #4f46e5;
-            --text: #fff;
-            --border: #333;
-            --red: #ff4d4d;
-        }
-        body[data-theme="light"] { --bg: #f0f2f5; --card: #fff; --text: #000; --border: #ddd; }
-        
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 10px; transition: 0.3s; }
-        .container { max-width: 500px; margin: auto; padding-bottom: 100px; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .search-box { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); margin-bottom: 15px; box-sizing: border-box; }
-        
-        .main-btn { width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
-        
-        .input-card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--border); display: none; }
-        .input-card textarea, .input-card input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background: #000; color: #fff; box-sizing: border-box; }
-        
-        .note-card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
-        
-        /* රූල් ඇර පෙන්වීම සඳහා මෙම කොටස වැදගත් වේ */
-        .note-display { white-space: pre-wrap; word-wrap: break-word; line-height: 1.6; margin-bottom: 10px; }
-        
-        .media-content { width: 100%; border-radius: 10px; margin-top: 10px; object-fit: cover; }
-        
-        .text-btn { background: #1e1e1e; color: #aaa; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; }
-        .note-footer { display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 10px; }
-        
-        .modal-box { position: fixed; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; z-index: 1000; display: none; padding: 10px; }
-        .modal-head { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold; }
-
-        /* Comment System Styling */
-        .comment-section { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; }
-        .comment-item { font-size: 13px; margin-bottom: 5px; background: #1a1a1a; padding: 5px; border-radius: 5px; }
-        .comment-input-group { display: flex; gap: 5px; margin-top: 10px; }
-        .comment-input { flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #333; background: #000; color: #fff; }
-        .comment-send { background: var(--primary); border: none; color: #fff; padding: 0 10px; border-radius: 5px; cursor: pointer; }
-
-        /* Floating buttons */
-        .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 999; }
-        .fab { width: 50px; height: 50px; border-radius: 50%; background: var(--primary); border: none; color: #fff; font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-
-        /* Chat System */
-        #chatBox { bottom: 90px; height: 400px; flex-direction: column; }
-        #chatLogs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 14px; }
-        .msg.me { align-self: flex-end; background: var(--primary); color: #fff; }
-        .msg.other { align-self: flex-start; background: #333; color: #fff; }
-    </style>
-</head>
-<body data-theme="dark">
-
-<div class="container">
-    <div class="header">
-        <div style="background:orange; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:bold; color:#000;">Sinhala & Tamil New Year</div>
-        <button class="text-btn" style="background:var(--primary); color:#fff;" onclick="cycleThemes()">THEME</button>
-    </div>
-    
-    <h1 style="text-align:center;">Smart Notes Sri Lanka</h1>
-
-    <input type="text" id="searchInput" class="search-box" placeholder="සටහන් සොයන්න..." onkeyup="searchNotes()">
-    
-    <button id="mainAddBtn" class="main-btn" onclick="toggleInput()">ADD NEW NOTE</button>
-
-    <div id="inputSection" class="input-card">
-        <textarea id="noteInput" rows="5" placeholder="ඔබේ සටහන මෙතැන ටයිප් කරන්න..."></textarea>
-        <input type="text" id="mediaUrl" placeholder="Image හෝ Video Link එක (ඇත්නම්)">
-        <input type="hidden" id="editKey">
-        <button id="submitBtn" class="main-btn" style="margin-bottom:0;" onclick="saveNote()">SAVE NOTE</button>
-    </div>
-
-    <div id="notesFeed"></div>
-</div>
-
-<div class="fab-container">
-    <button class="fab" onclick="openChat()">💬</button>
-    <button class="fab" onclick="openInfo()">ℹ️</button>
-</div>
-
-<div id="chatBox" class="modal-box">
-    <div class="modal-head"><span>Community Chat</span> <span onclick="closeModals()" style="cursor:pointer">✕</span></div>
-    <div id="chatLogs"></div>
-    <div style="padding:10px; display:flex; gap:5px; border-top:1px solid #333;">
-        <input type="text" id="chatInput" style="flex:1; padding:8px; border-radius:5px; border:1px solid #333; background:#000; color:#fff;" placeholder="පණිවිඩයක් ලියන්න...">
-        <button onclick="sendChat()" style="background:var(--primary); border:none; color:#fff; padding:0 15px; border-radius:5px;">➜</button>
-    </div>
-</div>
 
 <div id="infoModal" class="modal-box" style="height:auto; max-height: 80vh; bottom:90px; overflow-y: auto;">
     <div class="modal-head"><span>Developer Info</span> <span onclick="closeModals()" style="cursor:pointer">✕</span></div>
     <div style="padding:20px; font-size:14px; line-height:1.6;">
         <p><b>Coder:</b> Yuresh kavindu sumanasinha</p>
+        
         <div style="margin-top:15px;">
             <p><b>🇱🇰 සිංහල:</b> මෙම වෙබ් අඩවිය මගේ නවීන ඩිජිටල් සටහන් කළමනාකරණ පද්ධතියකි. මෙහි ප්‍රධාන අරමුණ වන්නේ වැදගත් සටහන්, ඡායාරූප සහ වීඩියෝ සබැඳි ඉතා ආරක්ෂිතව සහ පහසුවෙන් ගබඩා කර තබා ගැනීමට අවස්ථාව ලබා දීමයි.</p>
-            <p><b>🇬🇧 English:</b> This website is a modern digital note-management system developed by Yuresh Kavindu Sumanasinha.</p>
-            <p><b>🇮🇳 தமிழ்:</b> இந்த இணையதளம் யுரேஷ் காවිந்த்ய சுமனசிங்க அவர்களால் உருவாக்கப்பட்ட ஒரு நவீன டிජිටල් குறிப்பு மேලාண்மை அமைப்பாகும்.</p>
-            <p dir="rtl"><b>🇸🇦 العربية:</b> هذا الموقع هو نظام حديث لإدارة الملاحظات الرقمية تم تطويره بواسطة يوريش كافيندو سومناسينها.</p>
+            
+            <p><b>🇬🇧 English:</b> This website is a modern digital note-management system developed by Yuresh Kavindu Sumanasinha. Built with a focus on speed and simplicity, it allows users to store notes and media securely.</p>
+            
+            <p><b>🇮🇳 தமிழ்:</b> இந்த இணையதளம் யுரேஷ் காவிந்த்ய சுமனசிங்க அவர்களால் உருவாக்கப்பட்ட ஒரு நவீன டிஜිටல் குறிப்பு மேலாண்மை அமைப்பாகும். இது குறிப்புகள் மற்றும் ஊடகங்களைப் பாதுகாப்பாகச் சேமிக்க உதவுகிறது.</p>
+            
+            <p dir="rtl" style="font-family: 'Noto Sans Arabic', sans-serif;"><b>🇸🇦 العربية:</b> هذا الموقع هو نظام حديث لإدارة الملاحظات الرقمية تم تطويره بواسطة يوريش كافيندو سومناسينها. تم تصميمه لتخزين الملاحظات والوسائط بشكل آمن وسهل.</p>
         </div>
+
         <hr style="border:0; border-top:1px solid var(--border); margin:15px 0;">
         <p>මෙම අඩවිය නිර්මාණය කිරීමට ගත් උත්සාහය, නවීන තාක්ෂණය භාවිතා කරමින් සරල සහ කාර්යක්ෂම සේවාවක් ලබා දීමයි.</p>
+        <p><i>Developed by Yuresh Coder with a passion for web development.</i></p>
     </div>
 </div>
 
@@ -134,13 +42,26 @@
         document.body.setAttribute('data-theme', themes[currentThemeIdx]);
     }
 
-    function openChat() { document.getElementById('chatBox').style.display = 'flex'; }
+    function openChat() { document.getElementById('chatBox').style.display = 'flex'; checkName(); }
     function openInfo() { document.getElementById('infoModal').style.display = 'block'; }
     function closeModals() { document.getElementById('chatBox').style.display = 'none'; document.getElementById('infoModal').style.display = 'none'; }
+    function checkName() { document.getElementById('nameOverlay').style.display = localStorage.getItem('chat_name') ? 'none' : 'flex'; }
+    function saveUserName() {
+        const n = document.getElementById('userNameInput').value.trim();
+        if(n) { myName = n; localStorage.setItem('chat_name', n); checkName(); }
+    }
+
+    // WhatsApp මෙන් *අකුරු* Bold කිරීමට සහ රූල් ඇරීමට මෙම Function එක භාවිතා වේ
+    function formatNoteText(text) {
+        if (!text) return "";
+        // *Text* -> <b>Text</b> බවට පත් කිරීම
+        let formatted = text.replace(/\*(.*?)\*/g, '<b>$1</b>');
+        return formatted;
+    }
 
     function sendChat() {
         const i = document.getElementById('chatInput');
-        if(i.value.trim()) { db.ref('community_chat').push({ name: myName, msg: i.value, time: Date.now() }); i.value = ""; }
+        if(i.value.trim() && myName) { db.ref('community_chat').push({ name: myName, msg: i.value, time: Date.now() }); i.value = ""; }
     }
     db.ref('community_chat').limitToLast(30).on('value', (s) => {
         const l = document.getElementById('chatLogs'); l.innerHTML = "";
@@ -190,7 +111,6 @@
 
     function deleteNote(id) { if(confirm("මැකීමට අවශ්‍යද?")) db.ref('smart_notes/' + id).remove(); }
     function react(k, ty) { db.ref(`smart_notes/${k}/${ty}`).transaction(c => (c || 0) + 1); }
-
     function searchNotes() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('.note-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none");
@@ -205,13 +125,12 @@
             if(n.comments) { Object.values(n.comments).forEach(com => { commentsHtml += `<div class="comment-item"><b>${com.name}:</b> ${com.text}</div>`; }); }
 
             const div = document.createElement('div'); div.className = 'note-card';
-            div.innerHTML = `
-                <div class="note-display">${n.text}</div>
-                ${m}
+            // style="white-space: pre-wrap;" මගින් රූල් ඇර ටයිප් කරන දේ එලෙසම පෙන්වයි
+            div.innerHTML = `<div style="white-space: pre-wrap; word-wrap: break-word;">${formatNoteText(n.text)}</div>${m}
                 <div style="display:flex; gap:10px; margin-top:10px;">
                     <button class="text-btn" onclick="react('${k}','likes')">👍 ${n.likes||0}</button>
                     <button class="text-btn" onclick="react('${k}','hearts')">❤️ ${n.hearts||0}</button>
-                    <button class="text-btn" onclick="toggleComments('${k}')">💬 Comments</button>
+                    <button class="comment-toggle-btn" onclick="toggleComments('${k}')">💬 Comments</button>
                 </div>
                 <div class="comment-section" id="com-sec-${k}">
                     <div class="comment-list">${commentsHtml}</div>
@@ -221,10 +140,8 @@
                     </div>
                 </div>
                 <div class="note-footer">
-                    <div style="display:flex; gap:5px;">
-                        <button class="text-btn" onclick="navigator.clipboard.writeText(\`${n.text.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)">COPY</button>
-                        <button class="text-btn" onclick="editNote('${k}', \`${n.text.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`, '${n.url}')">EDIT</button>
-                    </div>
+                    <div style="display:flex; gap:5px;"><button class="text-btn" onclick="navigator.clipboard.writeText(\`${n.text.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)">COPY</button>
+                    <button class="text-btn" onclick="editNote('${k}', \`${n.text.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`, '${n.url}')">EDIT</button></div>
                     <button class="text-btn" style="color:var(--red)" onclick="deleteNote('${k}')">DELETE</button>
                 </div>`;
             f.prepend(div);
@@ -233,4 +150,3 @@
 </script>
 </body>
 </html>
-
