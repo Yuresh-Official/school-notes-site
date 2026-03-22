@@ -29,18 +29,18 @@
         .submit-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
         .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 50px; }
-        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; }
+        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; animation: fadeIn 0.5s ease; }
         .media-content { width: 100%; border-radius: 10px; margin: 12px 0; border: 1px solid var(--border); }
         
-        /* අලුත් Text Buttons */
-        .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); pt: 10px; padding-top: 12px;}
+        .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px;}
         .btn-group { display: flex; gap: 8px; }
-        .text-btn { background: var(--border); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 600; }
+        .text-btn { background: var(--border); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 700; }
         .text-btn.delete { color: var(--red); }
-        .text-btn:active { opacity: 0.7; }
 
         .reactions { display: flex; gap: 8px; margin-top: 12px; }
-        .react-btn { background: none; border: 1px solid var(--border); padding: 5px 10px; border-radius: 20px; color: var(--text); font-size: 11px; cursor: pointer; }
+        .react-btn { background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; color: var(--text); font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -52,7 +52,7 @@
 </header>
 
 <div class="controls">
-    <input type="text" id="searchInput" class="search-input" onkeyup="searchNotes()" placeholder="සටහන් සොයන්න...">
+    <input type="text" id="searchInput" class="search-input" onkeyup="searchNotes()" placeholder="සටහන් සොයන්න (Search)...">
     <button class="show-input-btn" id="mainAddBtn" onclick="toggleInput()">ADD NEW NOTE</button>
 </div>
 
@@ -157,8 +157,8 @@
                 ${m}
                 <div style="font-size:10px; color:var(--text-sec); margin-top:8px;">${n.time}</div>
                 <div class="reactions">
-                    <button class="react-btn" onclick="react('${k}', 'likes')">LIKE ${n.likes || 0}</button>
-                    <button class="react-btn" onclick="react('${k}', 'hearts')">LOVE ${n.hearts || 0}</button>
+                    <button class="react-btn" onclick="react('${k}', 'likes')">👍 <span>${n.likes || 0}</span></button>
+                    <button class="react-btn" onclick="react('${k}', 'hearts')">❤️ <span>${n.hearts || 0}</span></button>
                 </div>
                 <div class="note-footer">
                     <div class="btn-group">
@@ -169,7 +169,6 @@
                 </div>`;
             feed.prepend(card);
             
-            // Event Listeners (මේ විදිහට දැම්මම තමයි හරියටම වැඩ කරන්නේ)
             document.getElementById(`cp-${k}`).onclick = () => copyNote(n.text);
             document.getElementById(`ed-${k}`).onclick = () => editNote(k, n.text, n.url);
         });
