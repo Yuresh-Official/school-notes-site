@@ -10,32 +10,54 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
     <style>
-        :root { --bg: #000; --card: #0d0d0f; --border: #1c1c1e; --blue: #5856d6; --red: #ff3b30; }
+        :root { --bg: #000; --card: #0d0d0f; --border: #1c1c1e; --blue: #5856d6; --red: #ff3b30; --text-sec: #8e8e93; }
         body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: #fff; margin: 0; display: flex; flex-direction: column; align-items: center; }
-        header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; }
-        .input-box { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        
+        header { width: 100%; max-width: 500px; padding: 40px 20px 20px 20px; text-align: center; }
+        .greeting { font-size: 14px; color: var(--blue); font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .app-title { font-size: 26px; font-weight: 800; margin: 0; }
+
+        .input-box { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin: 20px 0; }
         textarea, input { width: 100%; background: #1c1c1e; border: 1px solid var(--border); border-radius: 12px; color: white; padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; }
-        .add-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .add-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .add-btn:active { transform: scale(0.98); }
+
         .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 50px; }
-        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; }
-        .media-content { width: 100%; border-radius: 10px; margin-top: 10px; }
-        .del-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text-sec); cursor: pointer; font-size: 18px; }
-        .del-btn:hover { color: var(--red); }
+        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; animation: fadeIn 0.5s ease; }
+        .media-content { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
+        .del-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--text-sec); cursor: pointer; font-size: 16px; opacity: 0.5; }
+        .del-btn:hover { color: var(--red); opacity: 1; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<header><h1 style="font-size: 26px;">Smart Notes Sri Lanka</h1></header>
+<header>
+    <div id="greeting" class="greeting">HELLO!</div>
+    <h1 class="app-title">Smart Notes Sri Lanka</h1>
+</header>
 
 <div class="input-box">
-    <textarea id="noteInput" placeholder="සටහන මෙතන ටයිප් කරන්න..."></textarea>
-    <input type="text" id="mediaUrl" placeholder="Image හෝ Video URL එක (Optional)">
+    <textarea id="noteInput" placeholder="ඔයාගේ සටහන මෙතන ටයිප් කරන්න..."></textarea>
+    <input type="text" id="mediaUrl" placeholder="Image හෝ Video URL එක (අත්‍යවශ්‍ය නොවේ)">
     <button class="add-btn" onclick="addNote()">Add School Note</button>
 </div>
 
 <div class="notes-feed" id="notesFeed"></div>
 
 <script>
+    // පද්ධතියට ඇතුළු වන විට සුබ පැතුම් ලබා දීම
+    function setGreeting() {
+        const hour = new Date().getHours();
+        const greetingDiv = document.getElementById('greeting');
+        if (hour < 12) greetingDiv.innerText = "Good Morning ☀️";
+        else if (hour < 17) greetingDiv.innerText = "Good Afternoon 🌤️";
+        else if (hour < 21) greetingDiv.innerText = "Good Evening 🌙";
+        else greetingDiv.innerText = "Good Night 😴";
+    }
+    setGreeting();
+
     const firebaseConfig = {
         apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
         authDomain: "smart-notes-sl.firebaseapp.com",
@@ -77,7 +99,7 @@
             if(note.url) {
                 if(note.url.includes('youtube.com') || note.url.includes('youtu.be')) {
                     const vidId = note.url.split('v=')[1] || note.url.split('/').pop();
-                    mediaHtml = `<iframe class="media-content" height="200" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>`;
+                    mediaHtml = `<iframe class="media-content" height="230" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>`;
                 } else {
                     mediaHtml = `<img src="${note.url}" class="media-content" onerror="this.style.display='none'">`;
                 }
@@ -85,9 +107,9 @@
             feed.innerHTML = `
                 <div class="note-card">
                     <button class="del-btn" onclick="deleteNote('${child.key}')">🗑️</button>
-                    <div>${note.text}</div>
+                    <div style="font-size: 15px; padding-right: 20px;">${note.text}</div>
                     ${mediaHtml}
-                    <div style="font-size:10px; color:#8e8e93; margin-top:10px;">${note.time}</div>
+                    <div style="font-size:10px; color:var(--text-sec); margin-top:12px;">${note.time}</div>
                 </div>` + feed.innerHTML;
         });
     });
