@@ -17,17 +17,31 @@
         .greeting { font-size: 14px; color: var(--blue); font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
         .app-title { font-size: 26px; font-weight: 800; margin: 0; }
 
-        .input-box { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin: 20px 0; }
+        /* Floating Add Button */
+        .show-input-btn {
+            background: var(--blue); color: #fff; border: none; padding: 12px 25px; 
+            border-radius: 30px; font-weight: 700; cursor: pointer; margin: 20px 0;
+            display: flex; align-items: center; gap: 8px; font-size: 15px; transition: 0.3s;
+        }
+        .show-input-btn:hover { transform: scale(1.05); background: #4a48c5; }
+
+        /* Hidden Input Section */
+        #inputSection {
+            width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: none; /* මුලින්ම පේන්නේ නැහැ */
+            animation: slideDown 0.4s ease forwards;
+        }
+
         textarea, input { width: 100%; background: #1c1c1e; border: 1px solid var(--border); border-radius: 12px; color: white; padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; }
-        .add-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .add-btn:active { transform: scale(0.98); }
+        .add-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
         .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 50px; }
         .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; animation: fadeIn 0.5s ease; }
         .media-content { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
         .del-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--text-sec); cursor: pointer; font-size: 16px; opacity: 0.5; }
-        .del-btn:hover { color: var(--red); opacity: 1; }
 
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -38,16 +52,19 @@
     <h1 class="app-title">Smart Notes Sri Lanka</h1>
 </header>
 
-<div class="input-box">
+<button class="show-input-btn" id="mainAddBtn" onclick="toggleInput()">
+    <span>➕</span> Add New Note
+</button>
+
+<div id="inputSection">
     <textarea id="noteInput" placeholder="ඔයාගේ සටහන මෙතන ටයිප් කරන්න..."></textarea>
     <input type="text" id="mediaUrl" placeholder="Image හෝ Video URL එක (අත්‍යවශ්‍ය නොවේ)">
-    <button class="add-btn" onclick="addNote()">Add School Note</button>
+    <button class="add-btn" onclick="addNote()">Submit Note</button>
 </div>
 
 <div class="notes-feed" id="notesFeed"></div>
 
 <script>
-    // පද්ධතියට ඇතුළු වන විට සුබ පැතුම් ලබා දීම
     function setGreeting() {
         const hour = new Date().getHours();
         const greetingDiv = document.getElementById('greeting');
@@ -57,6 +74,21 @@
         else greetingDiv.innerText = "Good Night 😴";
     }
     setGreeting();
+
+    // Input Box එක පෙන්නන්න සහ හංගන්න
+    function toggleInput() {
+        const section = document.getElementById('inputSection');
+        const btn = document.getElementById('mainAddBtn');
+        if (section.style.display === "none" || section.style.display === "") {
+            section.style.display = "block";
+            btn.innerHTML = "<span>✖</span> Close";
+            btn.style.background = "#ff3b30"; // Cancel කරන්න රතු පාට වෙන්න
+        } else {
+            section.style.display = "none";
+            btn.innerHTML = "<span>➕</span> Add New Note";
+            btn.style.background = "#5856d6";
+        }
+    }
 
     const firebaseConfig = {
         apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
@@ -78,6 +110,7 @@
             db.ref('smart_notes').push({ text, url, time: new Date().toLocaleString() });
             document.getElementById('noteInput').value = "";
             document.getElementById('mediaUrl').value = "";
+            toggleInput(); // සේව් වුණාම ආයෙත් පෙට්ටිය හංගන්න
         }
     }
 
