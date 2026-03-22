@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Notes Sri Lanka - Community</title>
+    <title>Smart Notes Sri Lanka - Final Fixed</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Sinhala:wght@400;600;800&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
@@ -37,25 +37,26 @@
         .media-content { width: 100%; border-radius: 10px; margin: 12px 0; border: 1px solid var(--border); }
         .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px;}
         .text-btn { background: var(--border); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 700; }
+        .text-btn.delete { color: var(--red); }
 
         .reactions { display: flex; gap: 8px; margin-top: 12px; }
         .react-btn { background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; color: var(--text); font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
-        /* --- Live Community Chat UI --- */
-        .chat-btn { position: fixed; bottom: 85px; right: 20px; width: 50px; height: 50px; background: var(--accent); border: none; border-radius: 50%; color: white; font-size: 22px; cursor: pointer; z-index: 999; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: fabPopIn 0.5s ease-out 1.2s forwards; opacity: 0; }
-        #chatBox { display: none; position: fixed; bottom: 90px; right: 20px; width: 320px; height: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; flex-direction: column; z-index: 1001; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; animation: modalPopIn 0.3s ease-out; }
-        .chat-header { background: var(--accent); color: white; padding: 15px; font-weight: 700; display: flex; justify-content: space-between; }
-        .chat-logs { flex: 1; padding: 15px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
-        .chat-msg { padding: 10px; border-radius: 15px; max-width: 85%; position: relative; }
-        .chat-msg.other { background: var(--card); align-self: flex-start; border: 1px solid var(--border); }
-        .chat-msg.me { background: var(--accent); color: white; align-self: flex-end; }
-        .msg-user { font-size: 10px; font-weight: 800; display: block; margin-bottom: 4px; opacity: 0.8; }
-        .chat-input-area { padding: 12px; display: flex; gap: 8px; border-top: 1px solid var(--border); background: var(--card); }
-        .chat-input-area input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: white; padding: 10px; outline: none; }
-        
-        #nameOverlay { display: none; position: absolute; inset: 0; background: var(--card); z-index: 1005; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        /* Floating Buttons UI */
+        .chat-btn { position: fixed; bottom: 85px; right: 20px; width: 50px; height: 50px; background: var(--accent); border: none; border-radius: 50%; color: white; font-size: 22px; cursor: pointer; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: fabPopIn 0.5s ease-out 1.2s forwards; opacity: 0; }
+        .info-fab { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--accent); color: white; border: none; border-radius: 50%; font-size: 24px; font-weight: bold; cursor: pointer; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: fabPopIn 0.5s ease-out 1s forwards; opacity: 0; }
 
-        .info-fab { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--accent); color: white; border: none; border-radius: 50%; font-size: 24px; font-weight: bold; cursor: pointer; z-index: 999; animation: fabPopIn 0.5s ease-out 1s forwards; opacity: 0; }
+        /* Chat & Info Modals */
+        #chatBox, #infoModal { display: none; position: fixed; bottom: 90px; right: 20px; width: 320px; height: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; animation: modalPopIn 0.3s ease-out; }
+        #infoModal { height: auto; bottom: 80px; max-width: 400px; padding: 20px; box-sizing: border-box; }
+        
+        .chat-header, .info-header { background: var(--accent); color: white; padding: 15px; font-weight: 700; display: flex; justify-content: space-between; }
+        .chat-logs { flex: 1; padding: 15px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
+        .chat-msg { padding: 10px; border-radius: 15px; max-width: 85%; }
+        .chat-msg.me { background: var(--accent); color: white; align-self: flex-end; }
+        .chat-msg.other { background: var(--card); align-self: flex-start; border: 1px solid var(--border); }
+        
+        #nameOverlay { position: absolute; inset: 0; background: var(--card); z-index: 2005; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
 
         @keyframes fallIn { 0% { opacity: 0; transform: translateY(-100px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes noteFallIn { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -67,7 +68,7 @@
 
 <header>
     <button class="theme-toggle" onclick="cycleThemes()">THEME</button>
-    <div id="greeting" class="greeting">HELLO!</div>
+    <div id="greeting" style="font-size:12px; color:var(--accent); font-weight:600;">HELLO!</div>
     <h1 class="app-title">Smart Notes Sri Lanka</h1>
 </header>
 
@@ -87,24 +88,30 @@
 
 <button class="chat-btn" onclick="toggleChat()">💬</button>
 <div id="chatBox">
-    <div class="chat-header"><span>Community Chat</span> <span onclick="toggleChat()" style="cursor:pointer">✖</span></div>
-    
+    <div class="chat-header"><span>Live Community</span> <span onclick="toggleChat()" style="cursor:pointer">✖</span></div>
     <div id="nameOverlay">
-        <p style="font-weight:700;">චැට් එකට කලින් ඔයාගේ නම ලියන්න</p>
-        <input type="text" id="userNameInput" placeholder="ඔයාගේ නම..." style="width:80%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:white; outline:none; margin-bottom:15px;">
-        <button onclick="saveUserName()" style="background:var(--accent); color:white; border:none; padding:10px 25px; border-radius:10px; font-weight:700; cursor:pointer;">START CHAT</button>
+        <p style="font-weight:700;">ඔයාගේ නම ලියන්න</p>
+        <input type="text" id="userNameInput" placeholder="Name..." style="width:80%; padding:10px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:white;">
+        <button onclick="saveUserName()" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">START</button>
     </div>
-
     <div class="chat-logs" id="chatLogs"></div>
-    <div class="chat-input-area" id="chatInputArea">
-        <input type="text" id="chatInput" placeholder="පණිවිඩයක් ලියන්න...">
-        <button onclick="sendChat()" style="background:var(--accent); border:none; color:white; border-radius:10px; padding:0 15px; cursor:pointer;">➜</button>
+    <div style="padding:10px; display:flex; gap:5px; background:var(--card);">
+        <input type="text" id="chatInput" placeholder="Type..." style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:white;">
+        <button onclick="sendChat()" style="background:var(--accent); border:none; color:white; border-radius:8px; padding:0 15px;">➜</button>
     </div>
 </div>
 
-<button class="info-fab" onclick="window.alert('Developer: Yuresh Kavindu Sumanasinha')">i</button>
+<button class="info-fab" onclick="toggleInfo()">i</button>
+<div id="infoModal">
+    <div class="info-header"><span>DEVELOPER</span> <span onclick="toggleInfo()" style="cursor:pointer">✖</span></div>
+    <div style="padding:15px; font-size:14px; line-height:1.6;">
+        <p><b>Creator:</b> යුරේෂ් කාවින්ද්‍ය සුමනසිංහ</p>
+        <p>මෙම පද්ධතියේ සියලුම වැඩකටයුතු මා විසින්ම අතින් (Manual) නිම කරන ලදී.</p>
+    </div>
+</div>
 
 <script>
+    // Firebase Config (ඔයා එවපු Screenshot එකේ විස්තර අනුව)
     const firebaseConfig = {
         apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
         authDomain: "smart-notes-sl.firebaseapp.com",
@@ -117,7 +124,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Theme Cycler
+    // Theme Logic
     const themes = ["dark", "light", "blue", "forest", "rose"];
     let currentThemeIdx = 0;
     function cycleThemes() {
@@ -125,71 +132,63 @@
         document.body.setAttribute('data-theme', themes[currentThemeIdx]);
     }
 
-    // Live Chat Logic
+    // Chat Logic
     let myName = localStorage.getItem('chat_name');
-
     function toggleChat() { 
         const cb = document.getElementById('chatBox');
-        const overlay = document.getElementById('nameOverlay');
         cb.style.display = (cb.style.display === 'flex') ? 'none' : 'flex';
-        if(!myName) overlay.style.display = 'flex';
-        else overlay.style.display = 'none';
+        document.getElementById('nameOverlay').style.display = myName ? 'none' : 'flex';
     }
-
+    function toggleInfo() {
+        const im = document.getElementById('infoModal');
+        im.style.display = (im.style.display === 'block') ? 'none' : 'block';
+    }
     function saveUserName() {
-        const name = document.getElementById('userNameInput').value.trim();
-        if(name !== "") {
-            myName = name;
-            localStorage.setItem('chat_name', name);
-            document.getElementById('nameOverlay').style.display = 'none';
-        }
+        const n = document.getElementById('userNameInput').value.trim();
+        if(n) { myName = n; localStorage.setItem('chat_name', n); document.getElementById('nameOverlay').style.display = 'none'; }
     }
-
     function sendChat() {
-        const input = document.getElementById('chatInput');
-        if(input.value.trim() === "" || !myName) return;
-        
-        db.ref('community_chat').push({
-            name: myName,
-            message: input.value,
-            time: Date.now()
-        });
-        input.value = "";
+        const i = document.getElementById('chatInput');
+        if(i.value.trim() && myName) { db.ref('community_chat').push({ name: myName, message: i.value, time: Date.now() }); i.value = ""; }
     }
-
-    // Listen for new messages
-    db.ref('community_chat').limitToLast(50).on('value', (snap) => {
-        const logs = document.getElementById('chatLogs');
-        logs.innerHTML = "";
-        snap.forEach(child => {
-            const data = child.val();
-            const type = (data.name === myName) ? 'me' : 'other';
-            logs.innerHTML += `
-                <div class="chat-msg ${type}">
-                    <span class="msg-user">${data.name}</span>
-                    ${data.message}
-                </div>`;
+    db.ref('community_chat').on('value', (snap) => {
+        const logs = document.getElementById('chatLogs'); logs.innerHTML = "";
+        snap.forEach(c => {
+            const d = c.val(); logs.innerHTML += `<div class="chat-msg ${d.name === myName ? 'me' : 'other'}"><small>${d.name}</small><br>${d.message}</div>`;
         });
         logs.scrollTop = logs.scrollHeight;
     });
 
-    // Notes Logic
+    // Notes & Edit Logic
     function toggleInput() {
         const s = document.getElementById('inputSection'), b = document.getElementById('mainAddBtn');
         s.style.display = (s.style.display === "none" || s.style.display === "") ? "block" : "none";
         b.innerText = (s.style.display === "block") ? "CLOSE" : "ADD NEW NOTE";
+        if(s.style.display === "none") resetForm();
+    }
+    function resetForm() {
+        document.getElementById('noteInput').value = ""; document.getElementById('mediaUrl').value = "";
+        document.getElementById('editKey').value = ""; document.getElementById('submitBtn').innerText = "SAVE NOTE";
     }
     function saveNote() {
         const t = document.getElementById('noteInput').value, u = document.getElementById('mediaUrl').value, k = document.getElementById('editKey').value;
-        if(t.trim() !== "") {
+        if(t.trim()) {
             if(k) db.ref('smart_notes/' + k).update({ text: t, url: u });
             else db.ref('smart_notes').push({ text: t, url: u, time: new Date().toLocaleString(), likes: 0, hearts: 0 });
             toggleInput();
-            document.getElementById('noteInput').value = ""; document.getElementById('mediaUrl').value = "";
         }
     }
+    function editNote(key, text, url) {
+        document.getElementById('inputSection').style.display = "block";
+        document.getElementById('mainAddBtn').innerText = "CLOSE";
+        document.getElementById('noteInput').value = text;
+        document.getElementById('mediaUrl').value = url;
+        document.getElementById('editKey').value = key;
+        document.getElementById('submitBtn').innerText = "UPDATE NOW";
+        window.scrollTo(0,0);
+    }
     function deleteNote(id) { if(confirm("මැකීමට අවශ්‍යද?")) db.ref('smart_notes/' + id).remove(); }
-    function react(key, type) { db.ref(`smart_notes/${key}/${type}`).transaction(c => (c || 0) + 1); }
+    function react(k, ty) { db.ref(`smart_notes/${k}/${ty}`).transaction(c => (c || 0) + 1); }
     function searchNotes() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('.note-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none");
@@ -197,14 +196,20 @@
 
     db.ref('smart_notes').on('value', (snap) => {
         const feed = document.getElementById('notesFeed'); feed.innerHTML = "";
-        snap.forEach((child) => {
-            const n = child.val(), k = child.key;
+        snap.forEach((c) => {
+            const n = c.val(), k = c.key;
             let m = n.url ? (n.url.includes('youtube') ? `<iframe class="media-content" height="230" src="https://www.youtube.com/embed/${n.url.split('v=')[1] || n.url.split('/').pop()}" frameborder="0"></iframe>` : `<img src="${n.url}" class="media-content">`) : "";
             const card = document.createElement('div');
             card.className = 'note-card';
             card.innerHTML = `<div>${n.text}</div>${m}
                 <div class="reactions"><button class="react-btn" onclick="react('${k}', 'likes')">👍 ${n.likes || 0}</button><button class="react-btn" onclick="react('${k}', 'hearts')">❤️ ${n.hearts || 0}</button></div>
-                <div class="note-footer"><button class="text-btn" onclick="navigator.clipboard.writeText('${n.text}')">COPY</button><button class="text-btn delete" onclick="deleteNote('${k}')">DELETE</button></div>`;
+                <div class="note-footer">
+                    <div style="display:flex; gap:5px;">
+                        <button class="text-btn" onclick="navigator.clipboard.writeText('${n.text}')">COPY</button>
+                        <button class="text-btn" onclick="editNote('${k}', \`${n.text}\`, '${n.url}')">EDIT</button>
+                    </div>
+                    <button class="text-btn delete" onclick="deleteNote('${k}')">DELETE</button>
+                </div>`;
             feed.prepend(card);
         });
     });
