@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Smart Notes Sri Lanka</title>
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Sinhala:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --system-bg: #000000;
+            --system-card: #0d0d0f;
+            --system-border: #1c1c1e;
+            --system-blue: #5856d6;
+            --text-main: #ffffff;
+            --text-secondary: #8e8e93;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, 'Inter', 'Noto Sans Sinhala', sans-serif;
+            background-color: var(--system-bg);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header Style */
+        header {
+            width: 100%;
+            padding: 40px 20px 20px 20px;
+            position: sticky; top: 0;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app-title { 
+            font-size: 26px; 
+            font-weight: 800; 
+            margin: 0 0 20px 0; 
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #8e8e93);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Add Notes Button (Join Telegram Style) */
+        .add-notes-btn {
+            background-color: #0d0d0f;
+            border: 1px solid var(--system-border);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .add-notes-btn:active { transform: scale(0.95); }
+
+        .btn-icon {
+            background: var(--system-blue);
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+        }
+
+        /* Container & Cards */
+        .app-content {
+            padding: 20px 15px 100px 15px;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .note-card {
+            background: var(--system-card);
+            border: 1px solid var(--system-border);
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .note-card:hover {
+            border-color: var(--system-blue);
+            background: #121214;
+        }
+
+        .card-emoji {
+            background: #1c1c1e;
+            width: 50px; height: 50px;
+            margin: 0 auto 20px auto;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            color: var(--system-blue);
+        }
+
+        .note-card h3 { 
+            margin: 0 0 10px 0; 
+            font-size: 20px; 
+            font-weight: 700; 
+        }
+
+        .note-card p { 
+            margin: 0; 
+            font-size: 14px; 
+            color: var(--text-secondary); 
+            line-height: 1.6;
+        }
+
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body onload="AOS.refresh()">
+
+    <header data-aos="fade-down">
+        <h1 class="app-title">Smart Notes Sri Lanka</h1>
+        <a href="https://t.me/your_link" target="_blank" class="add-notes-btn">
+            <span class="btn-icon">➕</span>
+            Add School Notes
+        </a>
+    </header>
+
+    <div class="app-content" id="notesGrid">
+        <div class="note-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-emoji">🔬</div>
+            <h3>විද්‍යාව (Science)</h3>
+            <p>පදාර්ථය, ජීව විද්‍යාව සහ භෞතික විද්‍යාවට අදාළ කෙටි සටහන් සහ ප්‍රශ්න පත්‍ර මෙතැනින් බලන්න.</p>
+        </div>
+
+        <div class="note-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="card-emoji">📐</div>
+            <h3>ගණිතය (Mathematics)</h3>
+            <p>ජ්‍යාමිතිය, වීජ ගණිතය සහ සංඛ්‍යාලේඛන විෂය කොටස් සඳහා අවශ්‍ය සියලුම සූත්‍ර එකතුව.</p>
+        </div>
+
+        <div class="note-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="card-emoji">💻</div>
+            <h3>තොරතුරු තාක්ෂණය (ICT)</h3>
+            <p>පද්ධති විශ්ලේෂණය, ක්‍රමලේඛන භාෂා සහ ජාලකරණය පිළිබඳ නවතම සටහන් එකතුව.</p>
+        </div>
+
+        <div class="note-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="card-emoji">📚</div>
+            <h3>සිංහල (Sinhala)</h3>
+            <p>සාහිත්‍යය, ව්‍යාකරණ සහ පද්‍ය පන්ති සඳහා වැදගත් වන කෙටි සටහන් මාලාව.</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // AOS Initialize
+        AOS.init({
+            duration: 800,
+            once: true,
+            easing: 'ease-out-back'
+        });
+    </script>
+</body>
+</html>
