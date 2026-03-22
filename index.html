@@ -10,68 +10,57 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
     <style>
-        :root {
-            --bg: #000; --card: #0d0d0f; --border: #1c1c1e; --blue: #5856d6; --red: #ff3b30; --text: #fff; --text-sec: #8e8e93;
-        }
-        [data-theme="light"] {
-            --bg: #f2f2f7; --card: #fff; --border: #d1d1d6; --blue: #007aff; --red: #ff3b30; --text: #000; --text-sec: #8e8e93;
-        }
+        :root { --bg: #000; --card: #121214; --border: #1c1c1e; --blue: #5856d6; --red: #ff3b30; --text: #fff; --text-sec: #8e8e93; }
+        [data-theme="light"] { --bg: #f2f2f7; --card: #fff; --border: #d1d1d6; --blue: #007aff; --red: #ff3b30; --text: #000; --text-sec: #8e8e93; }
 
         body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; transition: 0.3s; }
         
-        header { width: 100%; max-width: 500px; padding: 30px 20px 10px 20px; text-align: center; position: relative; }
-        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 50%; cursor: pointer; }
-        .greeting { font-size: 14px; color: var(--blue); font-weight: 600; }
-        .app-title { font-size: 26px; font-weight: 800; margin: 10px 0; }
+        header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; position: relative; }
+        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 12px; cursor: pointer; font-size: 12px; }
+        .greeting { font-size: 13px; color: var(--blue); font-weight: 600; margin-bottom: 5px; }
+        .app-title { font-size: 26px; font-weight: 800; margin: 0; }
 
-        /* Search & Controls */
-        .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 12px; margin: 10px 0 20px 0; }
         .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; outline: none; box-sizing: border-box; }
-        
-        .show-input-btn { background: var(--blue); color: #fff; border: none; padding: 12px; border-radius: 30px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .show-input-btn { background: var(--blue); color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; }
 
-        /* Input Section */
-        #inputSection { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: none; animation: slideDown 0.4s ease; }
-        textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; }
+        #inputSection { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: none; box-sizing: border-box; }
+        textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; font-family: inherit; }
         .submit-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        /* Notes Feed */
         .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 50px; }
-        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; animation: fadeIn 0.5s ease; }
-        .media-content { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
+        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; }
+        .media-content { width: 100%; border-radius: 10px; margin: 12px 0; border: 1px solid var(--border); }
         
-        .note-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; }
-        .action-btn { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.6; }
-        .action-btn:hover { opacity: 1; }
+        /* අලුත් Text Buttons */
+        .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); pt: 10px; padding-top: 12px;}
+        .btn-group { display: flex; gap: 8px; }
+        .text-btn { background: var(--border); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 600; }
+        .text-btn.delete { color: var(--red); }
+        .text-btn:active { opacity: 0.7; }
 
-        /* Reactions */
-        .reactions { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 10px; }
-        .react-btn { background: var(--bg); border: 1px solid var(--border); padding: 5px 10px; border-radius: 20px; color: var(--text); font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .reactions { display: flex; gap: 8px; margin-top: 12px; }
+        .react-btn { background: none; border: 1px solid var(--border); padding: 5px 10px; border-radius: 20px; color: var(--text); font-size: 11px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <header>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    <button class="theme-toggle" onclick="toggleTheme()">MODE</button>
     <div id="greeting" class="greeting">HELLO!</div>
     <h1 class="app-title">Smart Notes Sri Lanka</h1>
 </header>
 
 <div class="controls">
-    <input type="text" id="searchInput" class="search-input" onkeyup="searchNotes()" placeholder="සටහන් සොයන්න (Search)...">
-    <button class="show-input-btn" id="mainAddBtn" onclick="toggleInput()">
-        <span>➕</span> Add New Note
-    </button>
+    <input type="text" id="searchInput" class="search-input" onkeyup="searchNotes()" placeholder="සටහන් සොයන්න...">
+    <button class="show-input-btn" id="mainAddBtn" onclick="toggleInput()">ADD NEW NOTE</button>
 </div>
 
 <div id="inputSection">
     <input type="hidden" id="editKey">
-    <textarea id="noteInput" placeholder="ඔයාගේ සටහන මෙතන ටයිප් කරන්න..."></textarea>
-    <input type="text" id="mediaUrl" class="url-input" placeholder="Image හෝ Video URL එක">
-    <button class="submit-btn" id="submitBtn" onclick="saveNote()">Submit Note</button>
+    <textarea id="noteInput" placeholder="ඔයාගේ සටහන මෙතන ලියන්න..."></textarea>
+    <input type="text" id="mediaUrl" class="url-input" placeholder="Image/Video URL (Optional)">
+    <button class="submit-btn" id="submitBtn" onclick="saveNote()">SAVE NOTE</button>
 </div>
 
 <div class="notes-feed" id="notesFeed"></div>
@@ -89,69 +78,49 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Theme Toggle
     function toggleTheme() {
-        const body = document.body;
-        const current = body.getAttribute('data-theme');
-        body.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+        const b = document.body;
+        b.setAttribute('data-theme', b.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
     }
 
     function setGreeting() {
-        const hour = new Date().getHours();
+        const h = new Date().getHours();
         const g = document.getElementById('greeting');
-        if (hour < 12) g.innerText = "Good Morning ☀️";
-        else if (hour < 17) g.innerText = "Good Afternoon 🌤️";
-        else if (hour < 21) g.innerText = "Good Evening 🌙";
-        else g.innerText = "Good Night 😴";
+        g.innerText = h<12 ? "GOOD MORNING ☀️" : h<17 ? "GOOD AFTERNOON 🌤️" : h<21 ? "GOOD EVENING 🌙" : "GOOD NIGHT 😴";
     }
     setGreeting();
 
     function toggleInput() {
-        const s = document.getElementById('inputSection');
-        const b = document.getElementById('mainAddBtn');
+        const s = document.getElementById('inputSection'), b = document.getElementById('mainAddBtn');
         if (s.style.display === "none" || s.style.display === "") {
-            s.style.display = "block";
-            b.innerHTML = "<span>✖</span> Close";
-            b.style.background = "var(--red)";
+            s.style.display = "block"; b.innerText = "CLOSE"; b.style.background = "var(--red)";
         } else {
-            s.style.display = "none";
-            b.innerHTML = "<span>➕</span> Add New Note";
-            b.style.background = "var(--blue)";
+            s.style.display = "none"; b.innerText = "ADD NEW NOTE"; b.style.background = "var(--blue)";
             resetForm();
         }
     }
 
     function saveNote() {
-        const t = document.getElementById('noteInput').value;
-        const u = document.getElementById('mediaUrl').value;
-        const key = document.getElementById('editKey').value;
-
+        const t = document.getElementById('noteInput').value, u = document.getElementById('mediaUrl').value, k = document.getElementById('editKey').value;
         if(t.trim() !== "") {
-            if(key) {
-                db.ref('smart_notes/' + key).update({ text: t, url: u });
-            } else {
-                db.ref('smart_notes').push({ 
-                    text: t, url: u, time: new Date().toLocaleString(),
-                    likes: 0, hearts: 0
-                });
-            }
+            if(k) { db.ref('smart_notes/' + k).update({ text: t, url: u }); }
+            else { db.ref('smart_notes').push({ text: t, url: u, time: new Date().toLocaleString(), likes: 0, hearts: 0 }); }
             toggleInput();
         }
     }
 
     function resetForm() {
-        document.getElementById('noteInput').value = "";
-        document.getElementById('mediaUrl').value = "";
-        document.getElementById('editKey').value = "";
-        document.getElementById('submitBtn').innerText = "Submit Note";
+        document.getElementById('noteInput').value = ""; document.getElementById('mediaUrl').value = "";
+        document.getElementById('editKey').value = ""; document.getElementById('submitBtn').innerText = "SAVE NOTE";
     }
 
     function editNote(key, text, url) {
-        toggleInput();
+        document.getElementById('inputSection').style.display = "block";
         document.getElementById('noteInput').value = text;
         document.getElementById('mediaUrl').value = url;
         document.getElementById('editKey').value = key;
-        document.getElementById('submitBtn').innerText = "Update Note";
+        document.getElementById('submitBtn').innerText = "UPDATE NOW";
+        window.scrollTo(0,0);
     }
 
     function deleteNote(id) {
@@ -159,51 +128,50 @@
     }
 
     function copyNote(text) {
-        navigator.clipboard.writeText(text);
-        alert("සටහන Copy කරගත්තා!");
+        navigator.clipboard.writeText(text).then(() => alert("සටහන Copy කරගත්තා!"));
     }
 
     function react(key, type) {
-        const ref = db.ref(`smart_notes/${key}/${type}`);
-        ref.transaction(current => (current || 0) + 1);
+        db.ref(`smart_notes/${key}/${type}`).transaction(c => (c || 0) + 1);
     }
 
     function searchNotes() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const cards = document.querySelectorAll('.note-card');
-        cards.forEach(card => {
-            card.style.display = card.innerText.toLowerCase().includes(query) ? "block" : "none";
-        });
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.note-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none");
     }
 
     db.ref('smart_notes').on('value', (snap) => {
-        const feed = document.getElementById('notesFeed');
-        feed.innerHTML = "";
+        const feed = document.getElementById('notesFeed'); feed.innerHTML = "";
         snap.forEach((child) => {
-            const n = child.val();
-            const key = child.key;
-            let mHtml = "";
+            const n = child.val(), k = child.key;
+            let m = "";
             if(n.url) {
-                if(n.url.includes('youtube')) mHtml = `<iframe class="media-content" height="230" src="https://www.youtube.com/embed/${n.url.split('v=')[1] || n.url.split('/').pop()}" frameborder="0"></iframe>`;
-                else mHtml = `<img src="${n.url}" class="media-content">`;
+                if(n.url.includes('youtube')) m = `<iframe class="media-content" height="230" src="https://www.youtube.com/embed/${n.url.split('v=')[1] || n.url.split('/').pop()}" frameborder="0"></iframe>`;
+                else m = `<img src="${n.url}" class="media-content">`;
             }
             
-            feed.innerHTML = `
-                <div class="note-card">
-                    <div class="note-actions">
-                        <button class="action-btn" onclick="copyNote('${n.text.replace(/'/g, "\\'")}')">📋</button>
-                        <button class="action-btn" onclick="editNote('${key}', '${n.text.replace(/'/g, "\\'")}', '${n.url}')">✏️</button>
-                        <button class="action-btn" onclick="deleteNote('${key}')">🗑️</button>
+            const card = document.createElement('div');
+            card.className = 'note-card';
+            card.innerHTML = `
+                <div style="font-size: 15px; line-height:1.6;">${n.text}</div>
+                ${m}
+                <div style="font-size:10px; color:var(--text-sec); margin-top:8px;">${n.time}</div>
+                <div class="reactions">
+                    <button class="react-btn" onclick="react('${k}', 'likes')">LIKE ${n.likes || 0}</button>
+                    <button class="react-btn" onclick="react('${k}', 'hearts')">LOVE ${n.hearts || 0}</button>
+                </div>
+                <div class="note-footer">
+                    <div class="btn-group">
+                        <button class="text-btn" id="cp-${k}">COPY</button>
+                        <button class="text-btn" id="ed-${k}">EDIT</button>
                     </div>
-                    <div style="font-size: 15px; margin-top:10px;">${n.text}</div>
-                    ${mHtml}
-                    <div style="font-size:10px; color:var(--text-sec); margin-top:10px;">${n.time}</div>
-                    
-                    <div class="reactions">
-                        <button class="react-btn" onclick="react('${key}', 'likes')">👍 <span>${n.likes || 0}</span></button>
-                        <button class="react-btn" onclick="react('${key}', 'hearts')">❤️ <span>${n.hearts || 0}</span></button>
-                    </div>
-                </div>` + feed.innerHTML;
+                    <button class="text-btn delete" onclick="deleteNote('${k}')">DELETE</button>
+                </div>`;
+            feed.prepend(card);
+            
+            // Event Listeners (මේ විදිහට දැම්මම තමයි හරියටම වැඩ කරන්නේ)
+            document.getElementById(`cp-${k}`).onclick = () => copyNote(n.text);
+            document.getElementById(`ed-${k}`).onclick = () => editNote(k, n.text, n.url);
         });
     });
 </script>
