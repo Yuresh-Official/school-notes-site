@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Notes Sri Lanka - Yuresh Official</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Sinhala:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Sinhala:wght@400;600;800&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
     <style>
-        /* --- Themes --- */
         :root { --bg: #000; --card: #121214; --border: #1c1c1e; --accent: #5856d6; --red: #ff3b30; --text: #fff; --text-sec: #8e8e93; }
         [data-theme="light"] { --bg: #f2f2f7; --card: #fff; --border: #d1d1d6; --accent: #007aff; --text: #000; --text-sec: #666; }
         [data-theme="blue"] { --bg: #001a33; --card: #00264d; --border: #003366; --accent: #00d4ff; --text: #e6f7ff; --text-sec: #80ccff; }
@@ -20,31 +19,34 @@
 
         body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.5s; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
         
-        /* Entrance Animation */
-        body > * { opacity: 0; animation: fadeIn 0.8s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
+        /* Welcome Overlay */
+        #welcomeOverlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; padding: 20px; }
+        #welcomeOverlay h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+        #welcomeOverlay p { opacity: 0.7; margin-bottom: 30px; }
+        .enter-btn { background: var(--accent); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 16px; box-shadow: 0 0 20px var(--accent); transition: 0.3s; }
+        
+        /* Header & Music Toggle */
         header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; position: relative; }
+        .music-toggle { position: absolute; top: 20px; left: 20px; background: var(--card); border: 1px solid var(--border); color: var(--text); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; }
         .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--accent); border: none; color: white; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 700; z-index: 100; }
         .app-title { font-size: 26px; font-weight: 800; margin: 10px 0; }
 
-        /* Controls & Input */
+        /* General UI */
         .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
         .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; outline: none; box-sizing: border-box; }
-        .show-input-btn { background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-
+        .show-input-btn { background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; }
         #inputSection { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: none; box-sizing: border-box; }
         textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; font-family: inherit; }
         .submit-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        /* Notes Feed */
+        /* Notes */
         .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 150px; }
-        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; transition: 0.3s; }
+        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; }
         .media-content { width: 100%; border-radius: 12px; margin: 12px 0; border: 1px solid var(--border); }
         .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
         .text-btn { background: var(--border); color: var(--text); border: none; padding: 7px 14px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 700; }
 
-        /* Floating UI */
+        /* Floating Buttons */
         .fab-container { position: fixed; bottom: 30px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
         .fab { width: 55px; height: 55px; border-radius: 50%; border: none; background: var(--accent); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
         .fab svg { width: 24px; height: 24px; fill: white; }
@@ -56,13 +58,28 @@
         .msg { padding: 10px; border-radius: 12px; font-size: 13px; max-width: 85%; }
         .msg.me { background: var(--accent); align-self: flex-end; }
         .msg.other { background: var(--border); align-self: flex-start; }
-        
-        #nameOverlay { position: absolute; inset: 0; background: var(--card); z-index: 2100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; text-align: center; }
+        #nameOverlay { position: absolute; inset: 0; background: var(--card); z-index: 2100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; }
+
+        /* Arabic Text Style */
+        .arabic-text { font-family: 'Noto Sans Arabic', sans-serif; direction: rtl; font-size: 14px; }
     </style>
 </head>
 <body data-theme="dark">
 
+<div id="welcomeOverlay">
+    <h1>SMART NOTES SL</h1>
+    <p>Welcome to Yuresh Official Digital Space</p>
+    <button class="enter-btn" onclick="startSite()">ENTER SITE</button>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+
 <header>
+    <button class="music-toggle" onclick="toggleMusic()">
+        <svg id="musicIcon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+    </button>
     <button class="theme-toggle" onclick="cycleThemes()">THEME</button>
     <h1 class="app-title">Smart Notes Sri Lanka</h1>
 </header>
@@ -106,9 +123,13 @@
 
 <div id="infoModal" class="modal-box" style="height:auto; bottom:90px;">
     <div class="modal-head"><span>Developer Info</span> <span onclick="closeModals()" style="cursor:pointer">✕</span></div>
-    <div style="padding:20px; font-size:14px; line-height:1.6;">
+    <div style="padding:20px; font-size:14px; line-height:1.8;">
         <p><b>Developer:</b> යුරේෂ් කාවින්ද්‍ය සුමනසිංහ</p>
+        <p><b>Location:</b> නාරම්මල, ශ්‍රී ලංකාව</p>
+        <hr style="border:0; border-top:1px solid var(--border); margin:10px 0;">
         <p>මෙම අඩවිය ශ්‍රී ලංකාවේ නාරම්මල ප්‍රදේශයේ සිට යුරේෂ් විසින් නිර්මාණය කරන ලද්දකි.</p>
+        <p><i>This website was created by Yuresh from Narammala, Sri Lanka.</i></p>
+        <p class="arabic-text">تم إنشاء هذا الموقع بواسطة يوريش من نارامالا، سريلانකා.</p>
     </div>
 </div>
 
@@ -125,6 +146,22 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    // Welcome & Music Logic
+    const bgMusic = document.getElementById('bgMusic');
+    function startSite() {
+        document.getElementById('welcomeOverlay').style.display = 'none';
+        bgMusic.play();
+    }
+    function toggleMusic() {
+        if (bgMusic.paused) {
+            bgMusic.play();
+            document.getElementById('musicIcon').style.color = 'var(--accent)';
+        } else {
+            bgMusic.pause();
+            document.getElementById('musicIcon').style.color = 'var(--text)';
+        }
+    }
 
     // Theme Logic
     const themes = ["dark", "light", "blue", "forest", "rose"];
@@ -163,11 +200,6 @@
         const s = document.getElementById('inputSection'), b = document.getElementById('mainAddBtn');
         s.style.display = (s.style.display === "none" || s.style.display === "") ? "block" : "none";
         b.innerText = (s.style.display === "block") ? "CLOSE" : "ADD NEW NOTE";
-        if(s.style.display === "none") resetForm();
-    }
-    function resetForm() {
-        document.getElementById('noteInput').value = ""; document.getElementById('mediaUrl').value = "";
-        document.getElementById('editKey').value = ""; document.getElementById('submitBtn').innerText = "SAVE NOTE";
     }
     function saveNote() {
         const t = document.getElementById('noteInput').value, u = document.getElementById('mediaUrl').value, k = document.getElementById('editKey').value;
@@ -193,7 +225,6 @@
         document.querySelectorAll('.note-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none");
     }
 
-    // Load Notes
     db.ref('smart_notes').on('value', (snap) => {
         const f = document.getElementById('notesFeed'); f.innerHTML = "";
         snap.forEach((c) => {
