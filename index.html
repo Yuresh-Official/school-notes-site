@@ -13,47 +13,93 @@
         :root { --bg: #000; --card: #121214; --border: #1c1c1e; --blue: #5856d6; --red: #ff3b30; --text: #fff; --text-sec: #8e8e93; }
         [data-theme="light"] { --bg: #f2f2f7; --card: #fff; --border: #d1d1d6; --blue: #007aff; --red: #ff3b30; --text: #000; --text-sec: #8e8e93; }
 
-        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; transition: 0.3s; min-height: 100vh; }
+        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; transition: background 0.3s; min-height: 100vh; overflow-x: hidden; perspective: 1000px; /* 3D effect එක සඳහා */ }
         
-        header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; position: relative; }
-        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 12px; cursor: pointer; font-size: 11px; }
+        /* Initial Loading Animation for the whole body content */
+        body > * { opacity: 0; animation: fallIn 1s ease-out forwards; }
+        
+        header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; position: relative; animation-delay: 0.1s; /* Kali kali watena effect */ }
+        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 12px; cursor: pointer; font-size: 11px; z-index: 10; }
         .greeting { font-size: 13px; color: var(--blue); font-weight: 600; }
         .app-title { font-size: 26px; font-weight: 800; margin: 10px 0; }
 
-        .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-        .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; outline: none; box-sizing: border-box; }
-        .show-input-btn { background: var(--blue); color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; }
+        .controls { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; animation-delay: 0.3s; }
+        .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; outline: none; box-sizing: border-box; transition: transform 0.2s; }
+        .search-input:focus { transform: scale(1.02); }
+        .show-input-btn { background: var(--blue); color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; transition: background 0.3s, transform 0.2s; }
+        .show-input-btn:active { transform: scale(0.98); }
 
-        #inputSection { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: none; box-sizing: border-box; }
-        textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; font-family: inherit; }
-        .submit-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        #inputSection { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: none; box-sizing: border-box; transform-origin: top center; animation: slideDown 0.4s ease-out forwards; }
+        textarea, .url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; font-family: inherit; transition: border-color 0.2s; }
+        textarea:focus, .url-input:focus { border-color: var(--blue); }
+        .submit-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: background 0.3s; }
 
-        .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 80px; }
-        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; }
-        .media-content { width: 100%; border-radius: 10px; margin: 12px 0; border: 1px solid var(--border); }
+        .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 80px; animation-delay: 0.5s; }
+        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; transform-origin: center center; animation: noteFallIn 0.6s ease-out forwards; backface-visibility: hidden; /* Smoothness */ }
+        .media-content { width: 100%; border-radius: 10px; margin: 12px 0; border: 1px solid var(--border); transition: transform 0.3s; }
+        .media-content:hover { transform: scale(1.03); }
         
         .note-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px;}
         .btn-group { display: flex; gap: 8px; }
-        .text-btn { background: var(--border); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 700; }
+        .text-btn { background: var(--border); color: var(--text); border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 700; transition: background 0.2s, color 0.2s; }
         .text-btn.delete { color: var(--red); }
+        .text-btn:hover { background: rgba(255,255,255,0.1); }
+        .text-btn.delete:hover { background: rgba(255, 59, 48, 0.1); }
 
         .reactions { display: flex; gap: 8px; margin-top: 12px; }
-        .react-btn { background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; color: var(--text); font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+        .react-btn { background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; color: var(--text); font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; transition: transform 0.2s, background 0.2s; }
+        .react-btn:active { transform: scale(0.9); }
+        .react-btn:hover { background: rgba(255,255,255,0.05); }
 
         /* Floating Info Button */
-        .info-fab { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--blue); color: white; border: none; border-radius: 50%; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 999; }
+        .info-fab { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--blue); color: white; border: none; border-radius: 50%; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 999; animation: fabPopIn 0.5s ease-out 1s forwards; opacity: 0; }
+        .info-fab:hover { transform: scale(1.1) rotate(15deg); }
 
         /* Modal Structure */
-        #infoModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        .modal-content { background: var(--card); max-width: 500px; margin: 40px auto; padding: 25px; border-radius: 25px; border: 1px solid var(--border); }
+        #infoModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card); max-width: 500px; margin: 40px auto; padding: 25px; border-radius: 25px; border: 1px solid var(--border); transform: scale(0.8); opacity: 0; animation: modalPopIn 0.4s ease-out forwards; }
         .modal-header { font-size: 22px; font-weight: 800; margin-bottom: 20px; color: var(--blue); text-align: center; }
         .lang-block { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
         .lang-title { font-weight: 700; color: var(--text-sec); font-size: 12px; margin-bottom: 8px; display: block; }
         .lang-text { line-height: 1.6; font-size: 14px; }
         .arabic { font-family: 'Noto Sans Arabic', sans-serif; direction: rtl; text-align: right; font-size: 16px; }
-        .close-modal { width: 100%; background: var(--red); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .close-modal { width: 100%; background: var(--red); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
+        .close-modal:hover { background: #d63026; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- Keyframes Animations --- */
+        
+        /* 1. Page Load Fall In (Kali Kali Watena Effect) */
+        @keyframes fallIn {
+            0% { opacity: 0; transform: translateY(-100px) rotateX(-30deg); filter: blur(10px); }
+            100% { opacity: 1; transform: translateY(0) rotateX(0deg); filter: blur(0); }
+        }
+
+        /* 2. Individual Note Fall In ( Bounce Effect) */
+        @keyframes noteFallIn {
+            0% { opacity: 0; transform: translateY(-50px) scale(0.8) rotateX(-15deg); }
+            60% { transform: translateY(10px) scale(1.02); }
+            80% { transform: translateY(-5px) scale(0.99); }
+            100% { opacity: 1; transform: translateY(0) scale(1) rotateX(0deg); }
+        }
+
+        /* 3. Input Section Slide Down */
+        @keyframes slideDown {
+            0% { opacity: 0; transform: scaleY(0); }
+            100% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* 4. FAB Pop In */
+        @keyframes fabPopIn {
+            0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+            70% { transform: scale(1.1) rotate(10deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        /* 5. Modal Pop In */
+        @keyframes modalPopIn {
+            0% { opacity: 0; transform: scale(0.8) translateY(-20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -65,7 +111,7 @@
 </header>
 
 <div class="controls">
-    <input type="text" id="searchInput" class="search-input" onkeyup="searchNotes()" placeholder="සටහන් සොයන්න...">
+    <input type="text" id="searchInput" class="search-input" onkeyup="searchNotes()" placeholder="සටහන් සොයන්න (Search)...">
     <button class="show-input-btn" id="mainAddBtn" onclick="toggleInput()">ADD NEW NOTE</button>
 </div>
 
@@ -171,6 +217,7 @@
 
     function deleteNote(id) {
         if(confirm("ඔබට විශ්වාසද මෙම සටහන මැකීමට අවශ්‍ය බව?")) {
+            // Delete note එකත් අයින් වෙද්දී ලස්සනට අයින් වෙන්න animation එකක් ඇඩ් කරන්න පුළුවන් පස්සේ
             db.ref('smart_notes/' + id).remove();
         }
     }
