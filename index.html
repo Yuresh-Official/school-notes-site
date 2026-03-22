@@ -10,156 +10,87 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
     <style>
-        :root {
-            --bg: #000000;
-            --card: #0d0d0f;
-            --border: #1c1c1e;
-            --blue: #5856d6;
-            --text-main: #ffffff;
-            --text-sec: #8e8e93;
-        }
-
-        body {
-            font-family: 'Inter', 'Noto Sans Sinhala', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        header {
-            width: 100%; max-width: 500px;
-            padding: 40px 20px;
-            text-align: center;
-            position: sticky; top: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-        }
-
-        .app-title { font-size: 28px; font-weight: 800; margin: 0; }
-
-        /* Add Notes Section */
-        .input-box {
-            width: 90%; max-width: 450px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-
-        textarea {
-            width: 100%; height: 80px;
-            background: #1c1c1e;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: white; padding: 12px;
-            font-family: inherit; resize: none; outline: none;
-        }
-
-        .add-btn {
-            width: 100%; background: var(--blue);
-            color: white; border: none;
-            padding: 12px; border-radius: 12px;
-            font-weight: 700; margin-top: 10px; cursor: pointer;
-        }
-
-        /* Notes Feed */
-        .notes-feed {
-            width: 90%; max-width: 450px;
-            display: flex; flex-direction: column; gap: 15px;
-            padding-bottom: 50px;
-        }
-
-        .note-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 20px;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .note-text { font-size: 15px; line-height: 1.6; color: var(--text-main); }
-        
-        .note-date { 
-            font-size: 11px; color: var(--text-sec); 
-            margin-top: 10px; display: block; text-align: right;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        :root { --bg: #000; --card: #0d0d0f; --border: #1c1c1e; --blue: #5856d6; --red: #ff3b30; }
+        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background: var(--bg); color: #fff; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        header { width: 100%; max-width: 500px; padding: 30px 20px; text-align: center; }
+        .input-box { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        textarea, input { width: 100%; background: #1c1c1e; border: 1px solid var(--border); border-radius: 12px; color: white; padding: 12px; margin-bottom: 10px; outline: none; box-sizing: border-box; }
+        .add-btn { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .notes-feed { width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 50px; }
+        .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; position: relative; }
+        .media-content { width: 100%; border-radius: 10px; margin-top: 10px; }
+        .del-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text-sec); cursor: pointer; font-size: 18px; }
+        .del-btn:hover { color: var(--red); }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1 class="app-title">Smart Notes Sri Lanka</h1>
-    </header>
+<header><h1 style="font-size: 26px;">Smart Notes Sri Lanka</h1></header>
 
-    <div class="input-box">
-        <textarea id="noteInput" placeholder="ඔයාගේ සටහන මෙතන ටයිප් කරන්න..."></textarea>
-        <button class="add-btn" onclick="addNote()">Add School Note</button>
-    </div>
+<div class="input-box">
+    <textarea id="noteInput" placeholder="සටහන මෙතන ටයිප් කරන්න..."></textarea>
+    <input type="text" id="mediaUrl" placeholder="Image හෝ Video URL එක (Optional)">
+    <button class="add-btn" onclick="addNote()">Add School Note</button>
+</div>
 
-    <div class="notes-feed" id="notesFeed">
-        </div>
+<div class="notes-feed" id="notesFeed"></div>
 
-    <script>
-        // ඔයාගේ Firebase Config එක මෙන්න
-        const firebaseConfig = {
-            apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
-            authDomain: "smart-notes-sl.firebaseapp.com",
-            databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com",
-            projectId: "smart-notes-sl",
-            storageBucket: "smart-notes-sl.firebasestorage.app",
-            messagingSenderId: "887470710465",
-            appId: "1:887470710465:web:dced581802fce10ef93e40"
-        };
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
+        authDomain: "smart-notes-sl.firebaseapp.com",
+        databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com",
+        projectId: "smart-notes-sl",
+        storageBucket: "smart-notes-sl.firebasestorage.app",
+        messagingSenderId: "887470710465",
+        appId: "1:887470710465:web:dced581802fce10ef93e40"
+    };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-        // සටහනක් Database එකට යැවීම
-        function addNote() {
-            const text = document.getElementById('noteInput').value;
-            const timestamp = new Date().toLocaleString();
-
-            if(text.trim() !== "") {
-                db.ref('all_notes').push({
-                    content: text,
-                    time: timestamp
-                });
-                document.getElementById('noteInput').value = "";
-            } else {
-                alert("කරුණාකර සටහනක් ඇතුළත් කරන්න.");
-            }
+    function addNote() {
+        const text = document.getElementById('noteInput').value;
+        const url = document.getElementById('mediaUrl').value;
+        if(text.trim() !== "") {
+            db.ref('smart_notes').push({ text, url, time: new Date().toLocaleString() });
+            document.getElementById('noteInput').value = "";
+            document.getElementById('mediaUrl').value = "";
         }
+    }
 
-        // සටහන් Real-time ලබාගෙන පෙන්වීම
-        db.ref('all_notes').on('value', (snapshot) => {
-            const feed = document.getElementById('notesFeed');
-            feed.innerHTML = "";
-            
-            const data = snapshot.val();
-            if(data) {
-                // අලුත්ම සටහන් උඩට එන ලෙස සකස් කිරීම
-                const keys = Object.keys(data).reverse();
-                keys.forEach(key => {
-                    const note = data[key];
-                    const card = `
-                        <div class="note-card">
-                            <div class="note-text">${note.content}</div>
-                            <span class="note-date">${note.time}</span>
-                        </div>
-                    `;
-                    feed.innerHTML += card;
-                });
+    function deleteNote(id) {
+        const pass = prompt("Password එක ඇතුළත් කරන්න:");
+        if(pass === "2005") {
+            db.ref('smart_notes/' + id).remove();
+        } else {
+            alert("Password එක වැරදියි!");
+        }
+    }
+
+    db.ref('smart_notes').on('value', (snap) => {
+        const feed = document.getElementById('notesFeed');
+        feed.innerHTML = "";
+        snap.forEach((child) => {
+            const note = child.val();
+            let mediaHtml = "";
+            if(note.url) {
+                if(note.url.includes('youtube.com') || note.url.includes('youtu.be')) {
+                    const vidId = note.url.split('v=')[1] || note.url.split('/').pop();
+                    mediaHtml = `<iframe class="media-content" height="200" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>`;
+                } else {
+                    mediaHtml = `<img src="${note.url}" class="media-content" onerror="this.style.display='none'">`;
+                }
             }
+            feed.innerHTML = `
+                <div class="note-card">
+                    <button class="del-btn" onclick="deleteNote('${child.key}')">🗑️</button>
+                    <div>${note.text}</div>
+                    ${mediaHtml}
+                    <div style="font-size:10px; color:#8e8e93; margin-top:10px;">${note.time}</div>
+                </div>` + feed.innerHTML;
         });
-    </script>
-
+    });
+</script>
 </body>
 </html>
