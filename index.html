@@ -3,80 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Secure Ultimate</title>
+    <title>Smart Notes - Original Full</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #000; --card: #1c1c1e; --text: #fff; --primary: #30d158; --border: rgba(255,255,255,0.1); --admin: #ff3b30; }
+        :root { --bg: #000; --card: #1c1c1e; --text: #fff; --primary: #30d158; --border: rgba(255,255,255,0.1); }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 0; overflow: hidden; }
         
-        .overlay { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px; }
-        .input-box { padding: 14px; border-radius: 12px; border: 1px solid #333; width: 85%; margin-bottom: 15px; background: #111; color: #fff; text-align: center; outline: none; }
-        
-        .scroll-container { height: 100vh; overflow-y: auto; padding: 15px 12px 100px 12px; box-sizing: border-box; display: none; }
-        .note-card { background: var(--card); border-radius: 16px; padding: 12px; margin-bottom: 16px; border: 0.5px solid var(--border); }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .p-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
-        
-        /* Media view full box */
-        .media-box { width: 100%; background: #000; border-radius: 12px; margin: 8px 0; overflow: hidden; display: flex; justify-content: center; max-height: 450px; }
-        .media-box img, .media-box video { max-width: 100%; max-height: 450px; object-fit: contain; display: block; }
+        /* Setup Screen */
+        #welcomeScreen { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
+        .p-setup-img { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; margin-bottom: 20px; }
 
-        /* Chat System UI */
-        #chatBox { position: fixed; bottom: 90px; right: 15px; width: 300px; height: 400px; background: #1c1c1e; border: 0.5px solid var(--border); border-radius: 20px; display: none; flex-direction: column; z-index: 3000; }
-        #chatLogs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .chat-msg { display: flex; gap: 5px; align-items: flex-end; max-width: 85%; }
-        .chat-bubble { padding: 8px 12px; border-radius: 15px; font-size: 13px; background: #333; }
+        .scroll-container { height: 100vh; overflow-y: auto; padding: 15px 12px 100px 12px; box-sizing: border-box; }
+        .note-card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 16px; border: 0.5px solid var(--border); }
+        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .p-img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; }
+        
+        /* Media Optimization */
+        .media-box { width: 100%; background: #000; border-radius: 12px; margin: 10px 0; overflow: hidden; display: flex; justify-content: center; max-height: 480px; }
+        .media-box img, .media-box video { max-width: 100%; max-height: 480px; object-fit: contain; display: block; }
+
+        .react-bar { display: flex; gap: 10px; padding-top: 10px; border-top: 0.5px solid var(--border); }
+        .react-btn { background: rgba(255,255,255,0.08); border: none; padding: 8px 14px; border-radius: 20px; color: #fff; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+
+        /* Community Chat with DP */
+        #chatBox { position: fixed; bottom: 90px; right: 15px; width: 310px; height: 420px; background: #1c1c1e; border: 0.5px solid var(--border); border-radius: 20px; display: none; flex-direction: column; z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        #chatLogs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { display: flex; gap: 8px; align-items: flex-end; max-width: 85%; }
         .chat-msg.me { align-self: flex-end; flex-direction: row-reverse; }
+        .chat-dp { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+        .chat-bubble { padding: 8px 12px; border-radius: 15px; font-size: 13px; background: #333; }
         .chat-msg.me .chat-bubble { background: var(--primary); }
 
-        .fab { position: fixed; bottom: 25px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 24px; z-index: 1000; display:none; }
-        .chat-fab { position: fixed; bottom: 25px; left: 20px; width: 55px; height: 55px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 24px; z-index: 1000; display:none; }
+        .fab { position: fixed; bottom: 25px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 28px; z-index: 1000; }
+        .chat-fab { position: fixed; bottom: 25px; left: 20px; width: 60px; height: 60px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 26px; z-index: 1000; }
     </style>
 </head>
 <body>
 
-<div id="blocker" class="overlay">
-    <h2 id="blockMsg">සර්වර් එක පිරී ඇත (100/100)</h2>
-    <p id="subMsg">පසුව උත්සාහ කරන්න.</p>
-    <button onclick="showAdminLogin()" style="background:none; border:none; color:#222; margin-top:30px;">Admin Access</button>
+<div id="welcomeScreen">
+    <label for="pUpload"><img id="pPreview" class="p-setup-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png"></label>
+    <input type="file" id="pUpload" accept="image/*" style="display:none;" onchange="previewP(this)">
+    <input type="text" id="uNameInp" placeholder="ඔබේ නම..." style="width:70%; padding:14px; border-radius:12px; border:none; margin-bottom:20px; text-align:center; background:#222; color:#fff;">
+    <button onclick="saveProfile()" style="background:var(--primary); color:#fff; border:none; padding:14px 45px; border-radius:25px; font-weight:700;">ඇතුල් වන්න</button>
 </div>
 
-<div id="setup" class="overlay">
-    <h2>Smart Secure Setup</h2>
-    <input type="text" id="uNameInp" class="input-box" placeholder="ඔබේ නම...">
-    <input type="file" id="pUpload" accept="image/*" style="margin-bottom:15px; color:gray;">
-    <button onclick="saveProfile()" style="background:var(--primary); color:#fff; border:none; padding:14px 40px; border-radius:25px; font-weight:700;">Start Session</button>
-</div>
-
-<div id="adminPanel" class="overlay">
-    <h2 style="color:var(--admin)">Admin Unlock</h2>
-    <input type="password" id="adminKey" class="input-box" placeholder="Enter Secret Key...">
-    <button onclick="verifyAdmin()" style="background:var(--admin); color:#fff; border:none; padding:12px 40px; border-radius:20px;">Unlock Now</button>
-</div>
-
-<div class="scroll-container" id="appContent">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h1 style="font-size: 24px; margin: 0;">Smart Feed</h1>
-        <div id="sessionTimer" style="font-size:12px; color:var(--primary); font-weight:bold;">--:--</div>
-    </div>
+<div class="scroll-container">
+    <h1 style="font-size: 24px; margin-bottom: 20px;">Smart Feed</h1>
     <div id="notesFeed"></div>
 </div>
 
-<button class="chat-fab" id="chatBtn" onclick="toggleChat()">💬</button>
-<button class="fab" id="addBtn" onclick="toggleAdd()">+</button>
+<button class="chat-fab" onclick="toggleChat()">💬</button>
+<button class="fab" onclick="toggleAdd()">+</button>
 
 <div id="addBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:4000; padding:20px; flex-direction:column; justify-content:center;">
-    <textarea id="noteTxt" placeholder="මොනවා හරි ලියන්න..." style="width:100%; height:120px; background:#111; color:#fff; border:1px solid #333; padding:15px; border-radius:15px; margin-bottom:15px; outline:none;"></textarea>
-    <input type="file" id="fileInp" accept="image/*,video/*" style="margin-bottom:15px; color:gray;">
-    <button id="postBtn" onclick="postNote()" style="background:var(--primary); color:#fff; border:none; padding:15px; border-radius:15px; font-weight:700;">පළ කරන්න</button>
+    <textarea id="noteTxt" placeholder="මොනවා හරි ලියන්න..." style="width:100%; height:140px; background:#111; color:#fff; border:1px solid #333; padding:15px; border-radius:15px; margin-bottom:20px; outline:none; font-size:16px;"></textarea>
+    <input type="file" id="fileInp" accept="image/*,video/*" style="margin-bottom:20px; color:gray;">
+    <button id="postBtn" onclick="postNote()" style="background:var(--primary); color:#fff; border:none; padding:16px; border-radius:15px; font-weight:700;">පළ කරන්න</button>
     <button onclick="toggleAdd()" style="background:none; border:none; color:gray; margin-top:15px;">Close</button>
 </div>
 
 <div id="chatBox">
+    <div style="padding:15px; border-bottom:0.5px solid var(--border); font-weight:700;">Chat</div>
     <div id="chatLogs"></div>
-    <div style="padding:10px; display:flex; gap:5px; border-top:0.5px solid var(--border);">
-        <input type="text" id="chatInp" placeholder="Type..." style="flex:1; background:#222; border:none; padding:8px; border-radius:10px; color:#fff; outline:none;">
+    <div style="padding:12px; display:flex; gap:8px;">
+        <input type="text" id="chatInp" placeholder="Type here..." style="flex:1; background:#333; border:none; padding:10px; border-radius:20px; color:#fff; outline:none;">
         <button onclick="sendMsg()" style="color:var(--primary); background:none; border:none; font-weight:700;">Send</button>
     </div>
 </div>
@@ -86,109 +77,28 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const ADMIN_PASS = "Yuresh@2026";
-    const ONE_HOUR = 60 * 60 * 1000;
-    const FIVE_HOURS = 5 * 60 * 60 * 1000;
+    let myData = JSON.parse(localStorage.getItem("smart_user_v1"));
+    if(!myData) document.getElementById('welcomeScreen').style.display = 'flex';
 
-    let myData = JSON.parse(localStorage.getItem("secure_user_v3"));
-
-    async function checkAccess() {
-        if (myData && myData.isAdmin) { enterApp(); return; }
-
-        if (myData && myData.lastExit) {
-            const timePassed = Date.now() - myData.lastExit;
-            if (timePassed < FIVE_HOURS) {
-                const wait = Math.ceil((FIVE_HOURS - timePassed) / (60 * 1000));
-                showBlock("විවේක කාලය", `නැවත ඇතුල් වීමට තව මිනිත්තු ${wait} ක් ඇත.`);
-                return;
-            }
-        }
-
-        const snap = await db.ref('online_users').once('value');
-        if (snap.numChildren() >= 100) { showBlock("සර්වර් එක පිරී ඇත", "දැනට 100 දෙනාම ඇතුලත සිටී."); return; }
-
-        if (!myData || !myData.startTime) { document.getElementById('setup').style.display = 'flex'; }
-        else { enterApp(); }
-    }
-
-    function showBlock(t, m) { document.getElementById('blocker').style.display = 'flex'; document.getElementById('blockMsg').innerText=t; document.getElementById('subMsg').innerText=m; }
-    function showAdminLogin() { document.getElementById('blocker').style.display='none'; document.getElementById('adminPanel').style.display='flex'; }
+    function previewP(i) { if(i.files[0]) { const r = new FileReader(); r.onload=e=>document.getElementById('pPreview').src=e.target.result; r.readAsDataURL(i.files[0]); } }
 
     async function saveProfile() {
         const name = document.getElementById('uNameInp').value, file = document.getElementById('pUpload').files[0];
-        if(!name || !file) return alert("නම සහ DP එකක් දාන්න!");
+        if(!name || !file) return alert("නම සහ පින්තූරයක් අවශ්‍යයි!");
         const fd = new FormData(); fd.append("image", file);
         const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", {method:"POST", body:fd});
         const d = await res.json();
-        myData = { name, photo: d.data.url, startTime: Date.now(), isAdmin: false, id: "u_"+Date.now() };
-        localStorage.setItem("secure_user_v3", JSON.stringify(myData));
-        enterApp();
-    }
-
-    function verifyAdmin() {
-        if(document.getElementById('adminKey').value === ADMIN_PASS) {
-            myData = { name: "Admin", photo: "https://cdn-icons-png.flaticon.com/512/6024/6024190.png", isAdmin: true, id: "admin_1" };
-            localStorage.setItem("secure_user_v3", JSON.stringify(myData));
-            location.reload();
-        } else alert("Key Wrong!");
-    }
-
-    function enterApp() {
-        document.querySelectorAll('.overlay').forEach(o=>o.style.display='none');
-        document.getElementById('appContent').style.display='block';
-        document.getElementById('addBtn').style.display='block';
-        document.getElementById('chatBtn').style.display='block';
-
-        db.ref('online_users/' + myData.id).set({ name: myData.name });
-        db.ref('online_users/' + myData.id).onDisconnect().remove();
-
-        if(!myData.isAdmin) {
-            const left = ONE_HOUR - (Date.now() - myData.startTime);
-            if(left <= 0) exitApp();
-            startTimer(left);
-        } else document.getElementById('sessionTimer').innerText = "Admin Unlimited";
-
-        loadFeed();
-        loadChat();
-    }
-
-    function startTimer(t) {
-        setInterval(() => {
-            t -= 1000;
-            const m = Math.floor(t/60000), s = Math.floor((t%60000)/1000);
-            document.getElementById('sessionTimer').innerText = `Time: ${m}:${s<10?'0':''}${s}`;
-            if(t <= 0) exitApp();
-        }, 1000);
-    }
-
-    async function exitApp() {
-        if(!myData.isAdmin) { myData.lastExit = Date.now(); myData.startTime = null; localStorage.setItem("secure_user_v3", JSON.stringify(myData)); }
-        else localStorage.removeItem("secure_user_v3");
-        await db.ref('online_users/' + myData.id).remove();
+        myData = { name, photo: d.data.url };
+        localStorage.setItem("smart_user_v1", JSON.stringify(myData));
         location.reload();
     }
 
-    // Load Feed with Photo/Video Support
-    function loadFeed() {
-        db.ref('smart_notes').limitToLast(20).on('value', snap => {
-            const feed = document.getElementById('notesFeed');
-            snap.forEach(c => {
-                const id = c.key, d = c.val(), existing = document.getElementById('card-'+id);
-                if(!existing) {
-                    let media = d.url ? (d.fileType === "video" ? `<div class="media-box"><video src="${d.url}" controls preload="metadata"></video></div>` : `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`) : "";
-                    const html = `<div class="note-card" id="card-${id}">
-                        <div class="user-info"><img src="${d.uPhoto}" class="p-img"><b>${d.uName}</b></div>
-                        <div>${d.text || ""}</div>${media}
-                        <div style="margin-top:10px;"><button style="background:none; border:none; color:gray;" onclick="db.ref('smart_notes/${id}/likes').transaction(c=>(c||0)+1)">❤️ ${d.likes || 0}</button></div>
-                    </div>`;
-                    feed.insertAdjacentHTML('afterbegin', html);
-                }
-            });
-        });
-    }
+    function toggleAdd() { const b = document.getElementById('addBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
+    function toggleChat() { const b = document.getElementById('chatBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
 
     async function postNote() {
         const text = document.getElementById('noteTxt').value, file = document.getElementById('fileInp').files[0], btn = document.getElementById('postBtn');
+        if(!text && !file) return;
         btn.disabled = true; btn.innerText = "Syncing...";
         let url = "", type = "text";
         if(file) {
@@ -203,26 +113,47 @@
                 const d = await res.json(); url = d.secure_url; type = "video";
             }
         }
-        await db.ref('smart_notes').push({ uName: myData.name, uPhoto: myData.photo, text, url, fileType: type, time: Date.now(), likes: 0 });
+        await db.ref('smart_notes').push({ uName: myData.name, uPhoto: myData.photo, text, url, fileType: type, time: Date.now(), reacts: {love:0, fire:0} });
         location.reload();
     }
 
-    function toggleAdd() { const b = document.getElementById('addBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
-    function toggleChat() { const b = document.getElementById('chatBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
-
-    function sendMsg() { const i = document.getElementById('chatInp'); if(i.value) { db.ref('chat').push({name:myData.name, photo:myData.photo, msg:i.value}); i.value=""; } }
-    function loadChat() {
-        db.ref('chat').limitToLast(20).on('value', s => {
-            const l = document.getElementById('chatLogs'); l.innerHTML = "";
-            s.forEach(c => {
-                const d = c.val(), isMe = d.name === myData.name;
-                l.innerHTML += `<div class="chat-msg ${isMe?'me':''}"><img src="${d.photo}" class="p-img" style="width:20px;height:20px;"><div class="chat-bubble">${d.msg}</div></div>`;
-            });
-            l.scrollTop = l.scrollHeight;
+    // Stable Feed Update (Video Reset නොවී වැඩ කරයි)
+    db.ref('smart_notes').limitToLast(20).on('value', snap => {
+        const feed = document.getElementById('notesFeed');
+        snap.forEach(c => {
+            const id = c.key, d = c.val(), existing = document.getElementById('card-'+id);
+            if(existing) {
+                existing.querySelector('.l-cnt').innerText = d.reacts?.love || 0;
+                existing.querySelector('.f-cnt').innerText = d.reacts?.fire || 0;
+            } else {
+                let media = d.url ? (d.fileType === "video" ? `<div class="media-box"><video src="${d.url}" controls playsinline></video></div>` : `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`) : "";
+                const html = `<div class="note-card" id="card-${id}">
+                    <div class="user-info"><img src="${d.uPhoto}" class="p-img"><b>${d.uName}</b></div>
+                    <div style="font-size:15px; margin-bottom:5px;">${d.text || ""}</div>${media}
+                    <div class="react-bar">
+                        <button class="react-btn" onclick="react('${id}','love')">❤️ <span class="l-cnt">${d.reacts?.love||0}</span></button>
+                        <button class="react-btn" onclick="react('${id}','fire')">🔥 <span class="f-cnt">${d.reacts?.fire||0}</span></button>
+                    </div></div>`;
+                feed.insertAdjacentHTML('afterbegin', html);
+            }
         });
-    }
+    });
 
-    checkAccess();
+    function react(id, t) { db.ref(`smart_notes/${id}/reacts/${t}`).transaction(c=>(c||0)+1); }
+
+    // Chat Logic with DP
+    function sendMsg() { const i = document.getElementById('chatInp'); if(i.value) { db.ref('chat').push({name:myData.name, photo:myData.photo, msg:i.value}); i.value=""; } }
+    db.ref('chat').limitToLast(20).on('value', snap => {
+        const logs = document.getElementById('chatLogs'); logs.innerHTML = "";
+        snap.forEach(c => {
+            const d = c.val(), isMe = d.name === myData.name;
+            logs.innerHTML += `<div class="chat-msg ${isMe?'me':''}">
+                <img src="${d.photo}" class="chat-dp">
+                <div class="chat-bubble"><b>${d.name}:</b> ${d.msg}</div>
+            </div>`;
+        });
+        logs.scrollTop = logs.scrollHeight;
+    });
 </script>
 </body>
 </html>
