@@ -3,116 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Notes SL - Ultimate Edition</title>
+    <title>Smart Notes SL - Ultimate Fix</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --primary: #30d158; --glass: rgba(255, 255, 255, 0.08); --border: rgba(255, 255, 255, 0.15); --chat-bg: #1c1c1e; }
+        :root { --primary: #30d158; --glass: rgba(255, 255, 255, 0.1); --border: rgba(255, 255, 255, 0.2); }
         body { background: #000; color: #fff; font-family: -apple-system, sans-serif; margin: 0; overflow-x: hidden; }
         
-        /* Animated Background */
-        .bg-glow { position: fixed; width: 400px; height: 400px; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.35; animation: drift 15s infinite alternate; }
-        .g1 { background: #1a73e8; top: -100px; left: -100px; }
-        .g2 { background: #30d158; bottom: -100px; right: -100px; }
-        @keyframes drift { from { transform: translate(0,0); } to { transform: translate(50px, 50px); } }
+        /* Animated Background Glows */
+        .bg-glow { position: fixed; width: 300px; height: 300px; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.4; }
+        .g1 { background: #1a73e8; top: -50px; left: -50px; }
+        .g2 { background: #30d158; bottom: -50px; right: -50px; }
 
         .container { min-height: 100vh; padding: 20px 15px 120px 15px; display: flex; flex-direction: column; align-items: center; }
         
-        /* Glass Card */
+        /* Glass Card Design */
         .card { 
-            width: 100%; max-width: 400px; background: var(--glass); 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 28px; padding: 16px; margin-bottom: 22px; 
-            border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            width: 100%; max-width: 380px; background: var(--glass); 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px; padding: 15px; margin-bottom: 20px; 
+            border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
 
-        .user-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .user-row img { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--primary); object-fit: cover; }
-        .user-row span { font-weight: 700; font-size: 15px; }
+        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .user-row img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid var(--primary); }
+        .user-row b { font-size: 14px; }
 
-        .media-holder { width: 100%; border-radius: 18px; overflow: hidden; margin: 12px 0; background: rgba(0,0,0,0.6); }
-        .media-holder img, .media-holder video { width: 100%; display: block; max-height: 550px; object-fit: contain; }
+        /* Media Display Fix */
+        .media-box { width: 100%; border-radius: 12px; overflow: hidden; margin: 10px 0; background: #000; }
+        .media-box img, .media-box video { width: 100%; display: block; max-height: 500px; object-fit: contain; }
 
-        /* Floating Upload Status */
+        /* Upload Status Toast */
         #statusToast { 
-            position: fixed; top: 30px; left: 50%; transform: translateX(-50%); 
-            background: rgba(30, 30, 32, 0.9); backdrop-filter: blur(12px);
-            border: 1px solid var(--primary); padding: 12px 24px; border-radius: 40px; 
-            display: none; align-items: center; gap: 12px; z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+            background: rgba(20,20,22,0.9); border: 1px solid var(--primary); 
+            padding: 10px 20px; border-radius: 30px; display: none; align-items: center; gap: 10px; z-index: 9999;
         }
 
-        /* Buttons */
-        .fab { position: fixed; bottom: 35px; right: 25px; width: 65px; height: 65px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 32px; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(48, 209, 88, 0.4); }
-        .chat-toggle { position: fixed; bottom: 35px; left: 25px; width: 65px; height: 65px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 28px; z-index: 1000; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4); }
+        .fab { position: fixed; bottom: 30px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 30px; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .chat-toggle { position: fixed; bottom: 30px; left: 25px; width: 60px; height: 60px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 25px; z-index: 1000; }
 
         /* Preview UI */
-        #prevGrid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; width: 100%; max-height: 350px; overflow-y: auto; }
-        .prev-item { display: flex; gap: 12px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 15px; border: 1px solid var(--border); align-items: center; }
-        .prev-item img, .prev-item video { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; }
-        .cap-box { flex: 1; background: #222; border: none; color: #fff; padding: 10px; border-radius: 10px; outline: none; font-size: 14px; }
+        #prevList { width: 100%; margin-top: 15px; max-height: 300px; overflow-y: auto; }
+        .prev-item { display: flex; gap: 10px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px; margin-bottom: 8px; align-items: center; border: 1px solid var(--border); }
+        .prev-item img, .prev-item video { width: 55px; height: 55px; border-radius: 6px; object-fit: cover; }
+        .cap-inp { flex: 1; background: #222; border: none; color: #fff; padding: 8px; border-radius: 8px; font-size: 13px; outline: none; }
 
         /* Chat UI */
-        #chatWrap { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); z-index: 8000; display: none; flex-direction: column; padding: 20px; padding-top: 60px; }
-        #msgLogs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 10px; }
-        .msg-bubble { max-width: 75%; padding: 10px 15px; border-radius: 18px; font-size: 14px; line-height: 1.4; position: relative; }
-        .my-msg { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
-        .other-msg { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+        #chatBox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); z-index: 8000; display: none; flex-direction: column; padding: 20px; }
+        #chatLogs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 10px; border-radius: 15px; font-size: 14px; }
+        .msg-me { align-self: flex-end; background: var(--primary); }
+        .msg-other { align-self: flex-start; background: rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
     <div class="bg-glow g1"></div><div class="bg-glow g2"></div>
 
-    <div id="statusToast">
-        <div style="width:18px; height:18px; border:2px solid var(--primary); border-top-color:transparent; border-radius:50%; animation: spin 1s infinite linear;"></div>
-        <span id="statusTxt" style="font-size:14px; font-weight:700;">Syncing...</span>
-    </div>
+    <div id="statusToast"><div class="spinner"></div><span id="stTxt">Syncing...</span></div>
 
     <div class="container">
-        <h2 style="width:100%; max-width:400px; margin-bottom:25px; font-weight:800; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">Smart Notes Sri Lanka</h2>
+        <h3 style="width:100%; max-width:380px; margin-bottom:20px;">Smart Notes SL</h3>
         <div id="feed" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
     </div>
 
     <button class="chat-toggle" onclick="toggleChat()">💬</button>
     <button class="fab" onclick="toggleAdd()">+</button>
 
-    <div id="addBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.96); z-index:9000; align-items:center; justify-content:center; padding:25px;">
-        <div style="width:100%; max-width:400px; text-align: center;">
-            <h3 style="margin-bottom: 20px;">අලුත් පෝස්ට් එකක්</h3>
-            <input type="file" id="files" accept="image/*,video/*" multiple onchange="genPrev(this)" style="font-size:12px; color:#aaa; margin-bottom:15px;">
-            <div id="prevGrid"></div>
-            <button onclick="uploadAll()" id="goBtn" style="width:100%; background:var(--primary); color:#fff; border:none; padding:18px; border-radius:20px; font-weight:700; margin-top:25px; box-shadow: 0 5px 15px rgba(48,209,88,0.3);">සියල්ල පෝස්ට් කරන්න</button>
-            <button onclick="toggleAdd()" style="background:none; border:none; color:gray; margin-top:15px; font-size:14px;">දැන් එපා</button>
+    <div id="addBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.98); z-index:9000; align-items:center; justify-content:center; padding:20px;">
+        <div style="width:100%; max-width:380px; text-align:center;">
+            <h4>අලුත් පෝස්ට් එකක්</h4>
+            <input type="file" id="fileInp" accept="image/*,video/*" multiple onchange="doPrev(this)" style="font-size:12px; color:gray;">
+            <div id="prevList"></div>
+            <button onclick="startUpload()" id="upBtn" style="width:100%; background:var(--primary); color:#fff; border:none; padding:15px; border-radius:15px; font-weight:700; margin-top:20px;">පළ කරන්න</button>
+            <button onclick="toggleAdd()" style="background:none; border:none; color:gray; margin-top:10px;">අහක් කරන්න</button>
         </div>
     </div>
 
-    <div id="chatWrap">
-        <button onclick="toggleChat()" style="position:absolute; top:20px; right:25px; background:none; border:none; color:#fff; font-size:30px;">×</button>
-        <h3 style="margin-bottom:20px;">Community Chat</h3>
-        <div id="msgLogs"></div>
-        <div style="display:flex; gap:10px; padding:15px; background:rgba(255,255,255,0.05); border-radius:25px; border:1px solid var(--border); margin-bottom:20px;">
-            <input type="text" id="mInp" placeholder="මැසේජ් එකක්..." style="flex:1; background:none; border:none; color:#fff; outline:none; font-size:15px;">
-            <button onclick="sendM()" style="color:var(--primary); background:none; border:none; font-weight:700;">Send</button>
+    <div id="chatBox">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h4>Live Chat</h4>
+            <button onclick="toggleChat()" style="background:none; border:none; color:#fff; font-size:24px;">×</button>
+        </div>
+        <div id="chatLogs"></div>
+        <div style="display:flex; gap:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:20px; border:1px solid var(--border);">
+            <input type="text" id="chatInp" placeholder="මැසේජ් එකක්..." style="flex:1; background:none; border:none; color:#fff; outline:none;">
+            <button onclick="sendChat()" style="color:var(--primary); background:none; border:none; font-weight:700;">Send</button>
         </div>
     </div>
 
     <script>
-        const config = { apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g", databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com" };
-        firebase.initializeApp(config);
+        const firebaseConfig = { apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g", databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com" };
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let me = JSON.parse(localStorage.getItem("smart_user_v2"));
-        let busy = false;
+        let myData = JSON.parse(localStorage.getItem("smart_user_v2"));
+        let isUp = false;
 
-        window.onbeforeunload = () => busy ? "Upload active!" : null;
+        window.onbeforeunload = () => isUp ? "Upload in progress..." : null;
 
-        function genPrev(input) {
-            const grid = document.getElementById('prevGrid'); grid.innerHTML = "";
+        function doPrev(input) {
+            const list = document.getElementById('prevList'); list.innerHTML = "";
             Array.from(input.files).slice(0, 4).forEach((f, i) => {
                 const r = new FileReader();
                 r.onload = e => {
-                    grid.innerHTML += `<div class="prev-item">
+                    list.innerHTML += `<div class="prev-item">
                         ${f.type.startsWith('video') ? `<video src="${e.target.result}"></video>` : `<img src="${e.target.result}">`}
-                        <input type="text" id="t-${i}" class="cap-box" placeholder="මෙයට විස්තරයක්...">
+                        <input type="text" id="cap-${i}" class="cap-inp" placeholder="විස්තරය...">
                     </div>`;
                 };
                 r.readAsDataURL(f);
@@ -120,38 +117,35 @@
         }
 
         function toggleAdd() { const b = document.getElementById('addBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
-        function toggleChat() { const b = document.getElementById('chatWrap'); b.style.display = b.style.display==='none'?'flex':'none'; }
+        function toggleChat() { const b = document.getElementById('chatBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
 
-        async function uploadAll() {
-            const fs = document.getElementById('files').files;
-            if(fs.length === 0) return alert("Select files first!");
-
-            busy = true; toggleAdd();
+        async function startUpload() {
+            const fs = document.getElementById('fileInp').files;
+            if(fs.length === 0) return;
+            isUp = true; toggleAdd();
             const toast = document.getElementById('statusToast'); toast.style.display = 'flex';
 
             for(let i=0; i < Math.min(fs.length, 4); i++) {
-                const f = fs[i], cap = document.getElementById(`t-${i}`).value;
-                document.getElementById('statusTxt').innerText = `Posting ${i+1}/${fs.length}...`;
-
+                const f = fs[i], cap = document.getElementById(`cap-${i}`).value;
+                document.getElementById('stTxt').innerText = `Uploading ${i+1}/${fs.length}...`;
                 let fd = new FormData();
                 let isImg = f.type.startsWith('image');
                 let url = isImg ? "https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160" : "https://api.cloudinary.com/v1_1/ds5ig0wvd/upload";
-                
-                if(isImg) fd.append("image", f);
-                else { fd.append("file", f); fd.append("upload_preset", "Yuresh_preset"); }
+                if(isImg) fd.append("image", f); else { fd.append("file", f); fd.append("upload_preset", "Yuresh_preset"); }
 
                 try {
                     const res = await fetch(url, { method: "POST", body: fd });
                     const d = await res.json();
+                    const finalUrl = isImg ? d.data.url : d.secure_url;
                     await db.ref('smart_notes').push({
-                        uN: me.name, uP: me.photo,
-                        txt: cap, url: isImg ? d.data.url : d.secure_url,
-                        fT: isImg ? "img" : "vid", ts: Date.now(), luv: 0
+                        uN: myData.name, uP: myData.photo,
+                        txt: cap, url: finalUrl, type: isImg ? "img" : "vid",
+                        ts: Date.now(), luv: 0
                     });
                 } catch(e) {}
             }
-            busy = false; document.getElementById('statusTxt').innerText = "සාර්ථකයි! ✅";
-            setTimeout(() => toast.style.display = 'none', 3000);
+            isUp = false; document.getElementById('stTxt').innerText = "Done!";
+            setTimeout(() => toast.style.display = 'none', 2000);
         }
 
         db.ref('smart_notes').limitToLast(15).on('value', s => {
@@ -159,29 +153,33 @@
             s.forEach(c => {
                 const id = c.key, d = c.val();
                 if(!document.getElementById('c-'+id)) {
-                    let m = d.url ? (d.fT === "vid" ? `<div class="media-holder"><video src="${d.url}" controls playsinline preload="none"></video></div>` : `<div class="media-holder"><img src="${d.url}" loading="lazy"></div>`) : "";
+                    // Media Check Fix
+                    let m = "";
+                    if(d.url) {
+                        if(d.type === "vid") m = `<div class="media-box"><video src="${d.url}" controls playsinline preload="metadata"></video></div>`;
+                        else m = `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`;
+                    }
                     f.insertAdjacentHTML('afterbegin', `<div class="card" id="c-${id}">
-                        <div class="user-row"><img src="${d.uP}"><span>${d.uN}</span></div>
-                        <div style="font-size:15px; color:#ddd; margin: 5px 0 10px 0;">${d.txt || ""}</div>${m}
-                        <div style="margin-top:12px;"><button style="background:rgba(255,255,255,0.1); border:none; color:#fff; padding:8px 16px; border-radius:20px; font-size:13px;" onclick="db.ref('smart_notes/${id}/luv').transaction(v=>(v||0)+1)">❤️ <span id="l-${id}">${d.luv||0}</span></button></div>
+                        <div class="user-row"><img src="${d.uP}"><b>${d.uN}</b></div>
+                        <div style="font-size:14px; margin-bottom:5px;">${d.txt || ""}</div>${m}
+                        <div style="margin-top:10px;"><button style="background:rgba(255,255,255,0.1); border:none; color:#fff; padding:6px 12px; border-radius:20px; font-size:12px;" onclick="db.ref('smart_notes/${id}/luv').transaction(v=>(v||0)+1)">❤️ <span id="l-${id}">${d.luv||0}</span></button></div>
                     </div>`);
                 } else document.getElementById('l-'+id).innerText = d.luv || 0;
             });
         });
 
-        function sendM() { const i = document.getElementById('mInp'); if(i.value){ db.ref('chat').push({n:me.name, p:me.photo, m:i.value}); i.value=""; } }
-        db.ref('chat').limitToLast(25).on('value', s => {
-            const l = document.getElementById('msgLogs'); l.innerHTML = "";
+        function sendChat() { const i = document.getElementById('chatInp'); if(i.value){ db.ref('chat').push({n:myData.name, p:myData.photo, m:i.value}); i.value=""; } }
+        db.ref('chat').limitToLast(20).on('value', s => {
+            const l = document.getElementById('chatLogs'); l.innerHTML = "";
             s.forEach(c => {
-                const d = c.val(), isMe = d.n === me.name;
-                l.innerHTML += `<div class="msg-bubble ${isMe?'my-msg':'other-msg'}">
-                    <div style="font-size:10px; opacity:0.7; margin-bottom:2px;">${isMe?'You':d.n}</div>
-                    ${d.m}
+                const d = c.val(), isMe = d.n === myData.name;
+                l.innerHTML += `<div class="msg ${isMe?'msg-me':'msg-other'}">
+                    <div style="font-size:10px; opacity:0.7;">${isMe?'You':d.n}</div>${d.m}
                 </div>`;
             });
             l.scrollTop = l.scrollHeight;
         });
     </script>
-    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+    <style>.spinner { width:16px; height:16px; border:2px solid var(--primary); border-top-color:transparent; border-radius:50%; animation: spin 1s infinite linear; } @keyframes spin { to { transform: rotate(360deg); } }</style>
 </body>
 </html>
