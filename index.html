@@ -2,72 +2,90 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Notes Sri Lanka - Ultimate Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Notes Sri Lanka - Pro Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         :root { --bg: #000; --card: #121212; --primary: #4f46e5; --text: #fff; --border: #333; --red: #ff4d4d; }
         body[data-theme="light"] { --bg: #f0f2f5; --card: #fff; --text: #000; --border: #ddd; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 10px; transition: 0.3s; }
+        
+        /* Security: Disable Copy & Zoom */
+        body { 
+            background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 10px; 
+            user-select: none; -webkit-user-select: none; touch-action: pan-x pan-y; 
+        }
+
         .container { max-width: 500px; margin: auto; padding-bottom: 100px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .search-box { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); margin-bottom: 15px; box-sizing: border-box; }
-        .main-btn { width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
-        .input-card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--border); display: none; }
-        .input-card textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background: #000; color: #fff; box-sizing: border-box; font-size: 15px; }
-        .file-label { display: block; background: #1e1e1e; border: 1px dashed var(--border); padding: 15px; text-align: center; border-radius: 10px; cursor: pointer; margin-bottom: 10px; font-size: 14px; color: #aaa; }
+        
+        /* Notification Toast */
+        #notification {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: white; padding: 12px 20px;
+            border-radius: 30px; z-index: 2000; transition: 0.5s; font-size: 13px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 80%; text-align: center;
+        }
+
         .note-card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
         .media-container { width: 100%; margin-bottom: 12px; border-radius: 10px; overflow: hidden; background: #000; }
-        .media-content { width: 100%; max-height: 400px; display: block; object-fit: contain; cursor: pointer; }
-        .note-display { white-space: pre-wrap; word-wrap: break-word; line-height: 1.6; font-size: 15px; margin-bottom: 10px; }
-        .text-btn { background: #1e1e1e; color: #aaa; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-        .note-footer { display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
-        .modal-box { position: fixed; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; z-index: 1000; display: none; padding: 10px; }
-        .modal-head { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold; }
-        .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 999; }
-        .fab { width: 55px; height: 55px; border-radius: 50%; background: var(--primary); border: none; color: #fff; font-size: 20px; cursor: pointer; }
-        #chatBox { bottom: 90px; height: 400px; flex-direction: column; }
-        #chatLogs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 14px; background: #333; color: #fff; }
+        .media-content { width: 100%; max-height: 400px; display: block; object-fit: contain; }
+
+        .note-footer { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
+        
+        .btn-group { display: flex; gap: 8px; }
+        .text-btn { background: #1e1e1e; color: #aaa; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; }
+        .like-btn { background: transparent; border: 1px solid var(--border); color: #fff; display: flex; align-items: center; gap: 5px; }
+        .like-btn.active { color: var(--red); border-color: var(--red); }
+
+        /* Full Screen Chat Box */
+        #chatBox { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg); z-index: 1500; display: none; flex-direction: column; 
+        }
+        #chatLogs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 14px; background: #222; align-self: flex-start; }
+        .msg.me { align-self: flex-end; background: var(--primary); }
+
+        .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+        .fab { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); border: none; color: #fff; font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     </style>
 </head>
-<body data-theme="dark">
+<body>
+
+<div id="notification">නව පණිවිඩයක් ලැබුණා! 💬</div>
 
 <div class="container">
-    <div class="header">
-        <div style="background:orange; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:bold; color:#000;">Smart Notes SL</div>
+    <div class="header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div style="background:orange; padding:5px 12px; border-radius:20px; font-weight:bold; color:#000;">Smart Notes</div>
         <button class="text-btn" onclick="cycleThemes()">THEME</button>
     </div>
-    <h1 style="text-align:center;">Digital Diary</h1>
-    <input type="text" id="searchInput" class="search-box" placeholder="සටහන් සොයන්න..." onkeyup="searchNotes()">
-    <button id="mainAddBtn" class="main-btn" onclick="toggleInput()">ADD NEW NOTE</button>
 
-    <div id="inputSection" class="input-card">
-        <label class="file-label" for="fileInput">📷 Photo හෝ Video තෝරන්න</label>
-        <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;" onchange="updateLabel()">
-        <p id="fileStatus" style="font-size:11px; text-align:center; color:gray;"></p>
-        <textarea id="noteInput" rows="4" placeholder="ඔබේ සටහන මෙතැන ලියන්න..."></textarea>
-        <input type="hidden" id="editKey"><input type="hidden" id="existingUrl"><input type="hidden" id="existingType">
-        <button id="submitBtn" class="main-btn" onclick="saveNote()">SAVE NOTE</button>
+    <input type="text" id="searchInput" style="width:100%; padding:12px; border-radius:10px; background:var(--card); color:#fff; border:1px solid var(--border); margin-bottom:15px;" placeholder="සොයන්න..." onkeyup="searchNotes()">
+    
+    <button class="main-btn" style="width:100%; padding:15px; background:var(--primary); color:#fff; border:none; border-radius:10px; font-weight:bold;" onclick="toggleInput()">ADD NEW NOTE</button>
+
+    <div id="inputSection" style="display:none; margin-top:15px; background:var(--card); padding:15px; border-radius:15px; border:1px solid var(--border);">
+        <textarea id="noteInput" rows="4" style="width:100%; background:#000; color:#fff; border:1px solid var(--border); padding:10px; border-radius:10px;" placeholder="සටහන..."></textarea>
+        <button id="submitBtn" onclick="saveNote()" style="width:100%; margin-top:10px; padding:12px; background:var(--primary); color:#fff; border:none; border-radius:10px;">SAVE</button>
     </div>
-    <div id="notesFeed"></div>
+
+    <div id="notesFeed" style="margin-top:20px;"></div>
 </div>
 
-<div class="fab-container"><button class="fab" onclick="openChat()">💬</button><button class="fab" onclick="openInfo()">ℹ️</button></div>
+<div class="fab-container">
+    <button class="fab" onclick="openChat()">💬</button>
+</div>
 
-<div id="chatBox" class="modal-box">
-    <div class="modal-head"><span>Community Chat</span> <span onclick="closeModals()" style="cursor:pointer">✕</span></div>
+<div id="chatBox">
+    <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:bold;">Community Chat</span>
+        <button onclick="closeModals()" style="background:none; border:none; color:#fff; font-size:20px;">✕</button>
+    </div>
     <div id="chatLogs"></div>
-    <div style="padding:10px; display:flex; gap:5px; border-top:1px solid #333;">
-        <input type="text" id="chatInput" style="flex:1; padding:10px; border-radius:8px; background:#000; color:#fff; border:1px solid #333;" placeholder="පණිවිඩයක්...">
-        <button onclick="sendChat()" style="background:var(--primary); border:none; color:#fff; padding:0 15px; border-radius:8px;">➜</button>
+    <div style="padding:15px; display:flex; gap:10px; background:var(--card);">
+        <input type="text" id="chatInput" style="flex:1; padding:12px; border-radius:25px; background:#000; color:#fff; border:1px solid var(--border);" placeholder="පණිවිඩයක් ලියන්න...">
+        <button onclick="sendChat()" style="background:var(--primary); border:none; color:#fff; padding:0 20px; border-radius:25px;">➜</button>
     </div>
-</div>
-
-<div id="infoModal" class="modal-box" style="bottom:90px;">
-    <div class="modal-head"><span>Developer Info</span> <span onclick="closeModals()" style="cursor:pointer">✕</span></div>
-    <div style="padding:20px; font-size:14px;"><b>Coder:</b> Yuresh kavindu sumanasinha</div>
 </div>
 
 <script>
@@ -75,56 +93,72 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    const IMGBB_API_KEY = "87df23f624dc272459c450218569e160";
-    const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/ds5ig0wvd/upload";
-    const CLOUDINARY_PRESET = "Yuresh_preset";
+    let isChatOpen = false;
 
-    function updateLabel() { const f = document.getElementById('fileInput').files[0]; if(f) document.getElementById('fileStatus').innerText = "තෝරාගත්තා: " + f.name; }
-    function toggleInput() { const s = document.getElementById('inputSection'); s.style.display = (s.style.display === "none") ? "block" : "none"; if(s.style.display === "none") resetForm(); }
-    function resetForm() { document.getElementById('noteInput').value = ""; document.getElementById('fileInput').value = ""; document.getElementById('fileStatus').innerText = ""; document.getElementById('editKey').value = ""; document.getElementById('existingUrl').value = ""; document.getElementById('existingType').value = ""; document.getElementById('submitBtn').innerText = "SAVE NOTE"; }
-
-    async function saveNote() {
-        const text = document.getElementById('noteInput').value, file = document.getElementById('fileInput').files[0], editKey = document.getElementById('editKey').value, existingUrl = document.getElementById('existingUrl').value, existingType = document.getElementById('existingType').value, btn = document.getElementById('submitBtn');
-        if(!text.trim() && !file && !existingUrl) return alert("කරුණාකර යමක් ඇතුළත් කරන්න.");
-        btn.disabled = true; btn.innerText = "UPLOADING...";
-        let finalUrl = existingUrl || "", fileType = existingType || "text";
-        try {
-            if(file) {
-                let fd = new FormData();
-                if(file.type.startsWith('image/')) {
-                    fd.append("image", file);
-                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: fd });
-                    const d = await res.json(); finalUrl = d.data.url; fileType = "image";
-                } else if(file.type.startsWith('video/')) {
-                    fd.append("file", file); fd.append("upload_preset", CLOUDINARY_PRESET);
-                    const res = await fetch(CLOUDINARY_URL, { method: "POST", body: fd });
-                    const d = await res.json(); if(d.secure_url) { finalUrl = d.secure_url; fileType = "video"; } else throw new Error("Cloudinary Failed");
-                }
-            }
-            const data = { text, url: finalUrl, fileType, time: new Date().toLocaleString() };
-            if(editKey) await db.ref('smart_notes/' + editKey).update(data); else await db.ref('smart_notes').push(data);
-            toggleInput();
-        } catch (e) { alert("අසාර්ථකයි: " + e.message); } finally { btn.disabled = false; btn.innerText = "SAVE NOTE"; }
+    // Like System
+    function toggleLike(id) {
+        const ref = db.ref('smart_notes/' + id + '/likes');
+        ref.transaction(current => (current || 0) + 1);
     }
 
-    db.ref('smart_notes').on('value', (snap) => {
-        const f = document.getElementById('notesFeed'); f.innerHTML = "";
-        snap.forEach((c) => {
-            const n = c.val(), k = c.key;
-            let m = n.url ? (n.fileType === "video" ? `<video src="${n.url}" class="media-content" controls></video>` : `<img src="${n.url}" class="media-content" onclick="window.open('${n.url}')">`) : "";
-            f.innerHTML = `<div class="note-card"><div class="media-container">${m}</div><div class="note-display">${n.text}</div><div class="note-footer"><button class="text-btn" onclick="editNote('${k}', \`${n.text}\`, '${n.url}', '${n.fileType}')">EDIT</button><button class="text-btn" style="color:var(--red)" onclick="deleteNote('${k}')">DELETE</button></div></div>` + f.innerHTML;
+    // Copy System
+    function copyText(text) {
+        navigator.clipboard.writeText(text);
+        showToast("සටහන Copy කරගත්තා! ✅");
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('notification');
+        t.innerText = msg; t.style.top = "20px";
+        setTimeout(() => t.style.top = "-100px", 3000);
+    }
+
+    // Load Notes
+    db.ref('smart_notes').on('value', snap => {
+        const feed = document.getElementById('notesFeed'); feed.innerHTML = "";
+        snap.forEach(child => {
+            const n = child.val(), k = child.key;
+            let media = n.url ? (n.fileType === "video" ? `<video src="${n.url}" class="media-content" controls></video>` : `<img src="${n.url}" class="media-content">`) : "";
+            
+            const div = document.createElement('div'); div.className = 'note-card';
+            div.innerHTML = `
+                <div class="media-container">${media}</div>
+                <div style="font-size:15px; margin-bottom:10px;">${n.text}</div>
+                <div class="note-footer">
+                    <button class="text-btn like-btn" onclick="toggleLike('${k}')">❤️ ${n.likes || 0}</button>
+                    <div class="btn-group">
+                        <button class="text-btn" onclick="copyText(\`${n.text}\`)">COPY</button>
+                        <button class="text-btn" onclick="deleteNote('${k}')" style="color:var(--red)">DELETE</button>
+                    </div>
+                </div>`;
+            feed.prepend(div);
         });
     });
 
-    function editNote(k, t, u, ty) { toggleInput(); document.getElementById('noteInput').value = t; document.getElementById('existingUrl').value = u; document.getElementById('existingType').value = ty; document.getElementById('editKey').value = k; document.getElementById('submitBtn').innerText = "UPDATE NOW"; window.scrollTo(0,0); }
-    function deleteNote(id) { if(confirm("මැකීමට අවශ්‍යද?")) db.ref('smart_notes/' + id).remove(); }
-    function searchNotes() { const q = document.getElementById('searchInput').value.toLowerCase(); document.querySelectorAll('.note-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none"); }
+    // Chat Notification
+    db.ref('community_chat').limitToLast(1).on('child_added', snap => {
+        if(!isChatOpen) showToast("Chat: " + snap.val().msg);
+        updateChatLogs();
+    });
+
+    function updateChatLogs() {
+        db.ref('community_chat').limitToLast(20).once('value', s => {
+            const l = document.getElementById('chatLogs'); l.innerHTML = "";
+            s.forEach(c => { l.innerHTML += `<div class="msg"><b>${c.val().name}:</b> ${c.val().msg}</div>`; });
+            l.scrollTop = l.scrollHeight;
+        });
+    }
+
+    function openChat() { document.getElementById('chatBox').style.display = 'flex'; isChatOpen = true; }
+    function closeModals() { document.getElementById('chatBox').style.display = 'none'; isChatOpen = false; }
+    function sendChat() {
+        const i = document.getElementById('chatInput');
+        if(i.value.trim()) { db.ref('community_chat').push({ name: "User", msg: i.value }); i.value = ""; }
+    }
+    
+    function toggleInput() { const s = document.getElementById('inputSection'); s.style.display = s.style.display === "none" ? "block" : "none"; }
     function cycleThemes() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light'); }
-    function openChat() { document.getElementById('chatBox').style.display = 'flex'; }
-    function openInfo() { document.getElementById('infoModal').style.display = 'block'; }
-    function closeModals() { document.getElementById('chatBox').style.display = 'none'; document.getElementById('infoModal').style.display = 'none'; }
-    function sendChat() { const i = document.getElementById('chatInput'); if(i.value.trim()) { db.ref('community_chat').push({ name: "User", msg: i.value }); i.value = ""; } }
-    db.ref('community_chat').limitToLast(10).on('value', (s) => { const l = document.getElementById('chatLogs'); l.innerHTML = ""; s.forEach(c => { l.innerHTML += `<div class="msg"><b>${c.val().name}:</b> ${c.val().msg}</div>`; }); });
+    function deleteNote(id) { if(confirm("මැකීමට අවශ්‍යද?")) db.ref('smart_notes/' + id).remove(); }
 </script>
 </body>
 </html>
