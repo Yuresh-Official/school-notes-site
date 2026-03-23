@@ -2,182 +2,183 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Notes - High Capacity Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Secure System - Locked</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #000; --card: #1c1c1e; --text: #fff; --primary: #30d158; --border: rgba(255,255,255,0.1); }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 0; overflow: hidden; }
-        
-        /* Profile Setup Screen */
-        #welcomeScreen { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
-        .p-setup-img { width: 100px; height: 100px; border-radius: 50%; border: 2.5px solid var(--primary); object-fit: cover; margin-bottom: 15px; cursor: pointer; }
-
-        .scroll-container { height: 100vh; overflow-y: auto; padding: 15px 12px 100px 12px; box-sizing: border-box; }
-        .note-card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 16px; border: 0.5px solid var(--border); }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .p-img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; background: #333; }
-        
-        /* Media Optimized View */
-        .media-box { width: 100%; background: #000; border-radius: 12px; margin: 10px 0; overflow: hidden; display: flex; justify-content: center; max-height: 480px; border: 0.5px solid #333; }
-        .media-box img, .media-box video { max-width: 100%; max-height: 480px; object-fit: contain; display: block; }
-
-        .react-bar { display: flex; gap: 10px; padding-top: 10px; border-top: 0.5px solid var(--border); margin-top: 10px; }
-        .react-btn { background: rgba(255,255,255,0.08); border: none; padding: 8px 14px; border-radius: 20px; color: #fff; font-size: 14px; display: flex; align-items: center; gap: 6px; }
-
-        /* Community Chat UI with DP */
-        #chatBox { position: fixed; bottom: 90px; right: 15px; width: 320px; height: 450px; background: #1c1c1e; border: 0.5px solid var(--border); border-radius: 20px; display: none; flex-direction: column; z-index: 3000; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        #chatLogs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-        
-        .chat-msg { display: flex; gap: 8px; align-items: flex-end; max-width: 85%; }
-        .chat-msg.me { align-self: flex-end; flex-direction: row-reverse; }
-        .chat-dp { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; }
-        .chat-bubble { padding: 8px 12px; border-radius: 15px; font-size: 13px; word-wrap: break-word; }
-        .chat-msg.me .chat-bubble { background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
-        .chat-msg.other .chat-bubble { background: #333; color: #fff; border-bottom-left-radius: 2px; }
-
-        .fab { position: fixed; bottom: 25px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 28px; z-index: 1000; box-shadow: 0 5px 15px rgba(48, 209, 88, 0.3); }
-        .chat-fab { position: fixed; bottom: 25px; left: 20px; width: 60px; height: 60px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 26px; z-index: 1000; box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3); }
+        :root { --bg: #050505; --card: #121212; --primary: #30d158; --text: #fff; --admin: #ff3b30; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; overflow: hidden; }
+        .overlay { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px; }
+        .input-box { padding: 14px; border-radius: 12px; border: 1px solid #333; width: 80%; margin-bottom: 15px; background: #111; color: #fff; text-align: center; font-size: 16px; outline: none; }
+        .btn { background: var(--primary); color: #fff; border: none; padding: 14px 45px; border-radius: 25px; font-weight: 700; cursor: pointer; }
+        .scroll-container { height: 100vh; overflow-y: auto; padding: 15px; box-sizing: border-box; display: none; }
+        .timer-info { font-size: 11px; color: var(--primary); margin-bottom: 10px; background: rgba(48,209,88,0.1); padding: 5px 10px; border-radius: 8px; width: fit-content; }
+        .note-card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 0.5px solid #222; }
+        .fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); border: none; font-size: 25px; color: #fff; z-index: 1000; display: none; }
     </style>
 </head>
 <body>
 
-<div id="welcomeScreen">
-    <h3 style="margin-bottom:20px;">Smart Notes Setup</h3>
-    <label for="pUpload"><img id="pPreview" class="p-setup-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png"></label>
-    <input type="file" id="pUpload" accept="image/*" style="display:none;" onchange="previewP(this)">
-    <input type="text" id="uNameInp" placeholder="ඔබේ නම..." style="width:75%; padding:14px; border-radius:12px; border:none; margin-bottom:20px; text-align:center; background:#222; color:#fff; font-size:16px;">
-    <button onclick="saveProfile()" style="background:var(--primary); color:#fff; border:none; padding:14px 50px; border-radius:25px; font-weight:700; font-size:16px;">ඇතුල් වන්න</button>
+<div id="blocker" class="overlay" style="display:none;">
+    <h2 id="blockMsg">සර්වර් එක පිරී ඇත (100/100)</h2>
+    <p id="subMsg">කරුණාකර පසුව උත්සාහ කරන්න.</p>
+    <button onclick="showAdminLogin()" style="background:none; border:none; color:#333; margin-top:50px; font-size:10px;">Admin Login</button>
 </div>
 
-<div class="scroll-container">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h1 style="font-size: 26px; margin: 0;">Smart Feed</h1>
-        <span id="userCount" style="font-size:10px; color:var(--primary); background:rgba(48,209,88,0.1); padding:4px 8px; border-radius:10px;">Live Users: 1000 Limit</span>
+<div id="setup" class="overlay" style="display:none;">
+    <h2 style="color:var(--primary)">Smart Access</h2>
+    <input type="text" id="uName" class="input-box" placeholder="ඔබේ නම...">
+    <button class="btn" onclick="startSession()">ඇතුල් වන්න</button>
+    <p style="font-size:10px; color:gray; margin-top:20px;">සීමාව: පැය 1 | විවේකය: පැය 5</p>
+</div>
+
+<div id="adminPanel" class="overlay" style="display:none;">
+    <h2 style="color:var(--admin)">Admin Verification</h2>
+    <input type="password" id="adminKey" class="input-box" placeholder="Secret Key...">
+    <button class="btn" style="background:var(--admin)" onclick="verifyAdmin()">Unlock System</button>
+    <button onclick="location.reload()" style="background:none; border:none; color:gray; margin-top:15px;">Back</button>
+</div>
+
+<div class="scroll-container" id="appContent">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="timer-info" id="sessionTimer">Session: --:--</div>
+        <button onclick="exitApp()" style="background:none; border:none; color:gray; font-size:12px;">Logout</button>
     </div>
     <div id="notesFeed"></div>
 </div>
 
-<button class="chat-fab" onclick="toggleChat()">💬</button>
-<button class="fab" onclick="toggleAdd()">+</button>
-
-<div id="addBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:4000; padding:20px; flex-direction:column; justify-content:center;">
-    <textarea id="noteTxt" placeholder="මොනවා හරි ලියන්න..." style="width:100%; height:140px; background:#111; color:#fff; border:1px solid #333; padding:15px; border-radius:15px; margin-bottom:20px; outline:none; font-size:16px;"></textarea>
-    <input type="file" id="fileInp" accept="image/*,video/*" style="color:gray; margin-bottom:20px;">
-    <button id="postBtn" onclick="postNote()" style="background:var(--primary); color:#fff; border:none; padding:16px; border-radius:15px; font-weight:700; font-size:16px;">පළ කරන්න (Post)</button>
-    <button onclick="toggleAdd()" style="background:none; border:none; color:gray; margin-top:20px; font-weight:600;">පසුපසට</button>
-</div>
-
-<div id="chatBox">
-    <div style="padding:15px; border-bottom:0.5px solid var(--border); font-weight:700; display:flex; justify-content:space-between;">
-        <span>Community Chat</span>
-        <span onclick="toggleChat()" style="color:var(--primary); cursor:pointer;">Close</span>
-    </div>
-    <div id="chatLogs"></div>
-    <div style="padding:12px; display:flex; gap:8px; background:rgba(0,0,0,0.2);">
-        <input type="text" id="chatInp" placeholder="මැසේජ් එකක් ලියන්න..." style="flex:1; background:#333; border:none; padding:10px 15px; border-radius:20px; color:#fff; outline:none; font-size:14px;">
-        <button onclick="sendMsg()" style="color:var(--primary); background:none; border:none; font-weight:700; font-size:15px;">Send</button>
-    </div>
-</div>
+<button class="fab" id="addBtn" onclick="alert('Post Function can be added here!')">+</button>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g", databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let myData = JSON.parse(localStorage.getItem("smart_user_v2"));
-    if(!myData) document.getElementById('welcomeScreen').style.display = 'flex';
+    const ADMIN_PASS = "Yuresh@2026"; // ඔයාගේ රහස් Key එක මෙතන තියෙන්නේ
+    const ONE_HOUR = 60 * 60 * 1000;
+    const FIVE_HOURS = 5 * 60 * 60 * 1000;
 
-    function previewP(i) { if(i.files[0]) { const r = new FileReader(); r.onload=e=>document.getElementById('pPreview').src=e.target.result; r.readAsDataURL(i.files[0]); } }
+    let myUser = JSON.parse(localStorage.getItem("secure_user"));
 
-    async function saveProfile() {
-        const name = document.getElementById('uNameInp').value, file = document.getElementById('pUpload').files[0];
-        if(!name || !file) return alert("නම සහ පින්තූරයක් අවශ්‍යයි!");
-        const fd = new FormData(); fd.append("image", file);
-        const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", {method:"POST", body:fd});
-        const d = await res.json();
-        myData = { name: name, photo: d.data.url };
-        localStorage.setItem("smart_user_v2", JSON.stringify(myData));
+    async function checkAccess() {
+        // 1. Admin ද කියලා බලනවා (Admin ට සීමා නැත)
+        if (myUser && myUser.isAdmin) {
+            enterApp();
+            return;
+        }
+
+        // 2. Cooldown Check (පැය 5 සීමාව)
+        if (myUser && myUser.lastExit) {
+            const timePassed = Date.now() - myUser.lastExit;
+            if (timePassed < FIVE_HOURS) {
+                const wait = Math.ceil((FIVE_HOURS - timePassed) / (60 * 1000));
+                showBlock("Access Denied", `ඔබේ විවේක කාලය ක්‍රියාත්මකයි. තව මිනිත්තු ${wait} කින් උත්සාහ කරන්න.`);
+                return;
+            }
+        }
+
+        // 3. 100 Users Limit Check
+        const snap = await db.ref('online_users').once('value');
+        if (snap.numChildren() >= 100) {
+            showBlock("Server Full", "දැනට උපරිම සීමාව (100) කරා ළඟා වී ඇත.");
+            return;
+        }
+
+        // 4. Login එක පෙන්වනවා
+        if (!myUser || !myUser.startTime) {
+            document.getElementById('setup').style.display = 'flex';
+        } else {
+            enterApp();
+        }
+    }
+
+    function showBlock(title, msg) {
+        document.getElementById('blocker').style.display = 'flex';
+        document.getElementById('blockMsg').innerText = title;
+        document.getElementById('subMsg').innerText = msg;
+    }
+
+    function showAdminLogin() {
+        document.getElementById('blocker').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'flex';
+    }
+
+    function verifyAdmin() {
+        const key = document.getElementById('adminKey').value;
+        if (key === ADMIN_PASS) {
+            myUser = { id: "admin_1", name: "Owner", isAdmin: true, startTime: Date.now() };
+            localStorage.setItem("secure_user", JSON.stringify(myUser));
+            location.reload();
+        } else {
+            alert("වැරදි Key එකක්!");
+        }
+    }
+
+    async function startSession() {
+        const name = document.getElementById('uName').value;
+        if (!name) return;
+        myUser = { id: "u_" + Date.now(), name: name, startTime: Date.now(), isAdmin: false };
+        localStorage.setItem("secure_user", JSON.stringify(myUser));
+        enterApp();
+    }
+
+    function enterApp() {
+        document.getElementById('setup').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('blocker').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+        document.getElementById('addBtn').style.display = 'block';
+
+        db.ref('online_users/' + myUser.id).set({ name: myUser.name, lastSeen: Date.now() });
+        db.ref('online_users/' + myUser.id).onDisconnect().remove();
+
+        if (!myUser.isAdmin) {
+            const timeLeft = ONE_HOUR - (Date.now() - myUser.startTime);
+            if (timeLeft <= 0) { exitApp(); return; }
+            startTimer(timeLeft);
+        } else {
+            document.getElementById('sessionTimer').innerText = "Admin Mode: Unlimited Access";
+            document.getElementById('sessionTimer').style.color = "var(--admin)";
+        }
+        loadFeed();
+    }
+
+    function startTimer(timer) {
+        const display = document.getElementById('sessionTimer');
+        const interval = setInterval(() => {
+            const mins = Math.floor(timer / 60000);
+            const secs = Math.floor((timer % 60000) / 1000);
+            display.innerText = `Time Left: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            timer -= 1000;
+            if (timer <= 0) { clearInterval(interval); exitApp(); }
+        }, 1000);
+    }
+
+    async function exitApp() {
+        if (myUser && !myUser.isAdmin) {
+            myUser.lastExit = Date.now();
+            myUser.startTime = null;
+            localStorage.setItem("secure_user", JSON.stringify(myUser));
+        } else if(myUser.isAdmin) {
+            localStorage.removeItem("secure_user"); // Admin Logout
+        }
+        await db.ref('online_users/' + myUser.id).remove();
         location.reload();
     }
 
-    function toggleAdd() { const b = document.getElementById('addBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
-    function toggleChat() { const b = document.getElementById('chatBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
-
-    async function postNote() {
-        const text = document.getElementById('noteTxt').value, file = document.getElementById('fileInp').files[0], btn = document.getElementById('postBtn');
-        if(!text && !file) return;
-        btn.disabled = true; btn.innerText = "Uploading...";
-        let url = "", type = "text";
-        if(file) {
-            let fd = new FormData();
-            if(file.type.startsWith('image')) {
-                fd.append("image", file);
-                const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", {method:"POST", body:fd});
-                const d = await res.json(); url = d.data.url; type = "image";
-            } else {
-                fd.append("file", file); fd.append("upload_preset", "Yuresh_preset");
-                const res = await fetch("https://api.cloudinary.com/v1_1/ds5ig0wvd/upload", {method:"POST", body:fd});
-                const d = await res.json(); url = d.secure_url; type = "video";
-            }
-        }
-        await db.ref('smart_notes').push({ uName: myData.name, uPhoto: myData.photo, text, url, fileType: type, time: Date.now(), reacts: {love:0, fire:0} });
-        toggleAdd(); location.reload();
+    function loadFeed() {
+        db.ref('smart_notes').limitToLast(20).on('value', snap => {
+            const feed = document.getElementById('notesFeed');
+            feed.innerHTML = "";
+            snap.forEach(c => {
+                const d = c.val();
+                feed.innerHTML = `<div class="note-card"><b>${d.uName}</b><p>${d.text || ""}</p></div>` + feed.innerHTML;
+            });
+        });
     }
 
-    // Stable Feed with optimized insertion
-    db.ref('smart_notes').limitToLast(20).on('value', snap => {
-        const feed = document.getElementById('notesFeed');
-        snap.forEach(c => {
-            const id = c.key, d = c.val(), existing = document.getElementById('card-'+id);
-            if(existing) {
-                existing.querySelector('.l-cnt').innerText = d.reacts?.love || 0;
-                existing.querySelector('.f-cnt').innerText = d.reacts?.fire || 0;
-            } else {
-                let media = "";
-                if(d.url) {
-                    if(d.fileType === "video") media = `<div class="media-box"><video src="${d.url}" controls preload="metadata" playsinline></video></div>`;
-                    else media = `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`;
-                }
-                const html = `<div class="note-card" id="card-${id}">
-                    <div class="user-info"><img src="${d.uPhoto}" class="p-img"><b>${d.uName}</b></div>
-                    <div style="font-size:15px; line-height:1.4;">${d.text || ""}</div>${media}
-                    <div class="react-bar">
-                        <button class="react-btn" onclick="react('${id}','love')">❤️ <span class="l-cnt">${d.reacts?.love||0}</span></button>
-                        <button class="react-btn" onclick="react('${id}','fire')">🔥 <span class="f-cnt">${d.reacts?.fire||0}</span></button>
-                    </div></div>`;
-                feed.insertAdjacentHTML('afterbegin', html);
-            }
-        });
-    });
-
-    function react(id, t) { db.ref(`smart_notes/${id}/reacts/${t}`).transaction(c=>(c||0)+1); }
-
-    // Enhanced Community Chat with DP
-    function sendMsg() {
-        const i = document.getElementById('chatInp');
-        if(i.value.trim()) { 
-            db.ref('chat').push({ name: myData.name, photo: myData.photo, msg: i.value }); 
-            i.value = ""; 
-        }
-    }
-    db.ref('chat').limitToLast(25).on('value', snap => {
-        const logs = document.getElementById('chatLogs'); logs.innerHTML = "";
-        snap.forEach(c => {
-            const d = c.val();
-            const isMe = d.name === myData.name;
-            logs.innerHTML += `
-                <div class="chat-msg ${isMe ? 'me' : 'other'}">
-                    <img src="${d.photo || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="chat-dp">
-                    <div class="chat-bubble">
-                        <div style="font-size:10px; opacity:0.7; margin-bottom:2px;">${d.name}</div>
-                        ${d.msg}
-                    </div>
-                </div>`;
-        });
-        logs.scrollTop = logs.scrollHeight;
-    });
+    checkAccess();
 </script>
 </body>
 </html>
