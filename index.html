@@ -143,7 +143,9 @@
         const feed = document.getElementById('notesFeed'); feed.innerHTML = "";
         snap.forEach(c => {
             const n = c.val(), k = c.key;
-            let m = n.url ? (n.fileType === "video" ? `<video src="${n.url}" class="media-content" controls></video>` : `<img src="${n.url}" class="media-content">`) : "";
+            // Video Poster Fix එක මෙතන තියෙනවා
+            let posterUrl = n.url ? n.url.replace(".mp4", ".jpg") : "";
+            let m = n.url ? (n.fileType === "video" ? `<video src="${n.url}" class="media-content" controls preload="metadata" poster="${posterUrl}"></video>` : `<img src="${n.url}" class="media-content">`) : "";
             feed.innerHTML = `<div class="note-card">
                 ${m}
                 <div class="note-text">${n.text}</div>
@@ -171,4 +173,3 @@
 </script>
 </body>
 </html>
-
