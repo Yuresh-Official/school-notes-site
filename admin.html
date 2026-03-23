@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Notes - Admin Panel</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        :root { --bg: #0a0a0a; --card: #1c1c1e; --text: #fff; --danger: #ff3b30; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        #loginBox { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; }
+        input { padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; width: 250px; margin-bottom: 10px; text-align: center; }
+        
+        .admin-card { background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 15px; border: 0.5px solid #333; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .info { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .info img { width: 35px; height: 35px; border-radius: 50%; }
+        .post-preview { font-size: 13px; color: #aaa; max-width: 150px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        
+        .del-btn { background: var(--danger); color: #fff; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        #adminContent { display: none; max-width: 500px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+
+<div id="loginBox">
+    <h2>Admin Access</h2>
+    <input type="password" id="adminPass" placeholder="මුරපදය ඇතුළත් කරන්න">
+    <button onclick="checkAdmin()" style="background:#30d158; color:#fff; border:none; padding:10px 30px; border-radius:8px; font-weight:bold;">Login</button>
+</div>
+
+<div id="adminContent">
+    <div class="header">
+        <h3>Post Control</h3>
+        <button onclick="location.reload()" style="background:none; border:1px solid #444; color:#ccc; padding:5px 10px; border-radius:5px;">Refresh</button>
+    </div>
+    <div id="adminFeed">Loading posts...</div>
+</div>
+
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g", databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Admin Password (මේක ඔයාට ඕන විදිහට වෙනස් කරගන්න)
+    const SECRET_KEY = "yuresh123"; 
+
+    function checkAdmin() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass === SECRET_KEY) {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            loadPosts();
+        } else {
+            alert("වැරදි මුරපදයක්!");
+        }
+    }
+
+    function loadPosts() {
+        db.ref('smart_notes').on('value', snap => {
+            const feed = document.getElementById('adminFeed');
+            feed.innerHTML = "";
+            snap.forEach(c => {
+                const id = c.key, d = c.val();
+                feed.innerHTML += `
+                    <div class="admin-card">
+                        <div class="info">
+                            <img src="${d.uPhoto}">
+                            <div>
+                                <div style="font-weight:bold; font-size:14px;">${d.uName}</div>
+                                <div class="post-preview">${d.text || "Media Post"}</div>
+                            </div>
+                        </div>
+                        <button class="del-btn" onclick="deletePost('${id}')">Delete</button>
+                    </div>`;
+            });
+        });
+    }
+
+    function deletePost(id) {
+        if(confirm("මෙම පෝස්ට් එක අයින් කිරීමට ස්ථිරද?")) {
+            db.ref('smart_notes/' + id).remove()
+            .then(() => alert("පෝස්ට් එක සාර්ථකව අයින් කළා!"))
+            .catch(e => alert("Error: " + e));
+        }
+    }
+</script>
+</body>
+</html>
