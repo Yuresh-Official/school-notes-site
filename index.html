@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Notes - Live Voice Edition</title>
+    <title>Smart Notes - Profile Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-    <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
     <style>
         :root { 
             --bg: #000; --card: rgba(35, 35, 35, 0.5); --text: #eee; --primary: #30d158; --border: rgba(255, 255, 255, 0.1); 
@@ -14,52 +13,55 @@
         }
         body[data-theme="1"] { --bg: #f2f2f7; --card: rgba(255, 255, 255, 0.6); --text: #1c1c1e; --border: rgba(0, 0, 0, 0.1); --primary: #007aff; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 0; transition: 0.5s ease; }
+        
+        /* Welcome Profile Screen */
+        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; text-align: center; }
+        .profile-upload { width: 100px; height: 100px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 20px; border: 3px solid var(--primary); cursor: pointer; position: relative; }
+        .profile-upload img { width: 100%; height: 100%; object-fit: cover; }
+        .input-field { width: 80%; max-width: 300px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); padding: 12px; border-radius: 12px; color: #fff; text-align: center; margin-bottom: 20px; outline: none; }
+        
         .scroll-container { height: 100vh; overflow-y: auto; padding: 15px 10px 100px 10px; box-sizing: border-box; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .ios-btn { color: var(--primary); background: none; border: none; font-size: 14px; font-weight: 500; cursor: pointer; }
-        .note-card { background: var(--card); backdrop-filter: var(--glass); border-radius: 14px; padding: 10px; margin-bottom: 12px; border: 0.5px solid var(--border); }
-        .media-container { width: 100%; margin-bottom: 8px; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.1); }
-        .media-content { width: 100%; height: auto; display: block; max-height: 300px; object-fit: contain; }
-        .note-text { font-size: 13px; line-height: 1.4; margin-bottom: 10px; white-space: pre-wrap; }
-        .footer-tools { display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid var(--border); padding-top: 8px; }
-        .tool-btn { background: none; border: none; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        #chatBox { position: fixed; bottom: 85px; right: 15px; width: 300px; height: 420px; background: var(--card); backdrop-filter: var(--glass); z-index: 2000; display: none; flex-direction: column; border-radius: 18px; border: 0.5px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        #chatLogs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 7px 11px; border-radius: 14px; max-width: 80%; font-size: 12px; }
-        .msg.me { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
-        .msg.other { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 2px; }
-        .chat-input-area { padding: 10px; display: flex; gap: 6px; border-top: 0.5px solid var(--border); }
-        .chat-input-area input { flex: 1; background: rgba(255,255,255,0.05); border: 0.5px solid var(--border); padding: 8px 12px; border-radius: 16px; color: var(--text); outline: none; }
-        .fab { position: fixed; bottom: 25px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--primary); border: none; color: #fff; z-index: 1000; font-size: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        #callContainer { position: fixed; width: 1px; height: 1px; bottom: 0; left: 0; opacity: 0; pointer-events: none; }
-        #callNotify { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 85%; background: rgba(30, 30, 30, 0.9); backdrop-filter: blur(20px); border-radius: 15px; padding: 12px; display: none; align-items: center; justify-content: space-between; z-index: 10001; border: 0.5px solid rgba(255,255,255,0.2); }
+        .note-card { background: var(--card); backdrop-filter: var(--glass); border-radius: 15px; padding: 12px; margin-bottom: 15px; border: 0.5px solid var(--border); }
+        .user-info { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .p-img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; background: #444; }
+        
+        #chatBox { position: fixed; bottom: 85px; right: 15px; width: 320px; height: 450px; background: var(--card); backdrop-filter: var(--glass); z-index: 2000; display: none; flex-direction: column; border-radius: 20px; border: 0.5px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        #chatLogs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { display: flex; gap: 8px; align-items: flex-end; }
+        .chat-msg.me { flex-direction: row-reverse; }
+        .msg-text { padding: 8px 12px; border-radius: 15px; max-width: 70%; font-size: 13px; }
+        .chat-msg.me .msg-text { background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
+        .chat-msg.other .msg-text { background: rgba(255,255,255,0.1); border-bottom-left-radius: 2px; }
+        
+        .fab { position: fixed; bottom: 25px; right: 20px; width: 60px; height: 60px; border-radius: 30px; background: var(--primary); border: none; color: #fff; z-index: 1000; font-size: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body data-theme="2">
 
-<div id="callNotify">
-    <div style="display:flex; align-items:center; gap:10px;">
-        <span style="font-size: 20px;">📞</span>
-        <div><b style="font-size:13px; display:block;">Live Voice Call</b><span style="font-size:11px; opacity:0.6;">Tap to join</span></div>
-    </div>
-    <button onclick="joinCall()" style="background:#30d158; color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:700;">JOIN</button>
+<div id="welcomeScreen">
+    <h2 style="margin-bottom: 30px;">Welcome to Smart Notes</h2>
+    <label for="pUpload" class="profile-upload" id="pLabel">
+        <span id="pText">Add Photo</span>
+        <img id="pPreview" style="display:none;">
+    </label>
+    <input type="file" id="pUpload" accept="image/*" style="display:none;" onchange="previewProfile(this)">
+    <input type="text" id="pName" class="input-field" placeholder="ඔබේ නම ඇතුළත් කරන්න">
+    <button onclick="saveProfile()" style="background:var(--primary); color:white; border:none; padding:12px 40px; border-radius:25px; font-weight:700;">Get Started</button>
 </div>
 
-<div id="callContainer"></div>
-
 <div class="scroll-container">
-    <div class="header">
-        <h1 style="font-size: 26px; font-weight: 800; margin: 0;">Notes</h1>
-        <button class="ios-btn" onclick="nextTheme()">Change Theme</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1 style="font-size: 28px; font-weight: 800; margin: 0;">Smart Notes</h1>
+        <div id="myTopProfile" style="display:flex; align-items:center; gap:8px;"></div>
     </div>
 
-    <button onclick="toggleInput()" id="addToggle" style="width:100%; background:var(--primary); color:#fff; border:none; padding:11px; border-radius:10px; font-size:14px; font-weight:600; margin-bottom:15px;">+ New Note</button>
+    <button onclick="toggleInput()" style="width:100%; background:var(--primary); color:#fff; border:none; padding:12px; border-radius:12px; font-weight:700; margin-bottom:20px;">+ Add New Note</button>
 
-    <div id="inputSection" style="display:none; background:var(--card); padding:12px; border-radius:14px; margin-bottom:20px; border: 0.5px solid var(--border);">
-        <label for="fileInput" style="display:block; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; text-align:center; color:var(--primary); cursor:pointer;">Attach Media</label>
+    <div id="inputSection" style="display:none; background:var(--card); padding:15px; border-radius:18px; margin-bottom:25px; border: 0.5px solid var(--border);">
         <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;">
-        <textarea id="noteInput" placeholder="Write something..." style="width:100%; background:none; border:none; color:var(--text); font-size:15px; min-height:60px; outline:none; margin-top:10px;"></textarea>
-        <button id="submitBtn" onclick="saveNote()" style="width:100%; background:var(--primary); color:#fff; border:none; padding:10px; border-radius:8px; font-weight:600;">Save to Cloud</button>
+        <label for="fileInput" style="color:var(--primary); cursor:pointer;">📷 Attach Media</label>
+        <textarea id="noteInput" placeholder="Write something..." style="width:100%; background:none; border:none; color:var(--text); font-size:16px; min-height:80px; outline:none; margin-top:10px;"></textarea>
+        <button id="submitBtn" onclick="saveNote()" style="width:100%; background:var(--primary); color:#fff; border:none; padding:10px; border-radius:10px; font-weight:700;">Post</button>
     </div>
 
     <div id="notesFeed"></div>
@@ -68,126 +70,109 @@
 <button class="fab" onclick="openChat()">💬</button>
 
 <div id="chatBox">
-    <div style="padding: 12px; display:flex; justify-content:space-between; border-bottom:0.5px solid var(--border);">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <b id="chatTitle">Community</b>
-            <button onclick="startCall()" style="background:none; border:none; color:var(--primary); font-size:18px;">📞</button>
-        </div>
-        <button onclick="closeChat()" class="ios-btn">Done</button>
+    <div style="padding:15px; border-bottom:0.5px solid var(--border); display:flex; justify-content:space-between;">
+        <b>Community Chat</b>
+        <button onclick="closeChat()" class="ios-btn">Close</button>
     </div>
     <div id="chatLogs"></div>
-    <div class="chat-input-area">
-        <button onclick="startVoiceTyping()" style="background:none; border:none; font-size:18px;">🎤</button>
-        <input type="text" id="chatInput" placeholder="Message">
-        <button onclick="sendChat()" style="background:none; border:none; color:var(--primary); font-size:18px;">➤</button>
+    <div style="padding:10px; display:flex; gap:5px;">
+        <input type="text" id="chatInput" placeholder="Message..." style="flex:1; background:rgba(255,255,255,0.1); border:none; padding:10px; border-radius:20px; color:#fff; outline:none;">
+        <button onclick="sendChat()" style="background:none; border:none; color:var(--primary); font-size:20px;">➤</button>
     </div>
 </div>
 
 <script>
-    // --- User Setup ---
-    let userName = localStorage.getItem("chat_user_name");
-    if(!userName) {
-        userName = prompt("ඔයාගේ නම ඇතුළත් කරන්න (Chat එකේ පෙන්වීමට):");
-        if(!userName || userName.trim() === "") userName = "Guest_" + Math.floor(Math.random()*100);
-        localStorage.setItem("chat_user_name", userName);
-    }
-
-    // --- Firebase Config ---
+    // Firebase Setup
     const firebaseConfig = { apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g", databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const appID = 32099126; 
-    const serverSecret = "c1a2cda00ca7486168a97286ea0f47b0"; 
+    // Profile Logic
+    let myData = JSON.parse(localStorage.getItem("smart_user"));
+    if(!myData) { document.getElementById('welcomeScreen').style.display = 'flex'; }
+    else { showTopProfile(); }
 
-    function nextTheme() { const b = document.body; b.setAttribute('data-theme', b.getAttribute('data-theme') == "1" ? "2" : "1"); }
+    function previewProfile(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => { 
+                document.getElementById('pPreview').src = e.target.result;
+                document.getElementById('pPreview').style.display = 'block';
+                document.getElementById('pText').style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    async function saveProfile() {
+        const name = document.getElementById('pName').value;
+        const file = document.getElementById('pUpload').files[0];
+        if(!name || !file) return alert("කරුණාකර නම සහ පින්තූරයක් ඇතුළත් කරන්න!");
+
+        const fd = new FormData(); fd.append("image", file);
+        const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", { method: "POST", body: fd });
+        const d = await res.json();
+        
+        myData = { name: name, photo: d.data.url };
+        localStorage.setItem("smart_user", JSON.stringify(myData));
+        document.getElementById('welcomeScreen').style.display = 'none';
+        showTopProfile();
+    }
+
+    function showTopProfile() {
+        document.getElementById('myTopProfile').innerHTML = `<span style="font-size:12px;">Hi, ${myData.name}</span><img src="${myData.photo}" class="p-img">`;
+    }
+
     function toggleInput() { const s = document.getElementById('inputSection'); s.style.display = s.style.display === "none" ? "block" : "none"; }
 
-    // --- Notes & Feed ---
+    // Notes with Profile
     async function saveNote() {
         const text = document.getElementById('noteInput').value, file = document.getElementById('fileInput').files[0], btn = document.getElementById('submitBtn');
-        if(!text && !file) return;
-        btn.disabled = true; btn.innerText = "Syncing...";
+        btn.disabled = true;
         let url = "", type = "text";
-        try {
-            if(file) {
-                let fd = new FormData();
-                if(file.type.startsWith('image/')) {
-                    fd.append("image", file);
-                    const res = await fetch(`https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160`, { method: "POST", body: fd });
-                    const d = await res.json(); url = d.data.url; type = "image";
-                } else {
-                    fd.append("file", file); fd.append("upload_preset", "Yuresh_preset");
-                    const res = await fetch("https://api.cloudinary.com/v1_1/ds5ig0wvd/upload", { method: "POST", body: fd });
-                    const d = await res.json(); url = d.secure_url; type = "video";
-                }
-            }
-            await db.ref('smart_notes').push({ text, url, fileType: type, likes: 0, sender: userName });
-            document.getElementById('noteInput').value = ""; document.getElementById('fileInput').value = ""; toggleInput();
-        } catch(e) { alert("Error!"); } finally { btn.disabled = false; btn.innerText = "Save to Cloud"; }
+        if(file) {
+            let fd = new FormData(); fd.append("image", file);
+            const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", { method: "POST", body: fd });
+            const d = await res.json(); url = d.data.url; type = "image";
+        }
+        await db.ref('smart_notes').push({ text, url, fileType: type, likes: 0, uName: myData.name, uPhoto: myData.photo });
+        btn.disabled = false; toggleInput();
     }
 
     db.ref('smart_notes').on('value', snap => {
         const feed = document.getElementById('notesFeed'); feed.innerHTML = "";
         snap.forEach(c => {
             const n = c.val(), k = c.key;
-            let m = n.url ? `<div class="media-container">${n.fileType === "video" ? `<video src="${n.url}" class="media-content" controls></video>` : `<img src="${n.url}" class="media-content">`}</div>` : "";
-            feed.innerHTML = `<div class="note-card">${m}<div class="note-text">${n.text}</div><div class="footer-tools"><button class="tool-btn" onclick="db.ref('smart_notes/${k}/likes').transaction(l=>(l||0)+1)">❤️ ${n.likes || 0}</button><button class="tool-btn" style="color:#ff3b30" onclick="if(confirm('Delete?')) db.ref('smart_notes/${k}').remove()">Delete</button></div></div>` + feed.innerHTML;
+            feed.innerHTML = `
+                <div class="note-card">
+                    <div class="user-info"><img src="${n.uPhoto}" class="p-img"><b>${n.uName}</b></div>
+                    ${n.url ? `<img src="${n.url}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
+                    <div class="note-text">${n.text}</div>
+                    <button class="ios-btn" onclick="db.ref('smart_notes/${k}/likes').transaction(l=>(l||0)+1)">❤️ ${n.likes || 0}</button>
+                </div>` + feed.innerHTML;
         });
     });
 
-    // --- Community Chat (Dynamic Name) ---
+    // Chat with Profile
     function openChat() { document.getElementById('chatBox').style.display = 'flex'; }
     function closeChat() { document.getElementById('chatBox').style.display = 'none'; }
-    
-    function sendChat() { 
-        const i = document.getElementById('chatInput'); 
-        if(i.value.trim()){ 
-            db.ref('community_chat').push({ name: userName, msg: i.value }); 
-            i.value = ""; 
-        } 
+    function sendChat() {
+        const i = document.getElementById('chatInput');
+        if(i.value) { db.ref('community_chat').push({ name: myData.name, photo: myData.photo, msg: i.value }); i.value = ""; }
     }
 
-    db.ref('community_chat').limitToLast(15).on('value', s => {
+    db.ref('community_chat').limitToLast(20).on('value', s => {
         const l = document.getElementById('chatLogs'); l.innerHTML = "";
-        s.forEach(c => { 
-            const d = c.val(); 
-            // මෙතනදී තමන්ගේ මැසේජ් එකද නැද්ද කියලා බලලා Style එක වෙනස් කරනවා
-            const isMe = d.name === userName;
-            l.innerHTML += `<div class="msg ${isMe ? 'me' : 'other'}"><b>${isMe ? 'You' : d.name}:</b><br>${d.msg}</div>`; 
+        s.forEach(c => {
+            const d = c.val(); const isMe = d.name === myData.name;
+            l.innerHTML += `
+                <div class="chat-msg ${isMe ? 'me' : 'other'}">
+                    <img src="${d.photo}" class="p-img" style="width:25px; height:25px;">
+                    <div class="msg-text"><b>${isMe ? 'You' : d.name}</b><br>${d.msg}</div>
+                </div>`;
         });
         l.scrollTop = l.scrollHeight;
     });
-
-    // --- Voice Call System ---
-    function startCall() { db.ref('active_voice_call').set({ status: 'active', time: Date.now(), starter: userName }); joinCall(); }
-    db.ref('active_voice_call').on('value', snap => {
-        const d = snap.val();
-        document.getElementById('callNotify').style.display = (d && d.status === 'active') ? 'flex' : 'none';
-    });
-
-    async function joinCall() {
-        document.getElementById('callNotify').style.display = 'none';
-        const roomID = "yuresh_smart_notes_room", userID = "u" + Math.floor(Math.random()*1000);
-        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID, userName);
-        const zp = ZegoUIKitPrebuilt.create(kitToken);
-        zp.joinRoom({
-            container: document.getElementById('callContainer'),
-            scenario: { mode: ZegoUIKitPrebuilt.GroupVoiceCall },
-            showPreJoinView: false,
-            onLeaveRoom: () => { db.ref('active_voice_call').remove(); }
-        });
-    }
-
-    function startVoiceTyping() {
-        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        rec.lang = 'si-LK'; rec.start();
-        document.getElementById('chatInput').placeholder = "Listening...";
-        rec.onresult = (e) => { 
-            document.getElementById('chatInput').value = e.results[0][0].transcript; 
-            document.getElementById('chatInput').placeholder = "Message"; 
-        };
-    }
 </script>
 </body>
 </html>
