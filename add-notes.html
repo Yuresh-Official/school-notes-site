@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Notes SL - Ultimate Media Support</title>
+    <title>Smart Notes SL - Add Notes</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -11,28 +11,26 @@
         body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 15px; margin: 0; }
         .container { max-width: 500px; margin: auto; }
         .input-card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; }
-        textarea { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; }
-        .file-label { display: block; background: #1e1e1e; border: 1px dashed var(--border); padding: 15px; text-align: center; border-radius: 10px; cursor: pointer; margin: 10px 0; }
+        textarea { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        .file-label { display: block; background: #1e1e1e; border: 1px dashed var(--border); padding: 15px; text-align: center; border-radius: 10px; cursor: pointer; margin: 10px 0; font-size: 14px; }
         .main-btn { width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; }
-        .note-card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
-        .media-content { width: 100%; border-radius: 10px; margin-bottom: 10px; }
+        #status { font-size: 12px; color: gray; text-align: center; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align:center; color:orange;">Smart Notes Sri Lanka</h2>
-    
+    <h2 style="text-align:center; color:orange;">Smart Notes Admin</h2>
+    <p style="text-align:center; font-size:12px;">පින්තූර සහ වීඩියෝ මෙතැනින් ඇඩ් කරන්න</p>
+
     <div class="input-card">
-        <label class="file-label" for="fileInput">📁 Photo හෝ Video තෝරන්න</label>
-        <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;" onchange="document.getElementById('status').innerText = 'තෝරාගත්තා: ' + this.files[0].name">
-        <p id="status" style="font-size:12px; color:gray; text-align:center;"></p>
+        <label class="file-label" for="fileInput">📁 Photo හෝ Video එකක් තෝරන්න</label>
+        <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;" onchange="updateStatus()">
+        <p id="status"></p>
         
-        <textarea id="noteInput" rows="4" placeholder="ඔබේ සටහන මෙතැන ලියන්න..."></textarea>
+        <textarea id="noteInput" rows="5" placeholder="ඔබේ සටහන මෙතැන ලියන්න..."></textarea>
         <button id="submitBtn" class="main-btn" onclick="saveNote()">SAVE TO FIREBASE</button>
     </div>
-
-    <div id="notesFeed"></div>
 </div>
 
 <script>
@@ -44,17 +42,24 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 2. API Keys
+    // 2. API Settings
     const IMGBB_KEY = "87df23f624dc272459c450218569e160";
     const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/ds5ig0wvd/upload";
-    const CLOUDINARY_PRESET = "ඔයාගේ_UPLOAD_PRESET_එක"; // Cloudinary හි Unsigned Preset නම මෙතනට දාන්න
+    const CLOUDINARY_PRESET = "ඔයාගේ_PRESET_නම"; // මෙතනට ඔයාගේ Cloudinary Unsigned Preset නම දාන්න
+
+    function updateStatus() {
+        const file = document.getElementById('fileInput').files[0];
+        if (file) {
+            document.getElementById('status').innerText = "තෝරාගත්තා: " + file.name;
+        }
+    }
 
     async function saveNote() {
         const text = document.getElementById('noteInput').value;
         const file = document.getElementById('fileInput').files[0];
         const btn = document.getElementById('submitBtn');
 
-        if (!text.trim() && !file) return alert("කරුණාකර විස්තරයක් ඇතුළත් කරන්න.");
+        if (!text.trim() && !file) return alert("කරුණාකර විස්තරයක් හෝ ගොනුවක් ඇතුළත් කරන්න.");
 
         btn.disabled = true;
         btn.innerText = "UPLOADING...";
@@ -66,26 +71,34 @@
             if (file) {
                 let formData = new FormData();
                 
-                // පින්තූරයක් නම් ImgBB වෙත
+                // පින්තූරයක් නම් ImgBB වෙත යවයි
                 if (file.type.startsWith('image/')) {
                     formData.append("image", file);
                     const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
                     const data = await res.json();
-                    finalUrl = data.data.url;
-                    fileType = "image";
+                    if(data.success) {
+                        finalUrl = data.data.url;
+                        fileType = "image";
+                    } else {
+                        throw new Error("ImgBB Upload Failed");
+                    }
                 } 
-                // වීඩියෝවක් නම් Cloudinary වෙත
+                // වීඩියෝවක් නම් Cloudinary වෙත යවයි
                 else if (file.type.startsWith('video/')) {
                     formData.append("file", file);
                     formData.append("upload_preset", CLOUDINARY_PRESET);
                     const res = await fetch(CLOUDINARY_URL, { method: "POST", body: formData });
                     const data = await res.json();
-                    finalUrl = data.secure_url;
-                    fileType = "video";
+                    if(data.secure_url) {
+                        finalUrl = data.secure_url;
+                        fileType = "video";
+                    } else {
+                        throw new Error("Cloudinary Upload Failed");
+                    }
                 }
             }
 
-            // 3. Firebase Database එකට Text එක සහ Link එක යැවීම
+            // 3. Firebase Database එකට සේව් කිරීම
             await db.ref('smart_notes').push({
                 text: text,
                 url: finalUrl,
@@ -93,33 +106,20 @@
                 time: new Date().toLocaleString()
             });
 
-            alert("Firebase එකට සාර්ථකව ඇඩ් වුණා!");
+            alert("සාර්ථකව Firebase එකට ඇඩ් වුණා!");
+            
+            // Form එක Reset කිරීම
             document.getElementById('noteInput').value = "";
             document.getElementById('fileInput').value = "";
             document.getElementById('status').innerText = "";
 
         } catch (e) {
-            alert("Error: " + e.message);
+            alert("වැරදීමක්: " + e.message);
         } finally {
             btn.disabled = false;
             btn.innerText = "SAVE TO FIREBASE";
         }
     }
-
-    // සටහන් පෙන්වීම (Display Notes)
-    db.ref('smart_notes').on('value', (snap) => {
-        const feed = document.getElementById('notesFeed');
-        feed.innerHTML = "";
-        snap.forEach((child) => {
-            const n = child.val();
-            let media = "";
-            if (n.url) {
-                if (n.fileType === "video") media = `<video src="${n.url}" class="media-content" controls></video>`;
-                else media = `<img src="${n.url}" class="media-content" onclick="window.open('${n.url}')">`;
-            }
-            feed.innerHTML = `<div class="note-card">${media}<div>${n.text}</div><small style="color:gray;">${n.time}</small></div>` + feed.innerHTML;
-        });
-    });
 </script>
 </body>
 </html>
