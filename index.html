@@ -3,40 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Notes - Final Stable</title>
+    <title>Smart Notes - 24H Full View</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #000; --card: #1c1c1e; --text: #fff; --primary: #30d158; --border: rgba(255,255,255,0.1); }
+        :root { --bg: #000; --card: #151517; --text: #fff; --primary: #30d158; --border: rgba(255,255,255,0.08); }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 0; overflow: hidden; }
         
-        /* Setup Screen */
         #welcomeScreen { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
-        .p-setup-img { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; margin-bottom: 20px; }
+        .p-setup-img { width: 100px; height: 100px; border-radius: 50%; border: 2.5px solid var(--primary); object-fit: cover; margin-bottom: 20px; }
 
-        .scroll-container { height: 100vh; overflow-y: auto; padding: 15px 12px 100px 12px; box-sizing: border-box; }
-        .note-card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 16px; border: 0.5px solid var(--border); }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .p-img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: #333; }
+        .scroll-container { height: 100vh; overflow-y: auto; padding: 12px 10px 100px 10px; box-sizing: border-box; }
+        .note-card { background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 0.5px solid var(--border); }
+        .user-info { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .p-img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
         
-        /* Media Display */
-        .media-box { width: 100%; background: #000; border-radius: 12px; margin: 10px 0; overflow: hidden; display: flex; justify-content: center; max-height: 500px; border: 0.5px solid #333; }
-        .media-box img, .media-box video { max-width: 100%; max-height: 500px; object-fit: contain; display: block; }
+        /* Media Full Size View */
+        .media-box { width: 100%; margin: 8px 0; border-radius: 8px; overflow: hidden; background: #000; }
+        .media-box img, .media-box video { width: 100%; height: auto; display: block; border-radius: 8px; }
 
-        .react-bar { display: flex; gap: 12px; padding-top: 10px; border-top: 0.5px solid var(--border); margin-top: 10px; }
-        .react-btn { background: rgba(255,255,255,0.08); border: none; padding: 8px 16px; border-radius: 20px; color: #fff; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+        .react-bar { display: flex; gap: 10px; padding-top: 8px; margin-top: 5px; }
+        .react-btn { background: rgba(255,255,255,0.06); border: none; padding: 6px 12px; border-radius: 15px; color: #fff; font-size: 12px; display: flex; align-items: center; gap: 5px; }
 
-        /* Chat UI */
-        #chatBox { position: fixed; bottom: 90px; right: 15px; width: 320px; height: 450px; background: #1c1c1e; border: 0.5px solid var(--border); border-radius: 20px; display: none; flex-direction: column; z-index: 3000; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        #chatLogs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-        .chat-msg { display: flex; gap: 8px; align-items: flex-end; max-width: 85%; }
+        #chatBox { position: fixed; bottom: 85px; right: 15px; width: 300px; height: 400px; background: #1c1c1e; border: 0.5px solid var(--border); border-radius: 18px; display: none; flex-direction: column; z-index: 3000; }
+        #chatLogs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .chat-msg { display: flex; gap: 6px; align-items: flex-end; max-width: 85%; }
         .chat-msg.me { align-self: flex-end; flex-direction: row-reverse; }
-        .chat-dp { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; }
-        .chat-bubble { padding: 8px 12px; border-radius: 15px; font-size: 13px; background: #333; }
+        .chat-dp { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+        .chat-bubble { padding: 7px 11px; border-radius: 14px; font-size: 12.5px; background: #333; }
         .chat-msg.me .chat-bubble { background: var(--primary); }
 
-        .fab { position: fixed; bottom: 25px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 30px; z-index: 1000; box-shadow: 0 4px 15px rgba(48,209,88,0.4); }
-        .chat-fab { position: fixed; bottom: 25px; left: 20px; width: 60px; height: 60px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 26px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,122,255,0.4); }
+        .fab { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 26px; z-index: 1000; }
+        .chat-fab { position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 22px; z-index: 1000; }
     </style>
 </head>
 <body>
@@ -44,12 +42,12 @@
 <div id="welcomeScreen">
     <label for="pUpload"><img id="pPreview" class="p-setup-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png"></label>
     <input type="file" id="pUpload" accept="image/*" style="display:none;" onchange="previewP(this)">
-    <input type="text" id="uNameInp" placeholder="ඔබේ නම..." style="width:75%; padding:15px; border-radius:12px; border:none; margin-bottom:20px; text-align:center; background:#222; color:#fff; font-size:16px;">
-    <button onclick="saveProfile()" style="background:var(--primary); color:#fff; border:none; padding:15px 50px; border-radius:25px; font-weight:700;">ඇතුල් වන්න</button>
+    <input type="text" id="uNameInp" placeholder="ඔබේ නම..." style="width:70%; padding:14px; border-radius:12px; border:none; margin-bottom:20px; text-align:center; background:#222; color:#fff;">
+    <button onclick="saveProfile()" style="background:var(--primary); color:#fff; border:none; padding:14px 45px; border-radius:25px; font-weight:700;">ඇතුල් වන්න</button>
 </div>
 
 <div class="scroll-container">
-    <h1 style="font-size: 26px; margin-bottom: 20px;">Smart Feed</h1>
+    <h1 style="font-size: 22px; margin-bottom: 15px;">Smart Feed</h1>
     <div id="notesFeed"></div>
 </div>
 
@@ -57,17 +55,17 @@
 <button class="fab" onclick="toggleAdd()">+</button>
 
 <div id="addBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:4000; padding:20px; flex-direction:column; justify-content:center;">
-    <textarea id="noteTxt" placeholder="මොනවා හරි ලියන්න..." style="width:100%; height:150px; background:#111; color:#fff; border:1px solid #333; padding:15px; border-radius:15px; margin-bottom:20px; outline:none; font-size:16px;"></textarea>
-    <input type="file" id="fileInp" accept="image/*,video/*" style="color:gray; margin-bottom:20px;">
-    <button id="postBtn" onclick="postNote()" style="background:var(--primary); color:#fff; border:none; padding:18px; border-radius:15px; font-weight:700; font-size:16px;">පළ කරන්න (Upload)</button>
-    <button onclick="toggleAdd()" style="background:none; border:none; color:gray; margin-top:20px;">අතහරින්න</button>
+    <textarea id="noteTxt" placeholder="මොනවා හරි ලියන්න..." style="width:100%; height:120px; background:#111; color:#fff; border:1px solid #333; padding:15px; border-radius:12px; margin-bottom:15px; outline:none;"></textarea>
+    <input type="file" id="fileInp" accept="image/*,video/*" style="margin-bottom:20px; color:gray;">
+    <button id="postBtn" onclick="postNote()" style="background:var(--primary); color:#fff; border:none; padding:15px; border-radius:12px; font-weight:700;">පළ කරන්න</button>
+    <button onclick="toggleAdd()" style="background:none; border:none; color:gray; margin-top:15px;">Close</button>
 </div>
 
 <div id="chatBox">
-    <div style="padding:15px; border-bottom:0.5px solid var(--border); font-weight:700;">Community Chat</div>
+    <div style="padding:12px; border-bottom:0.5px solid var(--border); font-size:14px;">Chat</div>
     <div id="chatLogs"></div>
-    <div style="padding:12px; display:flex; gap:8px;">
-        <input type="text" id="chatInp" placeholder="මැසේජ් එකක් ලියන්න..." style="flex:1; background:#333; border:none; padding:12px; border-radius:20px; color:#fff; outline:none;">
+    <div style="padding:10px; display:flex; gap:5px;">
+        <input type="text" id="chatInp" placeholder="Type..." style="flex:1; background:#333; border:none; padding:8px; border-radius:15px; color:#fff; outline:none;">
         <button onclick="sendMsg()" style="color:var(--primary); background:none; border:none; font-weight:700;">Send</button>
     </div>
 </div>
@@ -77,19 +75,31 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let myData = JSON.parse(localStorage.getItem("smart_user_final_v1"));
+    // 24 Hour Logic
+    function checkUser() {
+        const stored = localStorage.getItem("smart_user_24h");
+        if (stored) {
+            const data = JSON.parse(stored);
+            const now = new Date().getTime();
+            if (now - data.timestamp < 24 * 60 * 60 * 1000) return data;
+            else localStorage.removeItem("smart_user_24h");
+        }
+        return null;
+    }
+
+    let myData = checkUser();
     if(!myData) document.getElementById('welcomeScreen').style.display = 'flex';
 
     function previewP(i) { if(i.files[0]) { const r = new FileReader(); r.onload=e=>document.getElementById('pPreview').src=e.target.result; r.readAsDataURL(i.files[0]); } }
 
     async function saveProfile() {
         const name = document.getElementById('uNameInp').value, file = document.getElementById('pUpload').files[0];
-        if(!name || !file) return alert("නම සහ පින්තූරයක් අවශ්‍යයි!");
+        if(!name || !file) return alert("නම සහ DP අවශ්‍යයි!");
         const fd = new FormData(); fd.append("image", file);
         const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", {method:"POST", body:fd});
         const d = await res.json();
-        myData = { name, photo: d.data.url };
-        localStorage.setItem("smart_user_final_v1", JSON.stringify(myData));
+        myData = { name, photo: d.data.url, timestamp: new Date().getTime() };
+        localStorage.setItem("smart_user_24h", JSON.stringify(myData));
         location.reload();
     }
 
@@ -99,60 +109,51 @@
     async function postNote() {
         const text = document.getElementById('noteTxt').value, file = document.getElementById('fileInp').files[0], btn = document.getElementById('postBtn');
         if(!text && !file) return;
-        btn.disabled = true; btn.innerText = "Uploading... Please Wait";
+        btn.disabled = true; btn.innerText = "Syncing...";
         let url = "", type = "text";
-        try {
-            if(file) {
-                let fd = new FormData();
-                if(file.type.startsWith('image')) {
-                    fd.append("image", file);
-                    const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", {method:"POST", body:fd});
-                    const d = await res.json(); url = d.data.url; type = "image";
-                } else {
-                    fd.append("file", file); fd.append("upload_preset", "Yuresh_preset");
-                    const res = await fetch("https://api.cloudinary.com/v1_1/ds5ig0wvd/upload", {method:"POST", body:fd});
-                    const d = await res.json(); url = d.secure_url; type = "video";
-                }
+        if(file) {
+            let fd = new FormData();
+            if(file.type.startsWith('image')) {
+                fd.append("image", file);
+                const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", {method:"POST", body:fd});
+                const d = await res.json(); url = d.data.url; type = "image";
+            } else {
+                fd.append("file", file); fd.append("upload_preset", "Yuresh_preset");
+                const res = await fetch("https://api.cloudinary.com/v1_1/ds5ig0wvd/upload", {method:"POST", body:fd});
+                const d = await res.json(); url = d.secure_url; type = "video";
             }
-            await db.ref('smart_notes').push({ uName: myData.name, uPhoto: myData.photo, text, url, fileType: type, time: Date.now(), reacts: {love:0, fire:0} });
-            location.reload();
-        } catch(e) { alert("Upload Failed! Try again."); btn.disabled = false; btn.innerText = "පළ කරන්න"; }
+        }
+        await db.ref('smart_notes').push({ uName: myData.name, uPhoto: myData.photo, text, url, fileType: type, time: Date.now(), love:0 });
+        location.reload();
     }
 
-    db.ref('smart_notes').limitToLast(25).on('value', snap => {
+    db.ref('smart_notes').limitToLast(15).on('value', snap => {
         const feed = document.getElementById('notesFeed');
         snap.forEach(c => {
             const id = c.key, d = c.val(), existing = document.getElementById('card-'+id);
-            if(existing) {
-                existing.querySelector('.l-cnt').innerText = d.reacts?.love || 0;
-                existing.querySelector('.f-cnt').innerText = d.reacts?.fire || 0;
-            } else {
+            if(!existing) {
                 let media = d.url ? (d.fileType === "video" ? `<div class="media-box"><video src="${d.url}" controls playsinline preload="metadata"></video></div>` : `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`) : "";
                 const html = `<div class="note-card" id="card-${id}">
                     <div class="user-info"><img src="${d.uPhoto}" class="p-img"><b>${d.uName}</b></div>
-                    <div style="font-size:16px; margin-bottom:5px; line-height:1.4;">${d.text || ""}</div>${media}
-                    <div class="react-bar">
-                        <button class="react-btn" onclick="react('${id}','love')">❤️ <span class="l-cnt">${d.reacts?.love||0}</span></button>
-                        <button class="react-btn" onclick="react('${id}','fire')">🔥 <span class="f-cnt">${d.reacts?.fire||0}</span></button>
-                    </div></div>`;
+                    <div style="font-size:14px; line-height:1.4;">${d.text || ""}</div>${media}
+                    <div class="react-bar"><button class="react-btn" onclick="db.ref('smart_notes/${id}/love').transaction(c=>(c||0)+1)">❤️ <span>${d.love||0}</span></button></div>
+                </div>`;
                 feed.insertAdjacentHTML('afterbegin', html);
-            }
+            } else { existing.querySelector('span').innerText = d.love || 0; }
         });
     });
 
-    function react(id, t) { db.ref(`smart_notes/${id}/reacts/${t}`).transaction(c=>(c||0)+1); }
-
-    function sendMsg() { const i = document.getElementById('chatInp'); if(i.value.trim()) { db.ref('chat').push({name:myData.name, photo:myData.photo, msg:i.value}); i.value=""; } }
-    db.ref('chat').limitToLast(25).on('value', snap => {
-        const logs = document.getElementById('chatLogs'); logs.innerHTML = "";
-        snap.forEach(c => {
+    function sendMsg() { const i = document.getElementById('chatInp'); if(i.value) { db.ref('chat').push({name:myData.name, photo:myData.photo, msg:i.value}); i.value=""; } }
+    db.ref('chat').limitToLast(20).on('value', s => {
+        const l = document.getElementById('chatLogs'); l.innerHTML = "";
+        s.forEach(c => {
             const d = c.val(), isMe = d.name === myData.name;
-            logs.innerHTML += `<div class="chat-msg ${isMe?'me':''}">
+            l.innerHTML += `<div class="chat-msg ${isMe?'me':''}">
                 <img src="${d.photo}" class="chat-dp">
                 <div class="chat-bubble"><b>${d.name}</b><br>${d.msg}</div>
             </div>`;
         });
-        logs.scrollTop = logs.scrollHeight;
+        l.scrollTop = l.scrollHeight;
     });
 </script>
 </body>
