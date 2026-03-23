@@ -2,179 +2,223 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Secure System - Locked</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Smart Secure Ultimate</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #050505; --card: #121212; --primary: #30d158; --text: #fff; --admin: #ff3b30; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; overflow: hidden; }
-        .overlay { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px; }
-        .input-box { padding: 14px; border-radius: 12px; border: 1px solid #333; width: 80%; margin-bottom: 15px; background: #111; color: #fff; text-align: center; font-size: 16px; outline: none; }
-        .btn { background: var(--primary); color: #fff; border: none; padding: 14px 45px; border-radius: 25px; font-weight: 700; cursor: pointer; }
-        .scroll-container { height: 100vh; overflow-y: auto; padding: 15px; box-sizing: border-box; display: none; }
-        .timer-info { font-size: 11px; color: var(--primary); margin-bottom: 10px; background: rgba(48,209,88,0.1); padding: 5px 10px; border-radius: 8px; width: fit-content; }
-        .note-card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 0.5px solid #222; }
-        .fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); border: none; font-size: 25px; color: #fff; z-index: 1000; display: none; }
+        :root { --bg: #000; --card: #1c1c1e; --text: #fff; --primary: #30d158; --border: rgba(255,255,255,0.1); --admin: #ff3b30; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 0; overflow: hidden; }
+        
+        .overlay { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px; }
+        .input-box { padding: 14px; border-radius: 12px; border: 1px solid #333; width: 85%; margin-bottom: 15px; background: #111; color: #fff; text-align: center; outline: none; }
+        
+        .scroll-container { height: 100vh; overflow-y: auto; padding: 15px 12px 100px 12px; box-sizing: border-box; display: none; }
+        .note-card { background: var(--card); border-radius: 16px; padding: 12px; margin-bottom: 16px; border: 0.5px solid var(--border); }
+        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .p-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        
+        /* Media view full box */
+        .media-box { width: 100%; background: #000; border-radius: 12px; margin: 8px 0; overflow: hidden; display: flex; justify-content: center; max-height: 450px; }
+        .media-box img, .media-box video { max-width: 100%; max-height: 450px; object-fit: contain; display: block; }
+
+        /* Chat System UI */
+        #chatBox { position: fixed; bottom: 90px; right: 15px; width: 300px; height: 400px; background: #1c1c1e; border: 0.5px solid var(--border); border-radius: 20px; display: none; flex-direction: column; z-index: 3000; }
+        #chatLogs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .chat-msg { display: flex; gap: 5px; align-items: flex-end; max-width: 85%; }
+        .chat-bubble { padding: 8px 12px; border-radius: 15px; font-size: 13px; background: #333; }
+        .chat-msg.me { align-self: flex-end; flex-direction: row-reverse; }
+        .chat-msg.me .chat-bubble { background: var(--primary); }
+
+        .fab { position: fixed; bottom: 25px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 24px; z-index: 1000; display:none; }
+        .chat-fab { position: fixed; bottom: 25px; left: 20px; width: 55px; height: 55px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 24px; z-index: 1000; display:none; }
     </style>
 </head>
 <body>
 
-<div id="blocker" class="overlay" style="display:none;">
+<div id="blocker" class="overlay">
     <h2 id="blockMsg">සර්වර් එක පිරී ඇත (100/100)</h2>
-    <p id="subMsg">කරුණාකර පසුව උත්සාහ කරන්න.</p>
-    <button onclick="showAdminLogin()" style="background:none; border:none; color:#333; margin-top:50px; font-size:10px;">Admin Login</button>
+    <p id="subMsg">පසුව උත්සාහ කරන්න.</p>
+    <button onclick="showAdminLogin()" style="background:none; border:none; color:#222; margin-top:30px;">Admin Access</button>
 </div>
 
-<div id="setup" class="overlay" style="display:none;">
-    <h2 style="color:var(--primary)">Smart Access</h2>
-    <input type="text" id="uName" class="input-box" placeholder="ඔබේ නම...">
-    <button class="btn" onclick="startSession()">ඇතුල් වන්න</button>
-    <p style="font-size:10px; color:gray; margin-top:20px;">සීමාව: පැය 1 | විවේකය: පැය 5</p>
+<div id="setup" class="overlay">
+    <h2>Smart Secure Setup</h2>
+    <input type="text" id="uNameInp" class="input-box" placeholder="ඔබේ නම...">
+    <input type="file" id="pUpload" accept="image/*" style="margin-bottom:15px; color:gray;">
+    <button onclick="saveProfile()" style="background:var(--primary); color:#fff; border:none; padding:14px 40px; border-radius:25px; font-weight:700;">Start Session</button>
 </div>
 
-<div id="adminPanel" class="overlay" style="display:none;">
-    <h2 style="color:var(--admin)">Admin Verification</h2>
-    <input type="password" id="adminKey" class="input-box" placeholder="Secret Key...">
-    <button class="btn" style="background:var(--admin)" onclick="verifyAdmin()">Unlock System</button>
-    <button onclick="location.reload()" style="background:none; border:none; color:gray; margin-top:15px;">Back</button>
+<div id="adminPanel" class="overlay">
+    <h2 style="color:var(--admin)">Admin Unlock</h2>
+    <input type="password" id="adminKey" class="input-box" placeholder="Enter Secret Key...">
+    <button onclick="verifyAdmin()" style="background:var(--admin); color:#fff; border:none; padding:12px 40px; border-radius:20px;">Unlock Now</button>
 </div>
 
 <div class="scroll-container" id="appContent">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div class="timer-info" id="sessionTimer">Session: --:--</div>
-        <button onclick="exitApp()" style="background:none; border:none; color:gray; font-size:12px;">Logout</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h1 style="font-size: 24px; margin: 0;">Smart Feed</h1>
+        <div id="sessionTimer" style="font-size:12px; color:var(--primary); font-weight:bold;">--:--</div>
     </div>
     <div id="notesFeed"></div>
 </div>
 
-<button class="fab" id="addBtn" onclick="alert('Post Function can be added here!')">+</button>
+<button class="chat-fab" id="chatBtn" onclick="toggleChat()">💬</button>
+<button class="fab" id="addBtn" onclick="toggleAdd()">+</button>
+
+<div id="addBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:4000; padding:20px; flex-direction:column; justify-content:center;">
+    <textarea id="noteTxt" placeholder="මොනවා හරි ලියන්න..." style="width:100%; height:120px; background:#111; color:#fff; border:1px solid #333; padding:15px; border-radius:15px; margin-bottom:15px; outline:none;"></textarea>
+    <input type="file" id="fileInp" accept="image/*,video/*" style="margin-bottom:15px; color:gray;">
+    <button id="postBtn" onclick="postNote()" style="background:var(--primary); color:#fff; border:none; padding:15px; border-radius:15px; font-weight:700;">පළ කරන්න</button>
+    <button onclick="toggleAdd()" style="background:none; border:none; color:gray; margin-top:15px;">Close</button>
+</div>
+
+<div id="chatBox">
+    <div id="chatLogs"></div>
+    <div style="padding:10px; display:flex; gap:5px; border-top:0.5px solid var(--border);">
+        <input type="text" id="chatInp" placeholder="Type..." style="flex:1; background:#222; border:none; padding:8px; border-radius:10px; color:#fff; outline:none;">
+        <button onclick="sendMsg()" style="color:var(--primary); background:none; border:none; font-weight:700;">Send</button>
+    </div>
+</div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g", databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const ADMIN_PASS = "Yuresh@2026"; // ඔයාගේ රහස් Key එක මෙතන තියෙන්නේ
+    const ADMIN_PASS = "Yuresh@2026";
     const ONE_HOUR = 60 * 60 * 1000;
     const FIVE_HOURS = 5 * 60 * 60 * 1000;
 
-    let myUser = JSON.parse(localStorage.getItem("secure_user"));
+    let myData = JSON.parse(localStorage.getItem("secure_user_v3"));
 
     async function checkAccess() {
-        // 1. Admin ද කියලා බලනවා (Admin ට සීමා නැත)
-        if (myUser && myUser.isAdmin) {
-            enterApp();
-            return;
-        }
+        if (myData && myData.isAdmin) { enterApp(); return; }
 
-        // 2. Cooldown Check (පැය 5 සීමාව)
-        if (myUser && myUser.lastExit) {
-            const timePassed = Date.now() - myUser.lastExit;
+        if (myData && myData.lastExit) {
+            const timePassed = Date.now() - myData.lastExit;
             if (timePassed < FIVE_HOURS) {
                 const wait = Math.ceil((FIVE_HOURS - timePassed) / (60 * 1000));
-                showBlock("Access Denied", `ඔබේ විවේක කාලය ක්‍රියාත්මකයි. තව මිනිත්තු ${wait} කින් උත්සාහ කරන්න.`);
+                showBlock("විවේක කාලය", `නැවත ඇතුල් වීමට තව මිනිත්තු ${wait} ක් ඇත.`);
                 return;
             }
         }
 
-        // 3. 100 Users Limit Check
         const snap = await db.ref('online_users').once('value');
-        if (snap.numChildren() >= 100) {
-            showBlock("Server Full", "දැනට උපරිම සීමාව (100) කරා ළඟා වී ඇත.");
-            return;
-        }
+        if (snap.numChildren() >= 100) { showBlock("සර්වර් එක පිරී ඇත", "දැනට 100 දෙනාම ඇතුලත සිටී."); return; }
 
-        // 4. Login එක පෙන්වනවා
-        if (!myUser || !myUser.startTime) {
-            document.getElementById('setup').style.display = 'flex';
-        } else {
-            enterApp();
-        }
+        if (!myData || !myData.startTime) { document.getElementById('setup').style.display = 'flex'; }
+        else { enterApp(); }
     }
 
-    function showBlock(title, msg) {
-        document.getElementById('blocker').style.display = 'flex';
-        document.getElementById('blockMsg').innerText = title;
-        document.getElementById('subMsg').innerText = msg;
-    }
+    function showBlock(t, m) { document.getElementById('blocker').style.display = 'flex'; document.getElementById('blockMsg').innerText=t; document.getElementById('subMsg').innerText=m; }
+    function showAdminLogin() { document.getElementById('blocker').style.display='none'; document.getElementById('adminPanel').style.display='flex'; }
 
-    function showAdminLogin() {
-        document.getElementById('blocker').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'flex';
-    }
-
-    function verifyAdmin() {
-        const key = document.getElementById('adminKey').value;
-        if (key === ADMIN_PASS) {
-            myUser = { id: "admin_1", name: "Owner", isAdmin: true, startTime: Date.now() };
-            localStorage.setItem("secure_user", JSON.stringify(myUser));
-            location.reload();
-        } else {
-            alert("වැරදි Key එකක්!");
-        }
-    }
-
-    async function startSession() {
-        const name = document.getElementById('uName').value;
-        if (!name) return;
-        myUser = { id: "u_" + Date.now(), name: name, startTime: Date.now(), isAdmin: false };
-        localStorage.setItem("secure_user", JSON.stringify(myUser));
+    async function saveProfile() {
+        const name = document.getElementById('uNameInp').value, file = document.getElementById('pUpload').files[0];
+        if(!name || !file) return alert("නම සහ DP එකක් දාන්න!");
+        const fd = new FormData(); fd.append("image", file);
+        const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", {method:"POST", body:fd});
+        const d = await res.json();
+        myData = { name, photo: d.data.url, startTime: Date.now(), isAdmin: false, id: "u_"+Date.now() };
+        localStorage.setItem("secure_user_v3", JSON.stringify(myData));
         enterApp();
     }
 
-    function enterApp() {
-        document.getElementById('setup').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'none';
-        document.getElementById('blocker').style.display = 'none';
-        document.getElementById('appContent').style.display = 'block';
-        document.getElementById('addBtn').style.display = 'block';
-
-        db.ref('online_users/' + myUser.id).set({ name: myUser.name, lastSeen: Date.now() });
-        db.ref('online_users/' + myUser.id).onDisconnect().remove();
-
-        if (!myUser.isAdmin) {
-            const timeLeft = ONE_HOUR - (Date.now() - myUser.startTime);
-            if (timeLeft <= 0) { exitApp(); return; }
-            startTimer(timeLeft);
-        } else {
-            document.getElementById('sessionTimer').innerText = "Admin Mode: Unlimited Access";
-            document.getElementById('sessionTimer').style.color = "var(--admin)";
-        }
-        loadFeed();
+    function verifyAdmin() {
+        if(document.getElementById('adminKey').value === ADMIN_PASS) {
+            myData = { name: "Admin", photo: "https://cdn-icons-png.flaticon.com/512/6024/6024190.png", isAdmin: true, id: "admin_1" };
+            localStorage.setItem("secure_user_v3", JSON.stringify(myData));
+            location.reload();
+        } else alert("Key Wrong!");
     }
 
-    function startTimer(timer) {
-        const display = document.getElementById('sessionTimer');
-        const interval = setInterval(() => {
-            const mins = Math.floor(timer / 60000);
-            const secs = Math.floor((timer % 60000) / 1000);
-            display.innerText = `Time Left: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
-            timer -= 1000;
-            if (timer <= 0) { clearInterval(interval); exitApp(); }
+    function enterApp() {
+        document.querySelectorAll('.overlay').forEach(o=>o.style.display='none');
+        document.getElementById('appContent').style.display='block';
+        document.getElementById('addBtn').style.display='block';
+        document.getElementById('chatBtn').style.display='block';
+
+        db.ref('online_users/' + myData.id).set({ name: myData.name });
+        db.ref('online_users/' + myData.id).onDisconnect().remove();
+
+        if(!myData.isAdmin) {
+            const left = ONE_HOUR - (Date.now() - myData.startTime);
+            if(left <= 0) exitApp();
+            startTimer(left);
+        } else document.getElementById('sessionTimer').innerText = "Admin Unlimited";
+
+        loadFeed();
+        loadChat();
+    }
+
+    function startTimer(t) {
+        setInterval(() => {
+            t -= 1000;
+            const m = Math.floor(t/60000), s = Math.floor((t%60000)/1000);
+            document.getElementById('sessionTimer').innerText = `Time: ${m}:${s<10?'0':''}${s}`;
+            if(t <= 0) exitApp();
         }, 1000);
     }
 
     async function exitApp() {
-        if (myUser && !myUser.isAdmin) {
-            myUser.lastExit = Date.now();
-            myUser.startTime = null;
-            localStorage.setItem("secure_user", JSON.stringify(myUser));
-        } else if(myUser.isAdmin) {
-            localStorage.removeItem("secure_user"); // Admin Logout
-        }
-        await db.ref('online_users/' + myUser.id).remove();
+        if(!myData.isAdmin) { myData.lastExit = Date.now(); myData.startTime = null; localStorage.setItem("secure_user_v3", JSON.stringify(myData)); }
+        else localStorage.removeItem("secure_user_v3");
+        await db.ref('online_users/' + myData.id).remove();
         location.reload();
     }
 
+    // Load Feed with Photo/Video Support
     function loadFeed() {
         db.ref('smart_notes').limitToLast(20).on('value', snap => {
             const feed = document.getElementById('notesFeed');
-            feed.innerHTML = "";
             snap.forEach(c => {
-                const d = c.val();
-                feed.innerHTML = `<div class="note-card"><b>${d.uName}</b><p>${d.text || ""}</p></div>` + feed.innerHTML;
+                const id = c.key, d = c.val(), existing = document.getElementById('card-'+id);
+                if(!existing) {
+                    let media = d.url ? (d.fileType === "video" ? `<div class="media-box"><video src="${d.url}" controls preload="metadata"></video></div>` : `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`) : "";
+                    const html = `<div class="note-card" id="card-${id}">
+                        <div class="user-info"><img src="${d.uPhoto}" class="p-img"><b>${d.uName}</b></div>
+                        <div>${d.text || ""}</div>${media}
+                        <div style="margin-top:10px;"><button style="background:none; border:none; color:gray;" onclick="db.ref('smart_notes/${id}/likes').transaction(c=>(c||0)+1)">❤️ ${d.likes || 0}</button></div>
+                    </div>`;
+                    feed.insertAdjacentHTML('afterbegin', html);
+                }
             });
+        });
+    }
+
+    async function postNote() {
+        const text = document.getElementById('noteTxt').value, file = document.getElementById('fileInp').files[0], btn = document.getElementById('postBtn');
+        btn.disabled = true; btn.innerText = "Syncing...";
+        let url = "", type = "text";
+        if(file) {
+            let fd = new FormData();
+            if(file.type.startsWith('image')) {
+                fd.append("image", file);
+                const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", {method:"POST", body:fd});
+                const d = await res.json(); url = d.data.url; type = "image";
+            } else {
+                fd.append("file", file); fd.append("upload_preset", "Yuresh_preset");
+                const res = await fetch("https://api.cloudinary.com/v1_1/ds5ig0wvd/upload", {method:"POST", body:fd});
+                const d = await res.json(); url = d.secure_url; type = "video";
+            }
+        }
+        await db.ref('smart_notes').push({ uName: myData.name, uPhoto: myData.photo, text, url, fileType: type, time: Date.now(), likes: 0 });
+        location.reload();
+    }
+
+    function toggleAdd() { const b = document.getElementById('addBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
+    function toggleChat() { const b = document.getElementById('chatBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
+
+    function sendMsg() { const i = document.getElementById('chatInp'); if(i.value) { db.ref('chat').push({name:myData.name, photo:myData.photo, msg:i.value}); i.value=""; } }
+    function loadChat() {
+        db.ref('chat').limitToLast(20).on('value', s => {
+            const l = document.getElementById('chatLogs'); l.innerHTML = "";
+            s.forEach(c => {
+                const d = c.val(), isMe = d.name === myData.name;
+                l.innerHTML += `<div class="chat-msg ${isMe?'me':''}"><img src="${d.photo}" class="p-img" style="width:20px;height:20px;"><div class="chat-bubble">${d.msg}</div></div>`;
+            });
+            l.scrollTop = l.scrollHeight;
         });
     }
 
