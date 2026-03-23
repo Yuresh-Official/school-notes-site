@@ -150,7 +150,7 @@
     function nextTheme() { const b = document.body; b.setAttribute('data-theme', b.getAttribute('data-theme') == "1" ? "2" : "1"); }
     function toggleInput() { const s = document.getElementById('inputSection'); s.style.display = s.style.display === "none" ? "block" : "none"; }
 
-    // --- New Voice Call Logic (No Black Box) ---
+    // --- Voice Call Logic ---
     async function startCall() {
         db.ref('active_voice_call').set({ status: 'active', user: 'Yuresh', time: Date.now() });
         joinCall();
@@ -204,7 +204,7 @@
         };
     }
 
-    // --- Original Notes Logic ---
+    // --- Notes Management ---
     async function saveNote() {
         const text = document.getElementById('noteInput').value, file = document.getElementById('fileInput').files[0], btn = document.getElementById('submitBtn');
         if(!text && !file) return;
@@ -237,6 +237,7 @@
         });
     });
 
+    // --- Chat Management ---
     function openChat() { document.getElementById('chatBox').style.display = 'flex'; }
     function closeChat() { document.getElementById('chatBox').style.display = 'none'; }
     function sendChat() { const i = document.getElementById('chatInput'); if(i.value.trim()){ db.ref('community_chat').push({ name: "Yuresh", msg: i.value }); i.value = ""; } }
