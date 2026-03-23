@@ -3,120 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Notes SL - Ultimate Glass</title>
+    <title>Smart Notes SL - Ultimate Fix</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         :root { --primary: #30d158; --glass: rgba(255, 255, 255, 0.1); --border: rgba(255, 255, 255, 0.2); }
         body { background: #000; color: #fff; font-family: -apple-system, sans-serif; margin: 0; overflow-x: hidden; }
         
-        .bg-glow { position: fixed; width: 300px; height: 300px; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.4; }
-        .g1 { background: #1a73e8; top: -50px; left: -50px; }
-        .g2 { background: #30d158; bottom: -50px; right: -50px; }
-
-        .container { min-height: 100vh; padding: 20px 15px 120px 15px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* Glass Card Design */
+        /* Glass Card Style */
         .card { 
             width: 100%; max-width: 380px; background: var(--glass); 
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-radius: 20px; padding: 15px; margin-bottom: 20px; 
-            border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 22px; padding: 15px; margin-bottom: 20px; 
+            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .user-row img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid var(--primary); }
-        .user-row b { font-size: 14px; }
+        .u-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .u-info img { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--primary); object-fit: cover; }
+        .u-info b { font-size: 15px; letter-spacing: 0.5px; }
 
-        .media-box { width: 100%; border-radius: 12px; overflow: hidden; margin: 10px 0; background: #000; position: relative; min-height: 200px; }
+        .media-box { width: 100%; border-radius: 15px; overflow: hidden; background: #111; margin: 10px 0; }
         .media-box img, .media-box video { width: 100%; display: block; max-height: 500px; object-fit: contain; }
 
-        #statusToast { 
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
-            background: rgba(20,20,22,0.9); border: 1px solid var(--primary); 
-            padding: 10px 20px; border-radius: 30px; display: none; align-items: center; gap: 10px; z-index: 9999;
-        }
+        /* Floating Action Buttons */
+        .fab { position: fixed; bottom: 30px; right: 25px; width: 65px; height: 65px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 30px; z-index: 1000; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(48,209,88,0.3); }
+        .chat-btn { position: fixed; bottom: 30px; left: 25px; width: 65px; height: 65px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 25px; z-index: 1000; display: flex; align-items: center; justify-content: center; }
 
-        .fab { position: fixed; bottom: 30px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 30px; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .chat-toggle { position: fixed; bottom: 30px; left: 25px; width: 60px; height: 60px; border-radius: 50%; background: #007aff; color: #fff; border: none; font-size: 25px; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        /* Progress Bar for 85% Fix */
+        #upStatus { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); border: 1px solid var(--primary); padding: 12px 25px; border-radius: 30px; display: none; z-index: 9999; text-align: center; width: 80%; max-width: 300px; }
+        .p-bar { height: 6px; background: #333; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .p-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
 
-        #chatBox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); z-index: 8000; display: none; flex-direction: column; padding: 20px; }
-        #chatLogs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 80%; padding: 10px; border-radius: 15px; font-size: 14px; }
-        .msg-me { align-self: flex-end; background: var(--primary); }
-        .msg-other { align-self: flex-start; background: rgba(255,255,255,0.1); }
+        #prevList { width: 100%; max-height: 300px; overflow-y: auto; margin-top: 15px; }
+        .prev-item { display: flex; gap: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 10px; align-items: center; }
+        .prev-item video, .prev-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
     </style>
 </head>
 <body>
-    <div class="bg-glow g1"></div><div class="bg-glow g2"></div>
-    <div id="statusToast"><span id="stTxt">Syncing...</span></div>
 
-    <div class="container">
-        <h3 style="width:100%; max-width:380px;">Smart Notes SL</h3>
-        <div id="feed" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
+    <div id="upStatus">
+        <span id="upTxt" style="font-size:14px; font-weight:bold;">Uploading...</span>
+        <div class="p-bar"><div class="p-fill" id="pFill"></div></div>
     </div>
 
-    <button class="chat-toggle" onclick="toggleChat()"><span role="img" aria-label="chat">💬</span></button>
+    <div style="padding: 20px 15px 100px 15px; display: flex; flex-direction: column; align-items: center;">
+        <h2 style="width: 100%; max-width: 380px;">Smart Notes SL</h2>
+        <div id="feed" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+    </div>
+
+    <button class="chat-btn" onclick="toggleChat()">💬</button>
     <button class="fab" onclick="toggleAdd()">+</button>
 
-    <div id="addBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.98); z-index:9000; align-items:center; justify-content:center; padding:20px;">
+    <div id="addBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9000; align-items:center; justify-content:center; padding:20px;">
         <div style="width:100%; max-width:380px; text-align:center;">
-            <h4>අලුත් පෝස්ට් එකක්</h4>
-            <input type="file" id="fileInp" accept="image/*,video/*" multiple style="color:gray;">
-            <button onclick="startUpload()" style="width:100%; background:var(--primary); color:#fff; border:none; padding:15px; border-radius:15px; font-weight:700; margin-top:20px;">පළ කරන්න</button>
-            <button onclick="toggleAdd()" style="background:none; border:none; color:gray; margin-top:10px;">අහක් කරන්න</button>
+            <h3>නව නිර්මාණයක්</h3>
+            <input type="file" id="fileInp" accept="image/*,video/*" multiple onchange="showPrev(this)" style="color:gray; font-size:12px;">
+            <div id="prevList"></div>
+            <button onclick="startUpload()" style="width:100%; background:var(--primary); color:#fff; border:none; padding:18px; border-radius:18px; font-weight:700; margin-top:20px;">සර්වර් එකට යවන්න</button>
+            <button onclick="toggleAdd()" style="background:none; border:none; color:gray; margin-top:10px;">අතහරින්න</button>
         </div>
-    </div>
-
-    <div id="chatBox">
-        <div style="display:flex; justify-content:space-between; align-items:center;"><h4>Live Chat</h4><button onclick="toggleChat()" style="color:#fff; font-size:24px; background:none; border:none;">×</button></div>
-        <div id="chatLogs"></div>
-        <div style="display:flex; gap:10px;"><input type="text" id="chatInp" style="flex:1; background:var(--glass); border:none; color:#fff; padding:10px; border-radius:10px;"><button onclick="sendChat()" style="color:var(--primary); background:none; border:none;">Send</button></div>
     </div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g", databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let myData = JSON.parse(localStorage.getItem("smart_user_v2")) || {name: "User", photo: "https://via.placeholder.com/50"};
+
+        // ඔයාගේ Profile Data (කලින් ලෝගින් වුණ එක)
+        let me = JSON.parse(localStorage.getItem("smart_user_v2")) || {name: "Yuresh", photo: "https://via.placeholder.com/100"};
 
         function toggleAdd() { const b = document.getElementById('addBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
-        function toggleChat() { const b = document.getElementById('chatBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
+
+        function showPrev(input) {
+            const list = document.getElementById('prevList'); list.innerHTML = "";
+            Array.from(input.files).slice(0, 4).forEach((f, i) => {
+                const r = new FileReader();
+                r.onload = e => {
+                    list.innerHTML += `<div class="prev-item">
+                        ${f.type.startsWith('video') ? `<video src="${e.target.result}"></video>` : `<img src="${e.target.result}">`}
+                        <input type="text" id="cap-${i}" style="flex:1; background:#222; border:none; color:#fff; padding:10px; border-radius:10px;" placeholder="විස්තරය...">
+                    </div>`;
+                };
+                r.readAsDataURL(f);
+            });
+        }
 
         async function startUpload() {
             const fs = document.getElementById('fileInp').files;
             if(fs.length === 0) return;
-            toggleAdd();
-            const toast = document.getElementById('statusToast'); toast.style.display = 'flex';
 
-            for(let i=0; i<fs.length; i++) {
-                let f = fs[i];
+            toggleAdd();
+            const status = document.getElementById('upStatus');
+            const fill = document.getElementById('pFill');
+            status.style.display = 'block';
+
+            for(let i=0; i < fs.length; i++) {
+                const f = fs[i], cap = document.getElementById(`cap-${i}`).value;
                 let isImg = f.type.startsWith('image');
                 let fd = new FormData();
-                if(isImg) fd.append("image", f); else { fd.append("file", f); fd.append("upload_preset", "Yuresh_preset"); }
                 
+                // Progress update
+                let p = Math.round(((i) / fs.length) * 100);
+                fill.style.width = p + "%";
+                document.getElementById('upTxt').innerText = `Syncing ${i+1}/${fs.length}...`;
+
+                if(isImg) fd.append("image", f);
+                else { fd.append("file", f); fd.append("upload_preset", "Yuresh_preset"); }
+
                 try {
                     let url = isImg ? "https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160" : "https://api.cloudinary.com/v1_1/ds5ig0wvd/upload";
                     const res = await fetch(url, { method: "POST", body: fd });
                     const d = await res.json();
                     const finalUrl = isImg ? d.data.url : d.secure_url;
 
-                    await db.ref('smart_notes').push({
-                        uN: myData.name, uP: myData.photo,
-                        url: finalUrl, type: isImg ? "img" : "vid",
-                        ts: Date.now(), luv: 0
+                    // Firebase එකට නිවැරදි Key Names වලින් දත්ත යැවීම
+                    await db.ref('posts_v2').push({
+                        userName: me.name, userPhoto: me.photo,
+                        desc: cap, mediaUrl: finalUrl, mediaType: isImg ? "img" : "vid",
+                        time: Date.now(), likes: 0
                     });
-                } catch(e) { console.error(e); }
+                } catch(e) { console.log("Error skip"); }
             }
-            toast.style.display = 'none';
+            fill.style.width = "100%";
+            document.getElementById('upTxt').innerText = "සාර්ථකයි! ✅";
+            setTimeout(() => status.style.display = 'none', 2000);
         }
 
-        db.ref('smart_notes').on('value', s => {
-            const f = document.getElementById('feed'); f.innerHTML = "";
-            s.forEach(c => {
-                const d = c.val();
-                let m = d.type === "vid" ? `<video src="${d.url}" controls></video>` : `<img src="${d.url}">`;
-                f.insertAdjacentHTML('afterbegin', `<div class="card"><div class="user-row"><img src="${d.uP}"><b>${d.uN}</b></div><div class="media-box">${m}</div></div>`);
+        // පෝස්ට් ලෝඩ් කරන කොට හරියටම පින්තූර පේන්න හැදුවා
+        db.ref('posts_v2').limitToLast(20).on('value', snap => {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = "";
+            snap.forEach(child => {
+                const d = child.val();
+                let media = d.mediaType === "vid" 
+                    ? `<video src="${d.mediaUrl}" controls playsinline preload="metadata"></video>` 
+                    : `<img src="${d.mediaUrl}" loading="lazy">`;
+
+                feed.insertAdjacentHTML('afterbegin', `
+                    <div class="card">
+                        <div class="u-info"><img src="${d.userPhoto}"><b>${d.userName}</b></div>
+                        <div style="font-size:14px; color:#ccc; margin-bottom:8px;">${d.desc || ""}</div>
+                        <div class="media-box">${media}</div>
+                        <button style="background:none; border:none; color:#ff453a; font-size:16px;" onclick="db.ref('posts_v2/${child.key}/likes').transaction(l=>(l||0)+1)">❤️ ${d.likes || 0}</button>
+                    </div>
+                `);
             });
         });
     </script>
