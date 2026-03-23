@@ -3,80 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Notes - Ultra Glass Edition</title>
+    <title>Smart Notes - Compact Glass</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         :root { 
-            --bg: #000; --card: rgba(40, 40, 40, 0.4); --text: #fff; --primary: #34c759; --border: rgba(255, 255, 255, 0.15); 
-            --glass: blur(25px) saturate(200%);
+            --bg: #000; --card: rgba(45, 45, 45, 0.4); --text: #fff; --primary: #34c759; --border: rgba(255, 255, 255, 0.12); 
+            --glass: blur(20px) saturate(180%);
         }
 
-        /* Themes with Deep Glass Effect */
         body[data-theme="1"] { --bg: #f2f2f7; --card: rgba(255, 255, 255, 0.5); --text: #000; --border: rgba(0, 0, 0, 0.1); --primary: #007aff; }
-        body[data-theme="2"] { --bg: #000; --card: rgba(30, 30, 30, 0.4); --text: #fff; --border: rgba(255, 255, 255, 0.1); --primary: #34c759; }
 
         body { 
             background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif;
-            margin: 0; padding: 0; transition: 0.5s; overflow: hidden;
+            margin: 0; padding: 0; transition: 0.5s;
         }
 
-        .scroll-container { height: 100vh; overflow-y: auto; padding: 20px 16px 120px 16px; box-sizing: border-box; }
+        .scroll-container { height: 100vh; overflow-y: auto; padding: 20px 12px 120px 12px; box-sizing: border-box; }
         
-        /* Premium Glass Card */
+        /* Compact Square Note Cards */
         .note-card { 
             background: var(--card); backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
-            border-radius: 20px; padding: 18px; margin-bottom: 20px; border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3); animation: fadeIn 0.5s;
+            border-radius: 18px; padding: 12px; margin-bottom: 15px; border: 0.8px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25); width: 100%; box-sizing: border-box;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        /* Square Media Container */
+        .media-wrapper {
+            width: 100%; aspect-ratio: 1 / 1; /* හතරැස් හැඩය */
+            overflow: hidden; border-radius: 12px; margin-bottom: 10px; background: rgba(0,0,0,0.2);
+        }
+        .media-content { width: 100%; height: 100%; object-fit: cover; } /* රූපය හෝ වීඩියෝව හතරැස් කොටුවට ගැලපේ */
 
-        .media-content { width: 100%; border-radius: 15px; margin-bottom: 12px; }
-        .note-text { font-size: 16px; line-height: 1.5; margin-bottom: 15px; }
+        .note-text { font-size: 14px; line-height: 1.4; margin-bottom: 12px; white-space: pre-wrap; opacity: 0.9; }
 
-        .footer-tools { display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px; }
-        .tool-btn { background: none; border: none; color: var(--primary); font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .footer-tools { display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid var(--border); padding-top: 10px; }
+        .tool-btn { background: none; border: none; color: var(--primary); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
 
-        /* Modern Chat Window */
+        /* Floating Controls */
         #chatBox { 
-            position: fixed; bottom: 100px; right: 20px; width: 340px; height: 500px; 
+            position: fixed; bottom: 100px; right: 15px; width: 320px; height: 480px; 
             background: var(--card); backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
             z-index: 2000; display: none; flex-direction: column; 
-            border-radius: 25px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 20px; border: 1px solid var(--border);
         }
-        
-        .chat-header { padding: 18px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        #chatLogs { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-        
-        .msg { padding: 10px 14px; border-radius: 18px; max-width: 80%; font-size: 14px; }
-        .msg-sender { font-size: 11px; font-weight: bold; margin-bottom: 3px; opacity: 0.7; }
-        .msg.me { align-self: flex-end; background: var(--primary); color: #fff; }
-        .msg.other { align-self: flex-start; background: rgba(255,255,255,0.1); border: 1px solid var(--border); }
+        .chat-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        #chatLogs { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 8px 12px; border-radius: 15px; max-width: 85%; font-size: 13px; }
+        .msg.me { align-self: flex-end; background: var(--primary); }
+        .msg.other { align-self: flex-start; background: rgba(255,255,255,0.1); }
 
-        .chat-input-area { padding: 15px; display: flex; gap: 8px; align-items: center; background: rgba(0,0,0,0.1); }
-        .chat-input-area input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 10px 15px; border-radius: 25px; color: #fff; outline: none; }
-        
-        .voice-btn { background: #ff3b30; color: #fff; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .chat-input-area { padding: 12px; display: flex; gap: 6px; background: rgba(0,0,0,0.1); }
+        .chat-input-area input { flex: 1; background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 8px 12px; border-radius: 20px; color: #fff; outline: none; }
 
-        .fab { position: fixed; bottom: 30px; right: 20px; width: 65px; height: 65px; border-radius: 50%; background: var(--primary); border: none; color: #fff; font-size: 30px; box-shadow: 0 10px 30px rgba(52, 199, 89, 0.4); z-index: 1000; }
+        .fab { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); border: none; color: #fff; font-size: 28px; z-index: 1000; }
     </style>
 </head>
 <body data-theme="2">
 
 <div class="scroll-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h1 style="font-size: 34px; font-weight: 800; margin: 0;">Smart Notes</h1>
-        <button class="tool-btn" onclick="nextTheme()">Themes</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 style="font-size: 28px; font-weight: 800; margin: 0;">Notes</h1>
+        <button class="tool-btn" onclick="nextTheme()">Theme</button>
     </div>
 
-    <button onclick="toggleInput()" id="addToggle" style="width:100%; background:var(--primary); color:#fff; border:none; padding:16px; border-radius:15px; font-size:17px; font-weight:700; margin-bottom:25px; box-shadow: 0 5px 15px rgba(52, 199, 89, 0.3);">+ CREATE NEW</button>
+    <button onclick="toggleInput()" id="addToggle" style="width:100%; background:var(--primary); color:#fff; border:none; padding:12px; border-radius:12px; font-weight:700; margin-bottom:20px;">+ NEW NOTE</button>
 
-    <div id="inputSection" style="display:none; background:var(--card); backdrop-filter: var(--glass); padding:20px; border-radius:20px; margin-bottom:30px; border: 1px solid var(--border);">
-        <label for="fileInput" style="display:block; background:rgba(255,255,255,0.1); padding:15px; border-radius:12px; text-align:center; color:var(--primary); font-weight:bold; cursor:pointer; margin-bottom:15px;">📎 Attach Media</label>
-        <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;">
-        <textarea id="noteInput" placeholder="What's on your mind?" style="width:100%; background:none; border:none; color:#fff; font-size:18px; outline:none; min-height:120px; resize:none;"></textarea>
-        <button id="submitBtn" onclick="saveNote()" style="width:100%; background:var(--primary); color:#fff; border:none; padding:14px; border-radius:12px; font-weight:bold;">SYNC TO CLOUD</button>
+    <div id="inputSection" style="display:none; background:var(--card); backdrop-filter: var(--glass); padding:15px; border-radius:18px; margin-bottom:25px; border: 1px solid var(--border);">
+        <input type="file" id="fileInput" accept="image/*,video/*" style="margin-bottom:10px; color:#fff; font-size:12px;">
+        <textarea id="noteInput" placeholder="Write something..." style="width:100%; background:none; border:none; color:#fff; font-size:16px; outline:none; min-height:80px; resize:none;"></textarea>
+        <button id="submitBtn" onclick="saveNote()" style="width:100%; background:var(--primary); color:#fff; border:none; padding:10px; border-radius:10px; font-weight:bold;">SAVE</button>
     </div>
 
     <div id="notesFeed"></div>
@@ -85,15 +81,12 @@
 <button class="fab" onclick="openChat()">💬</button>
 
 <div id="chatBox">
-    <div class="chat-header">
-        <span style="font-weight:800; font-size: 18px;">Yuresh Messenger</span>
-        <button class="tool-btn" onclick="closeChat()">Close</button>
-    </div>
+    <div class="chat-header"><b>Messenger</b><button class="tool-btn" onclick="closeChat()">Done</button></div>
     <div id="chatLogs"></div>
     <div class="chat-input-area">
-        <button class="voice-btn" onclick="alert('Voice recording starting...')">🎙️</button>
-        <input type="text" id="chatInput" placeholder="Message...">
-        <button onclick="sendChat()" style="background:var(--primary); color:#fff; border:none; width:35px; height:35px; border-radius:50%; font-weight:bold;">↑</button>
+        <button style="background:none; border:none; font-size:18px;">🎙️</button>
+        <input type="text" id="chatInput" placeholder="Message">
+        <button onclick="sendChat()" style="background:var(--primary); color:#fff; border:none; width:30px; height:30px; border-radius:50%;">↑</button>
     </div>
 </div>
 
@@ -106,14 +99,13 @@
     const CLOUD_URL = "https://api.cloudinary.com/v1_1/ds5ig0wvd/upload";
     const PRESET = "Yuresh_preset";
 
-    let currentTheme = 2;
-    function nextTheme() { currentTheme = currentTheme === 1 ? 2 : 1; document.body.setAttribute('data-theme', currentTheme); }
+    function nextTheme() { const b = document.body; b.setAttribute('data-theme', b.getAttribute('data-theme') == "1" ? "2" : "1"); }
     function toggleInput() { const s = document.getElementById('inputSection'); s.style.display = s.style.display === "none" ? "block" : "none"; }
 
     async function saveNote() {
         const text = document.getElementById('noteInput').value, file = document.getElementById('fileInput').files[0], btn = document.getElementById('submitBtn');
         if(!text && !file) return;
-        btn.disabled = true; btn.innerText = "Syncing...";
+        btn.disabled = true; btn.innerText = "Saving...";
         let url = "", type = "text";
         try {
             if(file) {
@@ -128,49 +120,27 @@
                     const d = await res.json(); url = d.secure_url; type = "video";
                 }
             }
-            await db.ref('smart_notes').push({ text, url, fileType: type, likes: 0, time: new Date().toLocaleString() });
+            await db.ref('smart_notes').push({ text, url, fileType: type, likes: 0 });
             document.getElementById('noteInput').value = ""; toggleInput();
-        } catch(e) { alert("Error!"); } finally { btn.disabled = false; btn.innerText = "SYNC TO CLOUD"; }
+        } catch(e) { alert("Error!"); } finally { btn.disabled = false; btn.innerText = "SAVE"; }
     }
 
     db.ref('smart_notes').on('value', snap => {
         const feed = document.getElementById('notesFeed'); feed.innerHTML = "";
         snap.forEach(c => {
             const n = c.val(), k = c.key;
-            let m = n.url ? (n.fileType === "video" ? `<video src="${n.url}" class="media-content" controls></video>` : `<img src="${n.url}" class="media-content">`) : "";
-            feed.innerHTML = `<div class="note-card">
-                ${m}
-                <div class="note-text">${n.text}</div>
-                <div class="footer-tools">
-                    <button class="tool-btn" onclick="db.ref('smart_notes/${k}/likes').transaction(l=>(l||0)+1)">❤️ ${n.likes || 0}</button>
-                    <div style="display:flex; gap:15px;">
-                        <button class="tool-btn" style="color:#007aff" onclick="navigator.clipboard.writeText(\`${n.text}\`); alert('Copied!')">📋 Copy</button>
-                        <button class="tool-btn" style="color:#ffcc00" onclick="editNote('${k}', \`${n.text}\`)">✏️ Edit</button>
-                        <button class="tool-btn" style="color:#ff3b30" onclick="if(confirm('Delete?')) db.ref('smart_notes/${k}').remove()">🗑️</button>
-                    </div>
-                </div>
-            </div>` + feed.innerHTML;
+            let posterUrl = n.url ? n.url.replace(".mp4", ".jpg") : "";
+            let m = n.url ? `<div class="media-wrapper">${n.fileType === "video" ? `<video src="${n.url}" class="media-content" controls preload="metadata" poster="${posterUrl}"></video>` : `<img src="${n.url}" class="media-content">`}</div>` : "";
+            feed.innerHTML = `<div class="note-card">${m}<div class="note-text">${n.text}</div><div class="footer-tools"><button class="tool-btn" onclick="db.ref('smart_notes/${k}/likes').transaction(l=>(l||0)+1)">❤️ ${n.likes || 0}</button><div style="display:flex; gap:10px;"><button class="tool-btn" onclick="navigator.clipboard.writeText(\`${n.text}\`);alert('Copied!')">📋</button><button class="tool-btn" style="color:#ff3b30" onclick="if(confirm('Delete?')) db.ref('smart_notes/${k}').remove()">🗑️</button></div></div></div>` + feed.innerHTML;
         });
     });
-
-    function editNote(id, oldText) {
-        const newText = prompt("සටහන වෙනස් කරන්න:", oldText);
-        if(newText) db.ref('smart_notes/' + id).update({ text: newText });
-    }
 
     function openChat() { document.getElementById('chatBox').style.display = 'flex'; }
     function closeChat() { document.getElementById('chatBox').style.display = 'none'; }
     function sendChat() { const i = document.getElementById('chatInput'); if(i.value.trim()){ db.ref('community_chat').push({ name: "Yuresh", msg: i.value }); i.value = ""; } }
-    
     db.ref('community_chat').limitToLast(20).on('value', s => {
         const l = document.getElementById('chatLogs'); l.innerHTML = "";
-        s.forEach(c => { 
-            const d = c.val(); const isMe = d.name === "Yuresh"; 
-            l.innerHTML += `<div class="msg ${isMe ? 'me' : 'other'}">
-                <div class="msg-sender">${d.name}</div>
-                ${d.msg}
-            </div>`; 
-        });
+        s.forEach(c => { const d = c.val(); l.innerHTML += `<div class="msg ${d.name === 'Yuresh' ? 'me' : 'other'}"><b>${d.name}:</b><br>${d.msg}</div>`; });
         l.scrollTop = l.scrollHeight;
     });
 </script>
