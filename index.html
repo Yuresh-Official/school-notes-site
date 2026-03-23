@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Notes SL - Ultra Fast</title>
+    <title>Smart Notes SL - Multi Caption</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -15,20 +15,23 @@
         .scroll-container { height: 100vh; overflow-y: auto; padding: 15px 15px 120px 15px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
         .note-card { width: 100%; max-width: 360px; background: var(--card); border-radius: 18px; padding: 12px; margin-bottom: 18px; border: 0.5px solid var(--border); }
         .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .p-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #222; }
-        .u-name { font-size: 15px; font-weight: 700; color: #fff; }
-        .media-box { width: 100%; margin: 10px 0; border-radius: 12px; overflow: hidden; background: #000; display: flex; justify-content: center; }
-        .media-box img, .media-box video { width: 100%; height: auto; display: block; max-height: 500px; object-fit: contain; border-radius: 12px; }
+        .p-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .u-name { font-size: 15px; font-weight: 700; }
+        .media-box { width: 100%; margin: 10px 0; border-radius: 12px; overflow: hidden; background: #000; }
+        .media-box img, .media-box video { width: 100%; height: auto; max-height: 500px; object-fit: contain; }
         .react-bar { display: flex; gap: 10px; padding-top: 10px; border-top: 0.5px solid var(--border); }
-        .react-btn { background: rgba(255,255,255,0.06); border: none; padding: 7px 15px; border-radius: 20px; color: #fff; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .react-btn { background: rgba(255,255,255,0.06); border: none; padding: 7px 15px; border-radius: 20px; color: #fff; font-size: 13px; display: flex; align-items: center; gap: 6px; }
         .fab { position: fixed; bottom: 25px; right: 25px; width: 55px; height: 55px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 28px; z-index: 1000; }
         
-        /* New Speed & Preview UI */
-        #previewGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; width: 100%; }
-        .thumb-preview { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; border: 1px solid #333; }
-        .progress-container { width: 100%; height: 8px; background: #222; border-radius: 4px; margin: 15px 0 5px 0; display: none; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s linear; }
-        #percentLabel { font-size: 14px; color: var(--primary); font-weight: bold; margin-bottom: 10px; }
+        /* Multi-Caption UI */
+        #previewList { width: 100%; margin-top: 15px; max-height: 300px; overflow-y: auto; }
+        .preview-item { display: flex; gap: 10px; background: #111; padding: 10px; border-radius: 12px; margin-bottom: 10px; align-items: center; border: 1px solid #222; }
+        .preview-item img, .preview-item video { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+        .caption-input { flex: 1; background: #222; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 8px; outline: none; font-size: 14px; }
+        
+        .progress-container { width: 100%; height: 6px; background: #222; border-radius: 3px; margin: 15px 0 5px 0; display: none; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s; }
+        #percentLabel { font-size: 13px; color: var(--primary); font-weight: bold; }
         #chatBox { position: fixed; bottom: 90px; right: 20px; width: 290px; height: 400px; background: #1c1c1e; border: 0.5px solid var(--border); border-radius: 20px; display: none; flex-direction: column; z-index: 3000; }
         #chatLogs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
     </style>
@@ -50,16 +53,16 @@
     <button class="fab" onclick="toggleChat()" style="left: 25px; background: #007aff;">💬</button>
 
     <div id="addBox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.98); z-index:4000; align-items:center; justify-content:center; flex-direction:column; padding:20px;">
-        <div style="width: 100%; max-width: 360px; text-align: center;">
-            <textarea id="noteTxt" placeholder="මොනවා හරි ලියන්න..." style="width:100%; height:100px; background:#111; color:#fff; border:1px solid #333; padding:15px; border-radius:15px; margin-bottom:10px; outline:none;"></textarea>
+        <div style="width: 100%; max-width: 380px; text-align: center;">
+            <h3 style="margin-bottom: 15px;">අලුත් පෝස්ට් එකක්</h3>
             
-            <input type="file" id="fileInp" accept="image/*,video/*" multiple onchange="handlePreview(this)" style="color:gray; font-size:12px; margin-bottom:10px;">
+            <input type="file" id="fileInp" accept="image/*,video/*" multiple onchange="handleMultiPreview(this)" style="color:gray; font-size:12px; margin-bottom:10px;">
             
-            <div id="previewGrid"></div> <div class="progress-container" id="progCont"><div class="progress-bar" id="progBar"></div></div>
+            <div id="previewList"></div> <div class="progress-container" id="progCont"><div class="progress-bar" id="progBar"></div></div>
             <div id="percentLabel" style="display:none;">0% Uploading...</div>
 
-            <button id="postBtn" onclick="postNote()" style="width: 100%; background:var(--primary); color:#fff; border:none; padding:15px; border-radius:15px; font-weight:700; margin-top:10px;">දැන්ම පළ කරන්න</button>
-            <button onclick="toggleAdd()" id="cancelBtn" style="background:none; border:none; color:gray; margin-top:15px;">අතහරින්න</button>
+            <button id="postBtn" onclick="postMulti()" style="width: 100%; background:var(--primary); color:#fff; border:none; padding:15px; border-radius:15px; font-weight:700; margin-top:15px;">සියල්ල පළ කරන්න</button>
+            <button onclick="toggleAdd()" id="cancelBtn" style="background:none; border:none; color:gray; margin-top:10px;">අතහරින්න</button>
         </div>
     </div>
 
@@ -76,101 +79,74 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function checkUser() {
-            const s = localStorage.getItem("smart_user_v2");
-            if(s) { const d = JSON.parse(s); if(new Date().getTime() - d.timestamp < 86400000) return d; }
-            return null;
-        }
-        let myData = checkUser();
+        let myData = (function(){ const s = localStorage.getItem("smart_user_v2"); if(s){ const d = JSON.parse(s); if(Date.now()-d.timestamp < 86400000) return d; } return null; })();
         if(!myData) document.getElementById('welcomeScreen').style.display = 'flex';
 
         function previewP(i) { if(i.files[0]) { const r = new FileReader(); r.onload=e=>document.getElementById('pPreview').src=e.target.result; r.readAsDataURL(i.files[0]); } }
-        
         async function saveProfile() {
             const name = document.getElementById('uNameInp').value, file = document.getElementById('pUpload').files[0];
             if(!name || !file) return alert("නම සහ DP අවශ්‍යයි!");
             const fd = new FormData(); fd.append("image", file);
             const res = await fetch("https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160", {method:"POST", body:fd});
             const d = await res.json();
-            myData = { name, photo: d.data.url, timestamp: new Date().getTime() };
+            myData = { name, photo: d.data.url, timestamp: Date.now() };
             localStorage.setItem("smart_user_v2", JSON.stringify(myData));
             location.reload();
         }
 
-        // Real-time Preview
-        function handlePreview(input) {
-            const grid = document.getElementById('previewGrid');
-            grid.innerHTML = "";
-            if (input.files) {
-                Array.from(input.files).slice(0, 4).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const el = file.type.startsWith('video') ? document.createElement('video') : document.createElement('img');
-                        el.src = e.target.result; el.className = "thumb-preview";
-                        grid.appendChild(el);
-                    }
-                    reader.readAsDataURL(file);
-                });
-            }
+        // Multi Preview with Title/Caption Box
+        function handleMultiPreview(input) {
+            const list = document.getElementById('previewList');
+            list.innerHTML = "";
+            Array.from(input.files).slice(0, 4).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const item = document.createElement('div');
+                    item.className = "preview-item";
+                    const media = file.type.startsWith('video') ? `<video src="${e.target.result}"></video>` : `<img src="${e.target.result}">`;
+                    item.innerHTML = `${media} <input type="text" class="caption-input" id="cap-${index}" placeholder="වීඩියෝ ${index+1} විස්තරය...">`;
+                    list.appendChild(item);
+                }
+                reader.readAsDataURL(file);
+            });
         }
 
         function toggleAdd() { const b = document.getElementById('addBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
         function toggleChat() { const b = document.getElementById('chatBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
 
-        async function postNote() {
-            const text = document.getElementById('noteTxt').value, files = document.getElementById('fileInp').files, btn = document.getElementById('postBtn');
-            if(!text && files.length === 0) return;
-            
-            btn.disabled = true; btn.innerText = "වේගයෙන් අප්ලෝඩ් වේ...";
+        async function postMulti() {
+            const files = document.getElementById('fileInp').files, btn = document.getElementById('postBtn');
+            if(files.length === 0) return alert("අඩුම තරමේ එක වීඩියෝවක්වත් තෝරන්න!");
+
+            btn.disabled = true; btn.innerText = "වේගයෙන් Sync වේ...";
             document.getElementById('progCont').style.display = 'block';
             document.getElementById('percentLabel').style.display = 'block';
-            document.getElementById('cancelBtn').style.display = 'none';
 
-            let uploads = Array.from(files).slice(0, 4).map(async (file, index) => {
+            const uploads = Array.from(files).slice(0, 4).map(async (file, i) => {
+                const caption = document.getElementById(`cap-${i}`).value;
                 let fd = new FormData();
-                let uploadUrl = "", type = "";
+                let isImg = file.type.startsWith('image');
+                let uploadUrl = isImg ? "https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160" : "https://api.cloudinary.com/v1_1/ds5ig0wvd/upload";
+                
+                if(isImg) fd.append("image", file);
+                else { fd.append("file", file); fd.append("upload_preset", "Yuresh_preset"); }
 
-                if(file.type.startsWith('image')) {
-                    fd.append("image", file);
-                    uploadUrl = "https://api.imgbb.com/1/upload?key=87df23f624dc272459c450218569e160";
-                    type = "image";
-                } else {
-                    fd.append("file", file);
-                    fd.append("upload_preset", "Yuresh_preset");
-                    uploadUrl = "https://api.cloudinary.com/v1_1/ds5ig0wvd/upload";
-                    type = "video";
-                }
-
-                // Simulate UI Speed
-                let p = 0; let iv = setInterval(() => { 
-                    p += Math.random() * 15; 
-                    if(p < 95) {
-                        document.getElementById('progBar').style.width = p + "%";
-                        document.getElementById('percentLabel').innerText = Math.floor(p) + "% Fast Syncing...";
-                    }
-                }, 100);
+                // UI Progress Simulation
+                let p = 0; let iv = setInterval(() => { p += 5; if(p < 90) { document.getElementById('progBar').style.width = p + "%"; document.getElementById('percentLabel').innerText = Math.floor(p) + "% Uploading..."; } }, 150);
 
                 const res = await fetch(uploadUrl, { method: "POST", body: fd });
                 const d = await res.json();
                 clearInterval(iv);
-                
-                return { url: type === "image" ? d.data.url : d.secure_url, type };
+
+                const finalUrl = isImg ? d.data.url : d.secure_url;
+                await db.ref('smart_notes').push({
+                    uName: myData.name, uPhoto: myData.photo,
+                    text: caption, url: finalUrl, fileType: isImg ? "image" : "video",
+                    time: Date.now(), love: 0
+                });
             });
 
-            // If no files, just post text
-            if(files.length === 0) {
-                await db.ref('smart_notes').push({ uName: myData.name, uPhoto: myData.photo, text, url:"", fileType:"text", time: Date.now(), love:0 });
-            } else {
-                const results = await Promise.all(uploads); // Parallel Execution (වේගයෙන්ම වෙන්නේ මෙතනයි)
-                for(let i=0; i<results.length; i++) {
-                    await db.ref('smart_notes').push({ 
-                        uName: myData.name, uPhoto: myData.photo, 
-                        text: i === 0 ? text : "", 
-                        url: results[i].url, fileType: results[i].type, 
-                        time: Date.now(), love:0 
-                    });
-                }
-            }
+            await Promise.all(uploads);
             document.getElementById('progBar').style.width = "100%";
             setTimeout(() => location.reload(), 500);
         }
@@ -178,15 +154,14 @@
         db.ref('smart_notes').limitToLast(20).on('value', snap => {
             const feed = document.getElementById('notesFeed');
             snap.forEach(c => {
-                const id = c.key, d = c.val(), existing = document.getElementById('card-'+id);
-                if(!existing) {
-                    let media = d.url ? (d.fileType === "video" ? `<div class="media-box"><video src="${d.url}" controls playsinline preload="metadata"></video></div>` : `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`) : "";
-                    const html = `<div class="note-card" id="card-${id}">
-                        <div class="user-info"><img src="${d.uPhoto}" class="p-img"><span class="u-name">${d.uName}</span></div>
-                        <div style="font-size:15px; color:#ccc; word-break: break-word;">${d.text || ""}</div>${media}
+                const id = c.key, d = c.val();
+                if(!document.getElementById('card-'+id)) {
+                    let media = d.url ? (d.fileType === "video" ? `<div class="media-box"><video src="${d.url}" controls playsinline></video></div>` : `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`) : "";
+                    feed.insertAdjacentHTML('afterbegin', `<div class="note-card" id="card-${id}">
+                        <div class="user-info"><img src="${d.uPhoto}" class="p-img" style="width:32px; height:32px; border-radius:50%; object-fit:cover;"><span class="u-name">${d.uName}</span></div>
+                        <div style="font-size:15px; color:#ccc;">${d.text || ""}</div>${media}
                         <div class="react-bar"><button class="react-btn" onclick="db.ref('smart_notes/${id}/love').transaction(c=>(c||0)+1)">❤️ <span id="react-${id}">${d.love||0}</span></button></div>
-                    </div>`;
-                    feed.insertAdjacentHTML('afterbegin', html);
+                    </div>`);
                 } else { document.getElementById('react-'+id).innerText = d.love || 0; }
             });
         });
