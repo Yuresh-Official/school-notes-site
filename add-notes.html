@@ -2,38 +2,132 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <title>Add Notes - Admin</title>
+    <title>Add Notes - Admin Panel</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; padding: 40px; text-align: center; }
-        .box { background: #0d0d0f; padding: 20px; border-radius: 20px; max-width: 400px; margin: auto; border: 1px solid #1c1c1e; }
-        select, textarea, button { width: 100%; margin-top: 15px; padding: 12px; border-radius: 10px; border: none; outline: none; }
-        textarea { height: 100px; background: #1c1c1e; color: #fff; }
-        button { background: #5856d6; color: #fff; font-weight: bold; cursor: pointer; }
+        body { background: #000; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; text-align: center; }
+        .box { background: #0d0d0f; padding: 25px; border-radius: 20px; max-width: 450px; margin: auto; border: 1px solid #1c1c1e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { margin-top: 0; color: #5856d6; }
+        
+        select, textarea, button, .file-input-label { 
+            width: 100%; margin-top: 15px; padding: 12px; border-radius: 12px; border: none; outline: none; box-sizing: border-box; 
+        }
+        
+        select, textarea { background: #1c1c1e; color: #fff; border: 1px solid #333; }
+        textarea { height: 120px; resize: none; font-size: 14px; }
+        
+        /* File input styling */
+        .file-input-label { 
+            background: #252525; color: #aaa; border: 1px dashed #444; cursor: pointer; display: inline-block; transition: 0.3s;
+        }
+        .file-input-label:hover { border-color: #5856d6; color: #fff; }
+        
+        button { background: #5856d6; color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:disabled { background: #333; cursor: not-allowed; }
+        button:hover:not(:disabled) { background: #4745b8; transform: translateY(-2px); }
+
+        #status { font-size: 12px; margin-top: 10px; color: #888; }
     </style>
 </head>
 <body>
     <div class="box">
-        <h2>Add New Note</h2>
-        <select id="sub"><option value="science">Science</option><option value="maths">Maths</option><option value="ict">ICT</option></select>
-        <textarea id="msg" placeholder="Type your note here..."></textarea>
-        <button onclick="send()">Add to Site</button>
+        <h2>Smart Notes Admin</h2>
+        <p style="font-size: 13px; color: #666;">සටහනට අදාළ විෂය සහ මාධ්‍ය තෝරන්න</p>
+        
+        <select id="sub">
+            <option value="science">Science</option>
+            <option value="maths">Maths</option>
+            <option value="ict">ICT</option>
+        </select>
+
+        <label class="file-input-label" for="fileInput">
+            <span id="fileNameDisplay">📷 පින්තූරයක් හෝ වීඩියෝවක් තෝරන්න</span>
+        </label>
+        <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;" onchange="showFileName()">
+        
+        <textarea id="msg" placeholder="සටහන මෙතැන ලියන්න..."></textarea>
+        
+        <button id="sendBtn" onclick="send()">Add to Site</button>
+        <div id="status"></div>
     </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
-            databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com"
+            authDomain: "smart-notes-sl.firebaseapp.com",
+            databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com",
+            projectId: "smart-notes-sl",
+            storageBucket: "smart-notes-sl.firebasestorage.app" // වැදගත්: Storage Bucket එක අනිවාර්යයි
         };
         firebase.initializeApp(firebaseConfig);
-        function send() {
-            const s = document.getElementById('sub').value;
-            const m = document.getElementById('msg').value;
-            if(m) {
-                firebase.database().ref('notes/' + s).push({ text: m });
-                alert("වැඩේ හරි! සයිට් එකට ඇඩ් වුණා.");
-                document.getElementById('msg').value = "";
+        
+        const db = firebase.database();
+        const storage = firebase.storage();
+
+        function showFileName() {
+            const file = document.getElementById('fileInput').files[0];
+            if(file) {
+                document.getElementById('fileNameDisplay').innerText = "✅ තෝරාගත්තා: " + file.name;
+                document.getElementById('fileNameDisplay').style.color = "#fff";
             }
+        }
+
+        async function send() {
+            const subject = document.getElementById('sub').value;
+            const message = document.getElementById('msg').value;
+            const file = document.getElementById('fileInput').files[0];
+            const btn = document.getElementById('sendBtn');
+            const status = document.getElementById('status');
+
+            if(!message && !file) {
+                alert("අඩුම තරමේ සටහනක් හෝ පින්තූරයක් තෝරන්න.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Uploading... කරුණාකර රැඳී සිටින්න";
+            status.innerText = "ෆයිල් එක සේව් වෙමින් පවතී...";
+
+            let fileUrl = "";
+            let fileType = "text";
+
+            try {
+                // 1. මුලින්ම File එක Storage එකට Upload කරනවා
+                if(file) {
+                    const storageRef = storage.ref('notes_media/' + Date.now() + "_" + file.name);
+                    const snapshot = await storageRef.put(file);
+                    fileUrl = await snapshot.ref.getDownloadURL();
+                    fileType = file.type;
+                }
+
+                // 2. ඩේටාබේස් එකට විස්තර යවනවා
+                await db.ref('notes/' + subject).push({
+                    text: message,
+                    url: fileUrl,
+                    type: fileType,
+                    timestamp: Date.now()
+                });
+
+                alert("වැඩේ හරි! සයිට් එකට සාර්ථකව ඇඩ් වුණා.");
+                resetForm();
+
+            } catch (error) {
+                console.error(error);
+                alert("වැරදීමක් සිදුවුණා: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Add to Site";
+                status.innerText = "";
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('msg').value = "";
+            document.getElementById('fileInput').value = "";
+            document.getElementById('fileNameDisplay').innerText = "📷 පින්තූරයක් හෝ වීඩියෝවක් තෝරන්න";
+            document.getElementById('fileNameDisplay').style.color = "#aaa";
         }
     </script>
 </body>
