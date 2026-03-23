@@ -7,49 +7,29 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root {
-            --bg: #000;
-            --card: #121212;
-            --primary: #4f46e5;
-            --text: #fff;
-            --border: #333;
-            --red: #ff4d4d;
-        }
+        :root { --bg: #000; --card: #121212; --primary: #4f46e5; --text: #fff; --border: #333; --red: #ff4d4d; }
         body[data-theme="light"] { --bg: #f0f2f5; --card: #fff; --text: #000; --border: #ddd; }
-        
         body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 10px; transition: 0.3s; }
         .container { max-width: 500px; margin: auto; padding-bottom: 100px; }
-        
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .search-box { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); margin-bottom: 15px; box-sizing: border-box; }
-        
         .main-btn { width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
-        
         .input-card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--border); display: none; }
         .input-card textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background: #000; color: #fff; box-sizing: border-box; font-size: 15px; }
-        
         .file-label { display: block; background: #1e1e1e; border: 1px dashed var(--border); padding: 15px; text-align: center; border-radius: 10px; cursor: pointer; margin-bottom: 10px; font-size: 14px; color: #aaa; }
-        
         .note-card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
         .media-container { width: 100%; margin-bottom: 12px; border-radius: 10px; overflow: hidden; background: #000; }
         .media-content { width: 100%; max-height: 400px; display: block; object-fit: contain; cursor: pointer; }
-        
         .note-display { white-space: pre-wrap; word-wrap: break-word; line-height: 1.6; font-size: 15px; margin-bottom: 10px; }
-        
         .text-btn { background: #1e1e1e; color: #aaa; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
         .note-footer { display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
-        
         .modal-box { position: fixed; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; z-index: 1000; display: none; padding: 10px; }
         .modal-head { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold; }
-
         .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 999; }
-        .fab { width: 55px; height: 55px; border-radius: 50%; background: var(--primary); border: none; color: #fff; font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-
+        .fab { width: 55px; height: 55px; border-radius: 50%; background: var(--primary); border: none; color: #fff; font-size: 20px; cursor: pointer; }
         #chatBox { bottom: 90px; height: 400px; flex-direction: column; }
         #chatLogs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 14px; }
-        .msg.me { align-self: flex-end; background: var(--primary); color: #fff; }
-        .msg.other { align-self: flex-start; background: #333; color: #fff; }
+        .msg { padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 14px; background: #333; color: #fff; }
     </style>
 </head>
 <body data-theme="dark">
@@ -59,196 +39,92 @@
         <div style="background:orange; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:bold; color:#000;">Smart Notes SL</div>
         <button class="text-btn" onclick="cycleThemes()">THEME</button>
     </div>
-    
     <h1 style="text-align:center;">Digital Diary</h1>
-
     <input type="text" id="searchInput" class="search-box" placeholder="සටහන් සොයන්න..." onkeyup="searchNotes()">
-    
     <button id="mainAddBtn" class="main-btn" onclick="toggleInput()">ADD NEW NOTE</button>
 
     <div id="inputSection" class="input-card">
         <label class="file-label" for="fileInput">📷 Photo හෝ Video තෝරන්න</label>
         <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;" onchange="updateLabel()">
         <p id="fileStatus" style="font-size:11px; text-align:center; color:gray;"></p>
-        
         <textarea id="noteInput" rows="4" placeholder="ඔබේ සටහන මෙතැන ලියන්න..."></textarea>
-        
-        <input type="hidden" id="editKey">
-        <input type="hidden" id="existingUrl">
-        <input type="hidden" id="existingType"> <button id="submitBtn" class="main-btn" style="margin-bottom:0;" onclick="saveNote()">SAVE NOTE</button>
+        <input type="hidden" id="editKey"><input type="hidden" id="existingUrl"><input type="hidden" id="existingType">
+        <button id="submitBtn" class="main-btn" onclick="saveNote()">SAVE NOTE</button>
     </div>
-
     <div id="notesFeed"></div>
 </div>
 
-<div class="fab-container">
-    <button class="fab" onclick="openChat()">💬</button>
-    <button class="fab" onclick="openInfo()">ℹ️</button>
-</div>
+<div class="fab-container"><button class="fab" onclick="openChat()">💬</button><button class="fab" onclick="openInfo()">ℹ️</button></div>
 
 <div id="chatBox" class="modal-box">
     <div class="modal-head"><span>Community Chat</span> <span onclick="closeModals()" style="cursor:pointer">✕</span></div>
     <div id="chatLogs"></div>
     <div style="padding:10px; display:flex; gap:5px; border-top:1px solid #333;">
-        <input type="text" id="chatInput" style="flex:1; padding:10px; border-radius:8px; border:1px solid #333; background:#000; color:#fff;" placeholder="පණිවිඩයක් ලියන්න...">
+        <input type="text" id="chatInput" style="flex:1; padding:10px; border-radius:8px; background:#000; color:#fff; border:1px solid #333;" placeholder="පණිවිඩයක්...">
         <button onclick="sendChat()" style="background:var(--primary); border:none; color:#fff; padding:0 15px; border-radius:8px;">➜</button>
     </div>
 </div>
 
-<div id="infoModal" class="modal-box" style="height:auto; max-height: 80vh; bottom:90px; overflow-y: auto;">
+<div id="infoModal" class="modal-box" style="bottom:90px;">
     <div class="modal-head"><span>Developer Info</span> <span onclick="closeModals()" style="cursor:pointer">✕</span></div>
-    <div style="padding:20px; font-size:14px; line-height:1.6;">
-        <p><b>Coder:</b> Yuresh kavindu sumanasinha</p>
-        <p>දැන් මෙයට පින්තූර (ImgBB) සහ වීඩියෝ (Cloudinary) යන දෙකම ඇතුළත් කළ හැක.</p>
-    </div>
+    <div style="padding:20px; font-size:14px;"><b>Coder:</b> Yuresh kavindu sumanasinha</div>
 </div>
 
 <script>
-    // Firebase Setup
-    const firebaseConfig = {
-        apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g",
-        databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com"
-    };
+    const firebaseConfig = { apiKey: "AIzaSyDsJ3-0AXE5e2XYSfBYnXz9Knly1AvOv7g", databaseURL: "https://smart-notes-sl-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    // API Keys
     const IMGBB_API_KEY = "87df23f624dc272459c450218569e160";
     const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/ds5ig0wvd/upload";
-    const CLOUDINARY_PRESET = "ඔයාගේ_PRESET_නම"; // මෙතනට ඔයාගේ Unsigned Preset එක දාන්න
+    const CLOUDINARY_PRESET = "Yuresh_preset";
 
-    let myName = localStorage.getItem('chat_name') || "අමුත්තෙක්";
-
-    function updateLabel() {
-        const f = document.getElementById('fileInput').files[0];
-        if(f) document.getElementById('fileStatus').innerText = "තෝරාගත්තා: " + f.name;
-    }
-
-    function toggleInput() {
-        const s = document.getElementById('inputSection'), b = document.getElementById('mainAddBtn');
-        s.style.display = (s.style.display === "none" || s.style.display === "") ? "block" : "none";
-        b.innerText = (s.style.display === "block") ? "CLOSE" : "ADD NEW NOTE";
-        if(s.style.display === "none") resetForm();
-    }
-
-    function resetForm() {
-        document.getElementById('noteInput').value = "";
-        document.getElementById('fileInput').value = "";
-        document.getElementById('fileStatus').innerText = "";
-        document.getElementById('editKey').value = "";
-        document.getElementById('existingUrl').value = "";
-        document.getElementById('existingType').value = "";
-        document.getElementById('submitBtn').innerText = "SAVE NOTE";
-        document.getElementById('submitBtn').disabled = false;
-    }
+    function updateLabel() { const f = document.getElementById('fileInput').files[0]; if(f) document.getElementById('fileStatus').innerText = "තෝරාගත්තා: " + f.name; }
+    function toggleInput() { const s = document.getElementById('inputSection'); s.style.display = (s.style.display === "none") ? "block" : "none"; if(s.style.display === "none") resetForm(); }
+    function resetForm() { document.getElementById('noteInput').value = ""; document.getElementById('fileInput').value = ""; document.getElementById('fileStatus').innerText = ""; document.getElementById('editKey').value = ""; document.getElementById('existingUrl').value = ""; document.getElementById('existingType').value = ""; document.getElementById('submitBtn').innerText = "SAVE NOTE"; }
 
     async function saveNote() {
-        const text = document.getElementById('noteInput').value;
-        const file = document.getElementById('fileInput').files[0];
-        const editKey = document.getElementById('editKey').value;
-        const existingUrl = document.getElementById('existingUrl').value;
-        const existingType = document.getElementById('existingType').value;
-        const submitBtn = document.getElementById('submitBtn');
-
+        const text = document.getElementById('noteInput').value, file = document.getElementById('fileInput').files[0], editKey = document.getElementById('editKey').value, existingUrl = document.getElementById('existingUrl').value, existingType = document.getElementById('existingType').value, btn = document.getElementById('submitBtn');
         if(!text.trim() && !file && !existingUrl) return alert("කරුණාකර යමක් ඇතුළත් කරන්න.");
-
-        submitBtn.disabled = true;
-        submitBtn.innerText = "UPLOADING...";
-
-        let finalUrl = existingUrl || "";
-        let fileType = existingType || "text";
-
+        btn.disabled = true; btn.innerText = "UPLOADING...";
+        let finalUrl = existingUrl || "", fileType = existingType || "text";
         try {
             if(file) {
-                let formData = new FormData();
-                // පින්තූරයක් නම් ImgBB වෙත
-                if (file.type.startsWith('image/')) {
-                    formData.append("image", file);
-                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-                    const data = await res.json();
-                    if(data.success) { finalUrl = data.data.url; fileType = "image"; }
-                    else throw new Error("ImgBB Upload Failed");
-                } 
-                // වීඩියෝවක් නම් Cloudinary වෙත
-                else if (file.type.startsWith('video/')) {
-                    formData.append("file", file);
-                    formData.append("upload_preset", CLOUDINARY_PRESET);
-                    const res = await fetch(CLOUDINARY_URL, { method: "POST", body: formData });
-                    const data = await res.json();
-                    if(data.secure_url) { finalUrl = data.secure_url; fileType = "video"; }
-                    else throw new Error("Cloudinary Upload Failed");
+                let fd = new FormData();
+                if(file.type.startsWith('image/')) {
+                    fd.append("image", file);
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: fd });
+                    const d = await res.json(); finalUrl = d.data.url; fileType = "image";
+                } else if(file.type.startsWith('video/')) {
+                    fd.append("file", file); fd.append("upload_preset", CLOUDINARY_PRESET);
+                    const res = await fetch(CLOUDINARY_URL, { method: "POST", body: fd });
+                    const d = await res.json(); if(d.secure_url) { finalUrl = d.secure_url; fileType = "video"; } else throw new Error("Cloudinary Failed");
                 }
             }
-
-            const noteData = { text, url: finalUrl, fileType, time: new Date().toLocaleString() };
-
-            if(editKey) await db.ref('smart_notes/' + editKey).update(noteData);
-            else await db.ref('smart_notes').push(noteData);
-            
+            const data = { text, url: finalUrl, fileType, time: new Date().toLocaleString() };
+            if(editKey) await db.ref('smart_notes/' + editKey).update(data); else await db.ref('smart_notes').push(data);
             toggleInput();
-        } catch (error) {
-            alert("අසාර්ථකයි: " + error.message);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "SAVE NOTE";
-        }
+        } catch (e) { alert("අසාර්ථකයි: " + e.message); } finally { btn.disabled = false; btn.innerText = "SAVE NOTE"; }
     }
 
-    // Load Notes
     db.ref('smart_notes').on('value', (snap) => {
         const f = document.getElementById('notesFeed'); f.innerHTML = "";
         snap.forEach((c) => {
             const n = c.val(), k = c.key;
-            let m = "";
-            if (n.url) {
-                if (n.fileType === "video") {
-                    m = `<div class="media-container"><video src="${n.url}" class="media-content" controls></video></div>`;
-                } else {
-                    m = `<div class="media-container"><img src="${n.url}" class="media-content" onclick="window.open('${n.url}')"></div>`;
-                }
-            }
-            
-            const div = document.createElement('div'); div.className = 'note-card';
-            div.innerHTML = `
-                ${m}
-                <div class="note-display">${n.text}</div>
-                <div class="note-footer">
-                    <button class="text-btn" onclick="editNote('${k}', \`${n.text}\`, '${n.url}', '${n.fileType}')">EDIT</button>
-                    <button class="text-btn" style="color:var(--red)" onclick="deleteNote('${k}')">DELETE</button>
-                </div>`;
-            f.prepend(div);
+            let m = n.url ? (n.fileType === "video" ? `<video src="${n.url}" class="media-content" controls></video>` : `<img src="${n.url}" class="media-content" onclick="window.open('${n.url}')">`) : "";
+            f.innerHTML = `<div class="note-card"><div class="media-container">${m}</div><div class="note-display">${n.text}</div><div class="note-footer"><button class="text-btn" onclick="editNote('${k}', \`${n.text}\`, '${n.url}', '${n.fileType}')">EDIT</button><button class="text-btn" style="color:var(--red)" onclick="deleteNote('${k}')">DELETE</button></div></div>` + f.innerHTML;
         });
     });
 
-    function editNote(k, t, u, type) {
-        toggleInput();
-        document.getElementById('noteInput').value = t;
-        document.getElementById('existingUrl').value = u;
-        document.getElementById('existingType').value = type;
-        document.getElementById('editKey').value = k;
-        document.getElementById('submitBtn').innerText = "UPDATE NOW";
-        window.scrollTo(0,0);
-    }
-
+    function editNote(k, t, u, ty) { toggleInput(); document.getElementById('noteInput').value = t; document.getElementById('existingUrl').value = u; document.getElementById('existingType').value = ty; document.getElementById('editKey').value = k; document.getElementById('submitBtn').innerText = "UPDATE NOW"; window.scrollTo(0,0); }
     function deleteNote(id) { if(confirm("මැකීමට අවශ්‍යද?")) db.ref('smart_notes/' + id).remove(); }
-    function searchNotes() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
-        document.querySelectorAll('.note-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none");
-    }
+    function searchNotes() { const q = document.getElementById('searchInput').value.toLowerCase(); document.querySelectorAll('.note-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none"); }
     function cycleThemes() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light'); }
     function openChat() { document.getElementById('chatBox').style.display = 'flex'; }
     function openInfo() { document.getElementById('infoModal').style.display = 'block'; }
     function closeModals() { document.getElementById('chatBox').style.display = 'none'; document.getElementById('infoModal').style.display = 'none'; }
-    
-    function sendChat() {
-        const i = document.getElementById('chatInput');
-        if(i.value.trim()) { db.ref('community_chat').push({ name: myName, msg: i.value }); i.value = ""; }
-    }
-    db.ref('community_chat').limitToLast(20).on('value', (s) => {
-        const l = document.getElementById('chatLogs'); l.innerHTML = "";
-        s.forEach(c => { const d = c.val(); l.innerHTML += `<div class="msg"><b>${d.name}:</b> ${d.msg}</div>`; });
-        l.scrollTop = l.scrollHeight;
-    });
+    function sendChat() { const i = document.getElementById('chatInput'); if(i.value.trim()) { db.ref('community_chat').push({ name: "User", msg: i.value }); i.value = ""; } }
+    db.ref('community_chat').limitToLast(10).on('value', (s) => { const l = document.getElementById('chatLogs'); l.innerHTML = ""; s.forEach(c => { l.innerHTML += `<div class="msg"><b>${c.val().name}:</b> ${c.val().msg}</div>`; }); });
 </script>
 </body>
 </html>
