@@ -12,7 +12,6 @@
             --glass: blur(20px) saturate(180%);
         }
 
-        /* Themes 1-12 */
         body[data-theme="1"] { --bg: #f2f2f7; --card: rgba(255, 255, 255, 0.7); --text: #000; --border: rgba(0, 0, 0, 0.1); }
         body[data-theme="2"] { --bg: #000; --card: rgba(28, 28, 30, 0.7); --text: #fff; --border: rgba(255, 255, 255, 0.1); }
         body[data-theme="3"] { --bg: #001f3f; --card: rgba(0, 51, 102, 0.7); --text: #fff; --primary: #0074d9; }
@@ -27,88 +26,62 @@
         body[data-theme="12"] { --bg: #2c3e50; --card: rgba(52, 73, 94, 0.7); --text: #ecf0f1; --primary: #3498db; }
 
         body { 
-            background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif;
             margin: 0; padding: 0; transition: background 0.5s ease;
             user-select: none; -webkit-user-select: none;
             overscroll-behavior-y: contain;
         }
 
-        .scroll-container { 
-            height: 100vh; overflow-y: auto; padding: env(safe-area-inset-top) 16px 100px 16px; 
-            box-sizing: border-box; scroll-behavior: smooth;
-        }
+        .scroll-container { height: 100vh; overflow-y: auto; padding: 20px 16px 100px 16px; box-sizing: border-box; }
+        .header { position: sticky; top: 0; z-index: 100; padding: 10px 0; background: var(--bg); display: flex; justify-content: space-between; align-items: center; }
+        .ios-btn { color: var(--primary); background: none; border: none; font-size: 16px; font-weight: 500; cursor: pointer; }
 
-        .header { 
-            position: sticky; top: 0; z-index: 100; padding: 10px 0;
-            background: var(--bg); display: flex; justify-content: space-between; align-items: center;
-        }
+        .search-container { background: rgba(118, 118, 128, 0.2); border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; margin-bottom: 20px; }
+        .search-container input { background: none; border: none; color: var(--text); width: 100%; outline: none; font-size: 17px; margin-left: 8px; }
 
-        .ios-btn { color: var(--primary); background: none; border: none; font-size: 16px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
-        .ios-btn:active { opacity: 0.5; }
-
-        /* Modern Search Bar */
-        .search-container {
-            background: rgba(118, 118, 128, 0.2); border-radius: 10px;
-            padding: 8px 12px; display: flex; align-items: center; margin: 10px 0 20px 0;
-        }
-        .search-container input {
-            background: none; border: none; color: var(--text); width: 100%; outline: none; font-size: 17px; margin-left: 8px;
-        }
-
-        /* Note Cards with Glass Effect */
         .note-card { 
             background: var(--card); backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
             border-radius: 14px; padding: 16px; margin-bottom: 16px; border: 0.5px solid var(--border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); animation: slideIn 0.4s ease-out;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .media-content { width: 100%; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .media-content { width: 100%; border-radius: 10px; margin-bottom: 12px; }
         .note-text { font-size: 16px; line-height: 1.4; white-space: pre-wrap; margin-bottom: 12px; }
         .note-footer { display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid var(--border); padding-top: 12px; }
 
-        /* Floating Action Button */
-        .fab { 
-            position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; 
-            border-radius: 50%; background: var(--primary); border: none; color: #fff; 
-            font-size: 26px; box-shadow: 0 8px 25px rgba(0,122,255,0.4); z-index: 1000;
-            display: flex; align-items: center; justify-content: center; transition: 0.3s;
-        }
-        .fab:active { transform: scale(0.9); }
+        .fab { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); border: none; color: #fff; font-size: 26px; box-shadow: 0 8px 25px rgba(0,122,255,0.4); z-index: 1000; }
 
-        /* Messenger UI */
         #chatBox { 
             position: fixed; bottom: 95px; right: 20px; width: 330px; height: 480px; 
             background: var(--card); backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
             z-index: 2000; display: none; flex-direction: column; 
             border-radius: 20px; border: 0.5px solid var(--border); overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4); transition: 0.3s;
         }
         #chatLogs { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 14px; position: relative; }
-        .msg.me { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
-        .msg.other { align-self: flex-start; background: rgba(255,255,255,0.15); color: #fff; border-bottom-left-radius: 4px; }
+        .msg { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 14px; }
+        .msg.me { align-self: flex-end; background: var(--primary); color: #fff; }
+        .msg.other { align-self: flex-start; background: rgba(255,255,255,0.15); color: #fff; }
     </style>
 </head>
 <body data-theme="2">
 
 <div class="scroll-container">
     <div class="header">
-        <h1 style="font-size: 32px; font-weight: 800; margin: 0; letter-spacing: -0.5px;">Notes</h1>
-        <button class="ios-btn" onclick="nextTheme()">Edit Theme</button>
+        <h1 style="font-size: 32px; font-weight: 800; margin: 0;">Notes</h1>
+        <button class="ios-btn" onclick="nextTheme()">Theme</button>
     </div>
 
     <div class="search-container">
-        <span style="opacity: 0.5;">🔍</span>
+        <span>🔍</span>
         <input type="text" id="searchInput" placeholder="Search notes..." onkeyup="searchNotes()">
     </div>
 
-    <button onclick="toggleInput()" id="addToggle" style="width:100%; background:var(--primary); color:#fff; border:none; padding:14px; border-radius:12px; font-size:16px; font-weight:600; margin-bottom:20px; box-shadow: 0 4px 12px rgba(0,122,255,0.3);">+ New Note</button>
+    <button onclick="toggleInput()" id="addToggle" style="width:100%; background:var(--primary); color:#fff; border:none; padding:14px; border-radius:12px; font-size:16px; font-weight:600; margin-bottom:20px;">+ New Note</button>
 
-    <div id="inputSection" style="display:none; background:var(--card); backdrop-filter: var(--glass); padding:20px; border-radius:16px; margin-bottom:25px; border: 0.5px solid var(--border);">
+    <div id="inputSection" style="display:none; background:var(--card); padding:20px; border-radius:16px; margin-bottom:25px; border: 0.5px solid var(--border);">
         <label for="fileInput" style="display:block; background:rgba(118,118,128,0.15); padding:15px; border-radius:10px; text-align:center; color:var(--primary); font-weight:600; margin-bottom:15px; cursor:pointer;">📷 Add Media</label>
         <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;" onchange="document.getElementById('fileStatus').innerText=this.files[0].name">
-        <p id="fileStatus" style="font-size:12px; text-align:center; opacity:0.6; margin-top:-10px; margin-bottom:10px;"></p>
+        <p id="fileStatus" style="font-size:12px; text-align:center; opacity:0.6; margin-bottom:10px;"></p>
         
         <textarea id="noteInput" placeholder="Write something smart..." style="width:100%; background:none; border:none; color:var(--text); font-size:17px; outline:none; min-height:100px; resize:none;"></textarea>
         <button id="submitBtn" onclick="saveNote()" style="width:100%; background:var(--primary); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:bold; margin-top:10px;">Save to Cloud</button>
@@ -120,14 +93,14 @@
 <button class="fab" onclick="openChat()">💬</button>
 
 <div id="chatBox">
-    <div style="padding: 16px; background: rgba(0,0,0,0.1); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight:700; font-size: 17px;">Yuresh Messenger</span>
+    <div style="padding: 16px; background: rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight:700;">Yuresh Messenger</span>
         <button class="ios-btn" onclick="closeChat()">Done</button>
     </div>
     <div id="chatLogs"></div>
-    <div style="padding: 12px; background: rgba(0,0,0,0.1); display: flex; gap: 10px; align-items: center;">
-        <input type="text" id="chatInput" style="flex:1; background:rgba(118,118,128,0.25); border:none; padding:10px 15px; border-radius:20px; color:#fff; outline:none; font-size: 15px;" placeholder="iMessage">
-        <button onclick="sendChat()" style="background:var(--primary); color:#fff; border:none; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px;">↑</button>
+    <div style="padding: 12px; display: flex; gap: 10px;">
+        <input type="text" id="chatInput" style="flex:1; background:rgba(118,118,128,0.25); border:none; padding:10px; border-radius:20px; color:#fff; outline:none;" placeholder="Message">
+        <button onclick="sendChat()" style="background:var(--primary); color:#fff; border:none; width:34px; height:34px; border-radius:50%;">↑</button>
     </div>
 </div>
 
@@ -142,53 +115,46 @@
 
     let currentTheme = 2;
     function nextTheme() { currentTheme = currentTheme >= 12 ? 1 : currentTheme + 1; document.body.setAttribute('data-theme', currentTheme); }
-
-    function toggleInput() { 
-        const s = document.getElementById('inputSection'); 
-        s.style.display = (s.style.display === "none") ? "block" : "none";
-        document.getElementById('addToggle').innerText = (s.style.display === "none") ? "+ New Note" : "Cancel";
-    }
+    function toggleInput() { const s = document.getElementById('inputSection'); s.style.display = (s.style.display === "none") ? "block" : "none"; }
 
     async function saveNote() {
-        const text = document.getElementById('noteInput').value, file = document.getElementById('fileInput').files[0], btn = document.getElementById('submitBtn');
+        const text = document.getElementById('noteInput').value, fileInput = document.getElementById('fileInput'), file = fileInput.files[0], btn = document.getElementById('submitBtn');
         if(!text && !file) return;
         btn.disabled = true; btn.innerText = "Syncing...";
         let url = "", type = "text";
+
         try {
             if(file) {
                 let fd = new FormData();
                 if(file.type.startsWith('image/')) {
                     fd.append("image", file);
                     const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
-                    const d = await res.json(); url = d.data.url; type = "image";
+                    const d = await res.json();
+                    if(d.success) { url = d.data.url; type = "image"; } else { throw new Error("ImageBB Failed"); }
                 } else {
                     fd.append("file", file); fd.append("upload_preset", PRESET);
                     const res = await fetch(CLOUD_URL, { method: "POST", body: fd });
-                    const d = await res.json(); url = d.secure_url; type = "video";
+                    const d = await res.json();
+                    if(d.secure_url) { url = d.secure_url; type = "video"; } else { throw new Error("Cloudinary Failed"); }
                 }
             }
             await db.ref('smart_notes').push({ text, url, fileType: type, likes: 0, time: new Date().toLocaleString() });
-            toggleInput(); document.getElementById('noteInput').value = ""; document.getElementById('fileInput').value = "";
-        } catch(e) { alert("Error Syncing"); } finally { btn.disabled = false; btn.innerText = "Save to Cloud"; }
+            document.getElementById('noteInput').value = ""; fileInput.value = ""; document.getElementById('fileStatus').innerText = "";
+            toggleInput();
+        } catch(e) { 
+            alert("අසාර්ථකයි: " + e.message); 
+        } finally { 
+            btn.disabled = false; btn.innerText = "Save to Cloud"; 
+        }
     }
 
     db.ref('smart_notes').on('value', snap => {
         const feed = document.getElementById('notesFeed'); feed.innerHTML = "";
         snap.forEach(c => {
             const n = c.val(), k = c.key;
-            let posterUrl = n.url ? n.url.replace(".mp4", ".jpg") : "";
+            let posterUrl = n.url ? n.url.replace(/\.[^/.]+$/, ".jpg") : "";
             let m = n.url ? (n.fileType === "video" ? `<video src="${n.url}" class="media-content" controls preload="metadata" poster="${posterUrl}"></video>` : `<img src="${n.url}" class="media-content">`) : "";
-            feed.innerHTML = `<div class="note-card">
-                ${m}
-                <div class="note-text">${n.text}</div>
-                <div class="note-footer">
-                    <button class="ios-btn" onclick="db.ref('smart_notes/${k}/likes').transaction(l=>(l||0)+1)">❤️ ${n.likes || 0}</button>
-                    <div style="display:flex; gap:18px;">
-                        <button class="ios-btn" onclick="navigator.clipboard.writeText(\`${n.text}\`);">Copy</button>
-                        <button class="ios-btn" style="color:#ff3b30" onclick="if(confirm('Delete?')) db.ref('smart_notes/${k}').remove()">Delete</button>
-                    </div>
-                </div>
-            </div>` + feed.innerHTML;
+            feed.innerHTML = `<div class="note-card">${m}<div class="note-text">${n.text}</div><div class="note-footer"><button class="ios-btn" onclick="db.ref('smart_notes/${k}/likes').transaction(l=>(l||0)+1)">❤️ ${n.likes || 0}</button><button class="ios-btn" style="color:#ff3b30" onclick="if(confirm('Delete?')) db.ref('smart_notes/${k}').remove()">Delete</button></div></div>` + feed.innerHTML;
         });
     });
 
@@ -197,7 +163,7 @@
     function sendChat() { const i = document.getElementById('chatInput'); if(i.value.trim()){ db.ref('community_chat').push({ name: "Yuresh", msg: i.value }); i.value = ""; } }
     db.ref('community_chat').limitToLast(20).on('value', s => {
         const l = document.getElementById('chatLogs'); l.innerHTML = "";
-        s.forEach(c => { const d = c.val(); const isMe = d.name === "Yuresh"; l.innerHTML += `<div class="msg ${isMe ? 'me' : 'other'}"><div style="font-size:10px; opacity:0.5; margin-bottom:2px;">${d.name}</div>${d.msg}</div>`; });
+        s.forEach(c => { const d = c.val(); const isMe = d.name === "Yuresh"; l.innerHTML += `<div class="msg ${isMe ? 'me' : 'other'}">${d.msg}</div>`; });
         l.scrollTop = l.scrollHeight;
     });
 
@@ -205,8 +171,6 @@
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('.note-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none");
     }
-
-    document.addEventListener('touchstart', (e) => { if(e.touches.length > 1) e.preventDefault(); }, {passive: false});
 </script>
 </body>
 </html>
