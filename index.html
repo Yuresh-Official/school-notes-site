@@ -115,7 +115,6 @@
 
         function toggleAdd() { const b = document.getElementById('addBox'); b.style.display = b.style.display==='none'?'flex':'none'; }
         
-        // Chat Toggle with Animation trigger
         function toggleChat() { 
             const p = document.getElementById('chatPanel'); 
             p.style.display = p.style.display==='none'?'flex':'none'; 
@@ -125,7 +124,6 @@
             }
         }
 
-        // Profile, Post Preview & Post logic remains same...
         function previewP(i) { if(i.files[0]) { const r = new FileReader(); r.onload=e=>document.getElementById('pPreview').src=e.target.result; r.readAsDataURL(i.files[0]); } }
         async function saveProfile() {
             const name = document.getElementById('uNameInp').value, file = document.getElementById('pUpload').files[0];
@@ -183,7 +181,6 @@
             location.reload();
         }
 
-        // Live Chat Messages Logic
         function sendMsg() {
             const i = document.getElementById('mInp');
             if(i.value.trim()) {
@@ -210,19 +207,26 @@
             logs.scrollTop = logs.scrollHeight;
         });
 
-        // Feed Loading
+        // Feed Loading - Thumbnail Fix Applied Here
         db.ref('smart_notes').limitToLast(20).on('value', snap => {
             const feed = document.getElementById('notesFeed');
+            feed.innerHTML = ""; // Refresh feed
             snap.forEach(c => {
                 const id = c.key, d = c.val();
-                if(!document.getElementById('card-'+id)) {
-                    let media = d.url ? (d.fileType === "video" ? `<div class="media-box"><video src="${d.url}" controls playsinline></video></div>` : `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`) : "";
-                    feed.insertAdjacentHTML('afterbegin', `<div class="note-card" id="card-${id}">
-                        <div class="user-info"><img src="${d.uPhoto}" class="p-img"><span class="u-name">${d.uName}</span></div>
-                        <div style="padding:5px 0; font-size:15px; color:#ccc;">${d.text || ""}</div>${media}
-                        <div class="react-bar"><button class="react-btn" onclick="db.ref('smart_notes/${id}/love').transaction(c=>(c||0)+1)">❤️ <span id="react-${id}">${d.love||0}</span></button></div>
-                    </div>`);
-                } else { document.getElementById('react-'+id).innerText = d.love || 0; }
+                
+                // Video thumbnail trick (#t=0.001)
+                let finalMediaUrl = d.url;
+                if(d.fileType === "video" && !finalMediaUrl.includes("#t=")) {
+                    finalMediaUrl += "#t=0.001";
+                }
+
+                let media = d.url ? (d.fileType === "video" ? `<div class="media-box"><video src="${finalMediaUrl}" controls playsinline preload="metadata"></video></div>` : `<div class="media-box"><img src="${d.url}" loading="lazy"></div>`) : "";
+                
+                feed.insertAdjacentHTML('afterbegin', `<div class="note-card" id="card-${id}">
+                    <div class="user-info"><img src="${d.uPhoto}" class="p-img"><span class="u-name">${d.uName}</span></div>
+                    <div style="padding:5px 0; font-size:15px; color:#ccc;">${d.text || ""}</div>${media}
+                    <div class="react-bar"><button class="react-btn" onclick="db.ref('smart_notes/${id}/love').transaction(c=>(c||0)+1)">❤️ <span id="react-${id}">${d.love||0}</span></button></div>
+                </div>`);
             });
         });
     </script>
